@@ -1,2 +1,2 @@
 # radiomics-develop
-A private repository to develop code and radiomics applications
+A private repository to develop code for radiomics applications
