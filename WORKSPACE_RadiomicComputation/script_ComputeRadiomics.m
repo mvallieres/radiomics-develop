@@ -63,9 +63,9 @@ imParamCT.reSeg.range = [-500,400]; % Voxels within the ROI with HU outside that
 imParamCT.reSeg.outliers = ''; % Not using outlier removal for CT (for now).
 imParamCT.discretisation.IH.type = 'FBN'; % Using fixed bin number for intensity-histogram features.
 imParamCT.discretisation.IH.val = 64; % Using 64 grey-levels for intensity-histogram features.
-% imParamCT.discretisation.IVH = []; % No need to discretise for CT, natural integer discretisation due to HU. Using "[]" is similar to FBS with a bin width of 1, but without a minimum value set up like in the case of PET (SUV = 0). But shall we also use a set minimal value (e.g. -500 HU as defined in imParam.reSgeg.range(1)) for CT? The answer is yes, so this line is commented for now, and new lines are added below.
-imParamCT.discretisation.IVH.type = 'FBS'; % Using fixed bin size for intensity-volume histogram features with CT. imParam.reSeg.range must be defined, as userSetMinVal will be assigned to imParam.reSeg.range(1).
-imParamCT.discretisation.IVH.val = 1; % Using 1 HU bin width for intensity-histogram features (natural HU discretisation).
+imParamCT.discretisation.IVH = []; % No need to discretise for CT, natural integer discretisation due to HU. Using "[]" is similar to FBS with a bin width of 1, but without a minimum value set up like in the case of PET (SUV = 0). But shall we also use a set minimal value (e.g. -500 HU as defined in imParam.reSgeg.range(1)) for CT for IVH features as well? If yes, use the two lines below instead (commented for now).
+% imParamCT.discretisation.IVH.type = 'FBS'; % Using fixed bin size for intensity-volume histogram features with CT. imParam.reSeg.range must be defined, as userSetMinVal will be assigned to imParam.reSeg.range(1).
+% imParamCT.discretisation.IVH.val = 1; % Using 1 HU bin width for intensity-histogram features (natural HU discretisation).
 imParamCT.discretisation.texture.type = {'FBN','FBNequal','FBS','FBSequal'}; % Using four different types of quantization algorithms. If "FBS" or "FBSequal" is used, imParam.reSeg.range must be defined, as userSetMinVal will be assigned to imParam.reSeg.range(1).
 imParamCT.discretisation.texture.val = {[8,16,32,64],[8,16,32,64],[12.5,25,50,100],[12.5,25,50,100]}; % Gray-levels to test for each algorithm on the above line (definition depends on the algorithm). The total number must be the same in each cell entry.
 
