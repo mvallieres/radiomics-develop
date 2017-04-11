@@ -1,0 +1,24 @@
+*****************************************************************************************************
+******************** FORMAT OF "radiomics" FEATURE STRUCTURE FOR A GIVEN PATIENT ********************
+*****************************************************************************************************
+
+--> After consecutively running script_ReadData.m and script_ComputeRadiomics.m, you will find another folder created in WORKSPACE. A "radiomics" structure is then saved for all combinations of patient-scans initially read. The format of the saved files is $PATIENT ID FOLDER NAME_$IMAGING FOLDER NAME($ROItype).$MODALITY.mat, where $ROItype refers to the parameter option "roiType" at the beginning of script_ComputeRadiomics.m. The structure of the "radiomics" structure goes as follows:
+
+radiomics.morph      : Morphological feature values (structure)
+	 .locInt     : Local intensity feature values (structure)
+	 .stats      : Statistical feature values (structure)
+	 .intHist    : Intensity histogram feature values (structure)
+         .intVolHist : Intensity-volume histrogram feature values (structure)
+	 .glcm       : Gray-Level Co-Occurence Matrix feature values (cell array of structures)
+	 .glrlm      : Gray-Level Run-Length Matrix feature values (cell array of structures)
+	 .glszm      : Gray-Level Size Zone Matrix feature values (cell array of structures)
+	 .ngtdm      : Neighborhood Gray-Tone Difference Matrix (cell array of structures)
+	 .gldzm      : Gray-Level Distance Zone Matrix feature values (cell array of structures)
+	 .ngldm      : Neighborhood Gray-Level Dependence Matrix feature values (cell array of structures)
+	 .imParam    : Structure defining the image processing parameters for the computation of the different radiomic features.
+
+--> Please see https://arxiv.org/abs/1612.07003 for more details about the different features and the different image processing parameters. Do not hesitate to also contact Martin Vallières for further details.
+
+--> For the GLCM, GLRLM, GLSZM, NGTDM, GLDZM and NGLDM texture features, the computation was performed for different combinations of isotropic resolutions (scale), quantization algorithms (algo) and number of gray-levels (Ng). Please see the parameter options in script_ComputeRadiomics.m and radiomics.imParam for more details. Typically, for all imaging volumes (either PET, CT OR MR), texture features are computed at four different isotropic resolutions (resampled via linear interpolation). Then, 4 different quantization algorithms are tested for PET, 2 for MR and 4 for CT. Finally, 4 different number of gray-levels are tested for all scans. As an example application, please see: https://doi.org/10.1088/0031-9155/60/14/5471.
+
+--> As a consequence of the computation of texture features with different extraction parameters (scale,algo,Ng), radiomics.glcm, radiomics.glrlm, radiomics.glszm, radiomics.ngtdm, radiomics.gldzm and radiomics.ngldm are cell arrays of structures. Each entry of a given cell array contains a structure with feature values for a given combination of scale-algo-Ng. The first dimension of the array varies the scale, the second the algo and the third Ng.
