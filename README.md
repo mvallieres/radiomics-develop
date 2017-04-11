@@ -5,8 +5,8 @@ This is a private repository dedicated to the development of programming code fo
 
 ## System requirements
 - MAC or Linux operating systems. If you are using Windows, please install a Linux virtual box on your system.
-- MATLAB 2014 and older.
-- Python version 2.7 and older.  
+- MATLAB 2014 and above.
+- Python version 2.7 and above. 
 
 All software code have up to now been tested on: 
 - MATLAB 2016a using Linux Ubuntu 16.04.
