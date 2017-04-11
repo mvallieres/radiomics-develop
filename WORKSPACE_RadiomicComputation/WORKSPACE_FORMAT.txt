@@ -71,7 +71,7 @@ is simply performed by running "sudo apt-get install python" in the terminal.
 4. Running script_ComputeRadiomics.m in MATLAB will compute all radiomic features and save them
 in a newly created FEATURES folder.
 
-4. It is not necessary to have all imaging modalities available for all patients (complete data), but
+5. It is not necessary to have all imaging modalities available for all patients (complete data), but
 it is desirable. The next multivariable modeling script should handle missing data.
 ----------------------------------------------------------------------------------------------------
 

@@ -23,3 +23,5 @@
 
 
 --> IMPORTANT: Before performing steps 6 to 9, please make sure to familiarize yourself with: 1) README.md in /radiomics-develop; 2) https://arxiv.org/abs/1612.07003; 3) WORKSPACE_FORMAT.txt in /radiomics-develop/WORKSPACE_RadiomicComputation; 4) All comments in script_ReadData.m and script_ComputeRadiomics.m; 5) roiNames.xlsx in /radiomics-develop/WORKSPACE_RadiomicComputation; 4) INSTRUCTIONS.txt in /radiomics-develop/WORKSPACE_RadiomicComputation; and 6) RADIOMIC_OUTPUT.txt in /radiomics-develop/WORKSPACE_RadiomicComputation. Do not hesitate to contact Martin Vallières if you have any question.
+
+--> NEW RADIOMICS STUDIES: IF ALL STEPS DESCRIBED ABOVE RUNS FINE ON YOUR COMPUTER USING THE EXAMPLE DATA AND WORKSPACE, YOU CAN NOW ADAPT THIS WORKSPACE TO COMPUTE RADIOMIC FEATURES ON YOUR OWN DATASETS!!
