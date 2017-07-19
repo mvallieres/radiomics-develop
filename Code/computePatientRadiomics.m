@@ -119,15 +119,15 @@ try
     
     try
         % STEP 7: CALCULATION OF INTENSITY-VOLUME HISTOGRAM FEATURES
-        if ~isempty(IVH), [volQuant_RE,wb] = discretisation(vol_RE,IVH.type,IVH.val,userSetMinVal,'ivh'); else volQuant_RE = vol_RE; wb = 1; end
+        if ~isempty(IVH), [volQuant_RE,wb] = discretisation(vol_RE,IVH.type,IVH.val,userSetMinVal,'ivh'); else volQuant_RE = vol_RE; wb = 1; end % FOR CT, WE DO NOT WANT TO DISCRETISE. AN EMPTY IVH STRUCT ([]) DEFINES WHAT WE WANT TO USE FOR CT. FOR PET: FBS/0.1; FOR MRI: FBN/1000.
         if ~isempty(IVH)
             if strcmp(IVH.type,'FBS') || strcmp(IVH.type,'FBSequal')
-                radiomics.intVolHist = getIntVolHistFeatures(volQuant_RE,wb,userSetMinVal);
+                radiomics.intVolHist = getIntVolHistFeatures(volQuant_RE,wb,range);
             else
                 radiomics.intVolHist = getIntVolHistFeatures(volQuant_RE,wb);
             end
         else
-            radiomics.intVolHist = getIntVolHistFeatures(volQuant_RE,wb);
+            radiomics.intVolHist = getIntVolHistFeatures(volQuant_RE,wb,range);
         end
     catch
         fprintf('PROBLEM WITH COMPUTATION OF INTENSITY-VOLUME HISTOGRAM FEATURES ')

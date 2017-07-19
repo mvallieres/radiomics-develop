@@ -95,7 +95,7 @@ end
 % SIMPLY USING "poly2mask.m" or "inpolygon.m". "inpolygon.m" is slower, but
 % apparently more accurate.
 if strcmp(interp,'noInterp')
-    % ROImask = getPolyMask(ROI_XYZ,spatialRef,orientation); % Using the poly2mask.m function.
+    %ROImask = getPolyMask(ROI_XYZ,spatialRef,orientation); % Using the poly2mask.m function.
     ROImask = getPolygonMask(ROI_XYZ,spatialRef,orientation); % Using the inpolygon.m function. To be further tested.
 end
 

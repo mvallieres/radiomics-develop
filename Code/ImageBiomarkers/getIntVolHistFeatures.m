@@ -1,4 +1,4 @@
-function intVolHist = getIntVolHistFeatures(vol,wb,userSetMinVal)
+function intVolHist = getIntVolHistFeatures(vol,wb,userSetRange)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
@@ -37,15 +37,21 @@ function intVolHist = getIntVolHistFeatures(vol,wb,userSetMinVal)
 % INITIALIZATION
 X = vol(~isnan(vol(:)));
 if nargin == 3
-    if ~isempty(userSetMinVal)
-        minVal = userSetMinVal;
+    if ~isempty(userSetRange)
+        minVal = userSetRange(1);
+        maxVal = userSetRange(2);
     else
         minVal = min(X);
+        maxVal = max(X);
     end
 else
     minVal = min(X);
+    maxVal = max(X);
 end
-levels = (minVal:wb:max(X))'; % Vector of grey-levels
+if maxVal == Inf % For PET, if we set up the maximum re-segmentation range to infinity. We must then use the maximum value of the volume as maxVal.
+    maxVal = max(X);
+end
+levels = (minVal:wb:maxVal)'; % Vector of grey-levels
 Ng = numel(levels);
 Nv = numel(X);
 
