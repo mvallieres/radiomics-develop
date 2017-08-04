@@ -5,6 +5,7 @@ function  [radiomics] = computePatientRadiomics(sData,nameROI,nameSet,imParam)
 % -------------------------------------------------------------------------
 % HISTORY:
 % - Creation: April 2017
+% - Revision I: August 2017
 % -------------------------------------------------------------------------
 % DISCLAIMER:
 % "I'm not a programmer, I'm just a scientist doing stuff!"
@@ -58,10 +59,10 @@ end
 
 % COMPUTATION OF ROI MASK
 tic, fprintf('\n--> Computation of ROI mask: ')
-box = '2box'; % Using twice the size of the minimal box containing the ROI for our calculations.
+box = 'box10'; % 10 voxels in all three dimensions are added to the smallest bounding box.
 try
     contourNumber = findContour(sData,nameROI,nameSet);
-    [volObjInit,roiObjInit] = getROI(sData,contourNumber,box); % This takes care of the "Volume resection" step as well using the argument "box".
+    [volObjInit,roiObjInit] = getROI(sData,contourNumber,box); % This takes care of the "Volume resection" step as well using the argument "box". No fourth argument: 'interp' by default.
 catch
     fprintf('\nPROBLEM WITH ROI')
     radiomics.morph = []; radiomics.locInt = []; radiomics.stats = []; radiomics. intHist = []; radiomics.intVolHist = []; radiomics.glcm = []; radiomics.glrlm = []; radiomics.glszm = []; radiomics.ngtdm = []; radiomics.gldzm = []; radiomics.ngldm = [];
@@ -77,16 +78,19 @@ try
     
     % STEP 1: INTERPOLATION
     [volObj] = interpVolume(volObjInit,scaleNonText,volInterp,glRound,'image');
-    [roiObj] = interpVolume(roiObjInit,scaleNonText,roiInterp,roiPV,'roi');
+    [roiObj_Morph] = interpVolume(roiObjInit,scaleNonText,roiInterp,roiPV,'roi');
 
     % STEP 2: RE-SEGMENTATION
-    [roiObj.data] = rangeReSeg(volObj.data,roiObj.data,range);
-    [roiObj.data] = outlierReSeg(volObj.data,roiObj.data,outliers);
-    vol_RE = roiExtract(volObj.data,roiObj.data);
+    roiObj_Int = roiObj_Morph; % Now is the time to create the intensity mask
+    [roiObj_Int.data] = rangeReSeg(volObj.data,roiObj_Int.data,range);
+    [roiObj_Int.data] = outlierReSeg(volObj.data,roiObj_Int.data,outliers);
+    
+    % Initialization
+    volInt_RE = roiExtract(volObj.data,roiObj_Int.data);
     
     try
         % STEP 3: CALCULATION OF MORPHOLOGICAL FEATURES
-        radiomics.morph = getMorphFeatures(roiExtract(volObj.data,imfill(roiObj.data,'holes')),scaleNonText); % Filling up internal holes for morphological features.
+        radiomics.morph = getMorphFeatures(volObj.data,roiObj_Int.data,roiObj_Morph.data,scaleNonText);
     catch
         fprintf('PROBLEM WITH COMPUTATION OF MORPHOLOGICAL FEATURES ')
         radiomics.morph = [];
@@ -94,7 +98,7 @@ try
     
     try
         % STEP 4: CALCULATION OF LOCAL INTENSITY FEATURES
-        radiomics.locInt = getLocIntFeatures(volObj.data,roiObj.data,scaleNonText);
+        radiomics.locInt = getLocIntFeatures(volObj.data,roiObj_Int.data,scaleNonText);
     catch
         fprintf('PROBLEM WITH COMPUTATION OF LOCAL INTENSITY FEATURES ')
         radiomics.locInt = [];        
@@ -102,7 +106,7 @@ try
     
     try
         % STEP 5: CALCULATION OF STATISTICAL FEATURES
-        radiomics.stats = getStatsFeatures(vol_RE);
+        radiomics.stats = getStatsFeatures(volInt_RE);
     catch
         fprintf('PROBLEM WITH COMPUTATION OF STATISTICAL FEATURES ')
         radiomics.stats = [];           
@@ -110,7 +114,7 @@ try
     
     try
         % STEP 6: CALCULATION OF INTENSITY HISTOGRAM FEATURES
-        [volQuant_RE] = discretisation(vol_RE,IH.type,IH.val); % No need to include "userSetMinVal" here as fourth argument, as discretisation for IH features is (logically) always set to "FBN".
+        [volQuant_RE] = discretisation(volInt_RE,IH.type,IH.val,userSetMinVal); % There would actually be no need to include "userSetMinVal" here as fourth argument, as discretisation for IH features is (logically) always set to "FBN". This value will not be used for "FBN", see discretisation.m code.
         radiomics.intHist = getIntHistFeatures(volQuant_RE);
     catch
         fprintf('PROBLEM WITH COMPUTATION OF INTENSITY HISTOGRAM FEATURES ')
@@ -119,7 +123,7 @@ try
     
     try
         % STEP 7: CALCULATION OF INTENSITY-VOLUME HISTOGRAM FEATURES
-        if ~isempty(IVH), [volQuant_RE,wb] = discretisation(vol_RE,IVH.type,IVH.val,userSetMinVal,'ivh'); else volQuant_RE = vol_RE; wb = 1; end % FOR CT, WE DO NOT WANT TO DISCRETISE. AN EMPTY IVH STRUCT ([]) DEFINES WHAT WE WANT TO USE FOR CT. FOR PET: FBS/0.1; FOR MRI: FBN/1000.
+        if ~isempty(IVH), [volQuant_RE,wb] = discretisation(volInt_RE,IVH.type,IVH.val,userSetMinVal,'ivh'); else volQuant_RE = volInt_RE; wb = 1; end % FOR CT, WE DO NOT WANT TO DISCRETISE. AN EMPTY IVH STRUCT ([]) DEFINES WHAT WE WANT TO USE FOR CT. FOR PET: FBS/0.1; FOR MRI: FBN/1000.
         if ~isempty(IVH)
             if strcmp(IVH.type,'FBS') || strcmp(IVH.type,'FBSequal')
                 radiomics.intVolHist = getIntVolHistFeatures(volQuant_RE,wb,range);
@@ -156,12 +160,13 @@ for s = 1:nScale
         
         % STEP 1: INTERPOLATION
         [volObj] = interpVolume(volObjInit,scaleText{s},volInterp,glRound,'image');
-        [roiObj] = interpVolume(roiObjInit,scaleText{s},roiInterp,roiPV,'roi');
+        [roiObj_Morph] = interpVolume(roiObjInit,scaleText{s},roiInterp,roiPV,'roi');
 
         % STEP 2: RE-SEGMENTATION
-        [roiObj.data] = rangeReSeg(volObj.data,roiObj.data,range);
-        [roiObj.data] = outlierReSeg(volObj.data,roiObj.data,outliers);
-
+        roiObj_Int = roiObj_Morph; % Now is the time to create the intensity mask
+        [roiObj_Int.data] = rangeReSeg(volObj.data,roiObj_Int.data,range);
+        [roiObj_Int.data] = outlierReSeg(volObj.data,roiObj_Int.data,outliers);
+        
         toc
 
         for a = 1:nAlgo
@@ -171,8 +176,11 @@ for s = 1:nScale
                     count = count + 1;
                     tic, fprintf(['--> Computation of texture features for "Scale=',num2str(scaleText{s}(1)),'", "Algo=',algo{a},'", "GL=',num2str(grayLevels{a}(n)),'" (',num2str(count),'/',num2str(nExp),'): '])
                 
+                    % Initialization
+                    volInt_RE = roiExtract(volObj.data,roiObj_Int.data);
+                    
                     % STEP 3: DISCRETISATION FOR TEXTURE FEATURES
-                    [volQuant_RE] = discretisation(roiExtract(volObj.data,roiObj.data),algo{a},grayLevels{a}(n),userSetMinVal);
+                    [volQuant_RE] = discretisation(volInt_RE,algo{a},grayLevels{a}(n),userSetMinVal);
 
                     % STEP 4: COMPUTING ALL TEXTURE FEATURES
                     try
@@ -194,16 +202,16 @@ for s = 1:nScale
                         glszm{s,a,n} = [];                         
                     end
                     try
+                        gldzm{s,a,n} = getGLDZMfeatures(volQuant_RE,roiObj_Morph.data);
+                    catch
+                        fprintf('PROBLEM WITH COMPUTATION OF GLDZM FEATURES ')
+                        gldzm{s,a,n} = [];                            
+                    end
+                    try
                         ngtdm{s,a,n} = getNGTDMfeatures(volQuant_RE);
                     catch
                         fprintf('PROBLEM WITH COMPUTATION OF NGTDM FEATURES ')
                         ngtdm{s,a,n} = [];                           
-                    end
-                    try
-                        gldzm{s,a,n} = getGLDZMfeatures(volQuant_RE);
-                    catch
-                        fprintf('PROBLEM WITH COMPUTATION OF GLDZM FEATURES ')
-                        gldzm{s,a,n} = [];                            
                     end
                     try
                         ngldm{s,a,n} = getNGLDMfeatures(volQuant_RE);

@@ -55,7 +55,7 @@ while strcmp(interp,'interp')
 
     % Creating new imref3d object for sample points (with slice dimension similar to original volume where RTstruct was created)
     sliceSpacing = double(findSpacing(ROI_XYZ(:,dimIJK),scanType)); % Slice spacing in mm
-    newSize = round(spatialRef.(['ImageExtentInWorld',direction])/sliceSpacing); % The closest new size we can get.
+    newSize = ceil(spatialRef.(['ImageExtentInWorld',direction])/sliceSpacing); %  Using "round" would yield the closest new size we can get. But using "ceil" is safer.
     resXYZ(dimXYZ) = sliceSpacing; 
     sz = spatialRef.ImageSize; sz(dimIJK) = newSize;
     newSpatialRef = imref3d(sz,resXYZ(1),resXYZ(2),resXYZ(3));

@@ -1,10 +1,11 @@
-function [GLDZM] = getGLDZMmatrix(ROIOnly,levels)
+function [GLDZM] = getGLDZMmatrix(ROIOnlyInt,mask,levels)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
 % -------------------------------------------------------------------------
 % HISTORY:
 % - Creation: April 2017
+% - Revision I: August 2017
 % -------------------------------------------------------------------------
 % DISCLAIMER:
 % "I'm not a programmer, I'm just a scientist doing stuff!"
@@ -33,7 +34,6 @@ function [GLDZM] = getGLDZMmatrix(ROIOnly,levels)
 
 
 % COMPUTATION OF DISTANCE MAP
-mask = ROIOnly; mask(~isnan(mask)) = 1; mask(isnan(mask)) = 0;
 mask = padarray(mask,[1,1,1],0);
 perimeter = bwperim(mask,6); % Computing the smallest ROI edge possible. Source of difference?
 perimeter = perimeter(2:end-1,2:end-1,2:end-1); % Removing the padding.
@@ -44,16 +44,16 @@ distMap = bwdist(perimeter,'cityblock') + 1; % +1 according to the definition of
 % INITIALIZATION
 Ng = length(levels); % Since levels is always defined as 1,2,3,4,...,max(quantized Volume)
 levelTemp = max(levels) + 1;
-ROIOnly(isnan(ROIOnly)) = levelTemp;
-distInit = max(distMap(mask == 1));
+ROIOnlyInt(isnan(ROIOnlyInt)) = levelTemp;
+distInit = max(distMap(mask == 1)); % Since the ROI morph always encompasses ROI int, using the mask as defined from ROI morph does not matter since we want to find the maximal possible distance.
 GLDZM = zeros(Ng,distInit);
 
 
 % COMPUTATION OF GLDZM
-temp = ROIOnly;
+temp = ROIOnlyInt;
 for i = 1:Ng
-    temp(ROIOnly~=levels(i)) = 0;
-    temp(ROIOnly==levels(i)) = 1;
+    temp(ROIOnlyInt~=levels(i)) = 0;
+    temp(ROIOnlyInt==levels(i)) = 1;
     connObjects = bwconncomp(temp,26);
     nZone = length(connObjects.PixelIdxList);
     for j = 1:nZone

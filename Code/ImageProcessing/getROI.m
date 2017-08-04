@@ -1,6 +1,6 @@
-function [volObj,roiObj] = getROI(sData,contourNumber,box,poly)
+function [volObj,roiObj] = getROI(sData,contourNumber,box,interp)
 % -------------------------------------------------------------------------
-% function [volObj,roiObj] = getROI(sData,contourNumber,box,poly)
+% function [volObj,roiObj] = getROI(sData,contourNumber,box,interp)
 % -------------------------------------------------------------------------
 % DESCRIPTION:
 % Computes the ROI box (+ smallest box containing the region of interest) 
@@ -15,19 +15,22 @@ function [volObj,roiObj] = getROI(sData,contourNumber,box,poly)
 %                  associated to each number will be appended.
 % - box:  String specifying the size if the box containing the region of interest.
 %         --> 'full': Full imaging data as output.
-%         --> 'box' computes the smalles bounding box.
+%         --> 'box' computes the smallest bounding box.
 %         --> Ex: 'box10': 10 voxels in all three dimensions are added to
 %             the smallest bounding box. The number after 'box' defines the
 %             number of voxels to add.
 %         --> Ex: '2box': Computes the smallest box and outputs double its 
 %             size. The number before 'box' defines the multiplication in
 %             size.
-% - poly: (optional). String specifying if we are to compute the ROI from
-%         XYZ points solely using the function "inpolygon.m" of MATLAB.
-%         This function can be considered safe when the RTstruct has been
-%         saved specifically for the volume of interest. Otherwise, an
-%         interpolation process (default; no argument) prior to 
-%         "inpolygon.m" in the slice axis direction is recommended.
+% - interp: (optional). String specifying if we are to compute the ROI from
+%           XYZ points solely using the function "inpolygon.m" of MATLAB.
+%           This function can be considered safe when the RTstruct has been
+%           saved specifically for the volume of interest. Otherwise, an
+%            interpolation process (default; no argument) prior to 
+%           "inpolygon.m" in the slice axis direction is recommended.
+%         --> Ex: 'noInterp' (this is the only option, don't put a fourth argument).
+%                 As a consequence: No Interpolation is performed in the
+%                 slice axis dimensions (not recommended).
 % -------------------------------------------------------------------------
 % OUTPUTS:
 % - volObj: 3D array of imaging data defining the smallest box
@@ -67,13 +70,11 @@ function [volObj,roiObj] = getROI(sData,contourNumber,box,poly)
 
 
 % PARSING OF ARGUMENTS
-if ~strcmp(box,'full') && isempty(strfind(box,'box'))
+if ~strcmp(box,'full') && isempty(strfind(box,'box')) % FOR MATLAB 2016b and above, the last check can be replaced by "~contains(box,'box')"
     error('The third argument must either be "full" or contain the word "box"')
 end
 if nargin == 4
-    if strcmp(poly,'poly')
-        interp = 'noInterp';
-    else
+    if ~strcmp(interp,'noInterp') % The only option for the fourth argument is 'noInterp'
         interp = 'interp';
     end
 else
@@ -135,7 +136,7 @@ roi(roi < 1) = 0;
 
 
 % COMPUTING THE BOUNDING BOX
-if ~isempty(strfind(box,'box'))
+if ~isempty(strfind(box,'box')) %  FOR MATLAB 2016b and above, this can be modifed with the function "contains"
     comp = strcmp(box,'box');
     [boxBound] = computeBoundingBox(roi);
     if ~comp

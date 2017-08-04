@@ -1,10 +1,11 @@
-function gldzm = getGLDZMfeatures(vol)
+function gldzm = getGLDZMfeatures(volInt,maskMorph)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
 % -------------------------------------------------------------------------
 % HISTORY:
 % - Creation: April 2017
+% - Revision I: August 2017
 % -------------------------------------------------------------------------
 % DISCLAIMER:
 % "I'm not a programmer, I'm just a scientist doing stuff!"
@@ -29,8 +30,8 @@ function gldzm = getGLDZMfeatures(vol)
 
 
 % GET THE GLDZM MATRIX
-levels = 1:max(vol(~isnan(vol(:)))); % Correct definition, without any assumption
-[GLDZM] = getGLDZMmatrix(vol,levels); Ns = sum(GLDZM(:));
+levels = 1:max(volInt(~isnan(volInt(:)))); % Correct definition, without any assumption
+[GLDZM] = getGLDZMmatrix(volInt,maskMorph,levels); Ns = sum(GLDZM(:));
 GLDZM = GLDZM./sum(GLDZM(:)); % Normalization of GLDZM
 sz = size(GLDZM); % Size of GLSZM
 cVect = 1:sz(2); rVect = 1:sz(1);% Row and column vectors
@@ -79,7 +80,7 @@ gldzm.Fdzm_zdnu = sum(pd.^2) * Ns;
 gldzm.Fdzm_zdnu_norm = sum(pd.^2);
 
 % Zone percentage
-gldzm.Fdzm_z_perc = Ns/sum(~isnan(vol(:))); % Must change the original definition here.
+gldzm.Fdzm_z_perc = Ns/sum(~isnan(volInt(:))); % Must change the original definition here.
 
 % Grey level variance
 temp = rMat .* GLDZM;

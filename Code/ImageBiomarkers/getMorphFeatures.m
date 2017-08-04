@@ -1,10 +1,11 @@
-function morph = getMorphFeatures(vol,res)
+function morph = getMorphFeatures(vol,maskInt,maskMorph,res)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
 % -------------------------------------------------------------------------
 % HISTORY:
 % - Creation: April 2017
+% - Revision I: August 2017
 % -------------------------------------------------------------------------
 % DISCLAIMER:
 % "I'm not a programmer, I'm just a scientist doing stuff!"
@@ -25,8 +26,9 @@ function morph = getMorphFeatures(vol,res)
 % Martin Vallieres for this matter.
 % -------------------------------------------------------------------------
 
-% - vol: 3D volume, NON-QUANTIZED, with NaNs outside the region of interest
-% --> vol: continous imaging intensity distribution
+% - vol: 3D volume, NON-QUANTIZED, continous imaging intensity distribution
+% - maskInt: Intensity mask
+% - maskMorph: Morphological mask
 % - res: [a,b,c] vector specfying the resolution of the volume in mm.  % XYZ resolution (world), or JIK resolution (intrinsic matlab).
 %
 % REFERENCES
@@ -35,11 +37,15 @@ function morph = getMorphFeatures(vol,res)
 
 % PADDING THE VOLUME WITH A LAYER OF NaNs (reduce mesh computation errors of associated mask)
 vol = padarray(vol,[1,1,1],NaN);
+% PADDING THE MASKS WITH A LAYER OF 0's (reduce mesh computation errors of associated mask)
+maskInt = padarray(maskInt,[1,1,1],0);
+maskMorph = padarray(maskMorph,[1,1,1],0);
 
 % GETTING IMPORTANT VARIABLES
-Xgl = vol(~isnan(vol(:)));
-mask = vol; mask(~isnan(mask)) = 1; mask(isnan(mask)) = 0;
-[XYZ,faces,vertices] = getMesh(mask,res); % XYZ refers to [Xc,Yc,Zc] in ref. [1].
+Xgl_int = vol(maskInt == 1);
+Xgl_morph = vol(maskMorph == 1);
+[XYZ_int,~,~] = getMesh(maskInt,res); % XYZ refers to [Xc,Yc,Zc] in ref. [1].
+[XYZ_morph,faces,vertices] = getMesh(maskMorph,res); % XYZ refers to [Xc,Yc,Zc] in ref. [1].
 convHull = convhull(vertices(:,1),vertices(:,2),vertices(:,3)); % [X,Y,Z] points of the convex hull.
 
 
@@ -50,7 +56,7 @@ volume = getMeshVolume(faces,vertices); % In mm^3
 morph.Fmorph_volume = volume;
 
 % Approximate Volume
-morph.Fmorph_approx_volume = sum(mask(:)) * prod(res);
+morph.Fmorph_approx_volume = sum(maskMorph(:)) * prod(res);
 
 % Surface area
 area = getMeshArea(faces,vertices); % In mm^2
@@ -75,13 +81,13 @@ morph.Fmorph_sphericity = ((36*pi*volume^2)^(1/3))/area;
 morph.Fmorph_asphericity = ((area^3)/(36*pi*volume^2))^(1/3) - 1;
 
 % Centre of mass shift
-morph.Fmorph_com = getCOM(Xgl,XYZ);
+morph.Fmorph_com = getCOM(Xgl_int,Xgl_morph,XYZ_int,XYZ_morph);
 
 % Maximum 3D diameter
 morph.Fmorph_diam = getMax3Ddiam(convHull,vertices);
 
 % Major axis length
-[major,minor,least] = getAxisLengths(XYZ);
+[major,minor,least] = getAxisLengths(XYZ_morph);
 morph.Fmorph_pca_major = 4*sqrt(major);
 
 % Minor axis length
@@ -123,7 +129,8 @@ morph.Fmorph_v_dens_aee = volume / Vaee;
 Aaee = getAreaDensApprox(a,b,c,20);
 morph.Fmorph_a_dens_aee = area / Aaee;
 
-% Volume density - minimum volume enclosing ellipsoid
+% Volume density - minimum volume enclosing ellipsoid (Rotate the volume
+% first??)
 % Copyright (c) 2009, Nima Moshtagh
 % http://www.mathworks.com/matlabcentral/fileexchange/9542-minimum-volume-enclosing-ellipsoid
 %[A,~] = MinVolEllipse([vertices(:,1),vertices(:,2),vertices(:,3)]',0.01); % Subsequent singular value decomposition of matrix A and and taking the inverse of the square root of the diagonal of the sigma matrix will produce respective semi-axis lengths.
@@ -145,12 +152,13 @@ Aconvex = getMeshArea(convHull,vertices);
 morph.Fmorph_a_dens_conv_hull = area / Aconvex;
 
 % Integrated intensity
-morph.Fmorph_integ_int = mean(Xgl) * volume;
+morph.Fmorph_integ_int = mean(Xgl_int) * volume;
 
-% Moran's I index
-%morph.Fmorph_moran_i = getMoranI(vol,res); % NEEDS TO BE VECTORIZED FOR FASTER CALCULATION!
-
-% Geary's C measure
-%morph.Fmorph_geary_c = getGearyC(vol,res); % NEEDS TO BE VECTORIZED FOR FASTER CALCULATION!
+% % Moran's I index
+% vol(maskInt == 0) = NaN;
+% morph.Fmorph_moran_i = getMoranI(vol,res); % NEEDS TO BE VECTORIZED FOR FASTER CALCULATION!
+% 
+% % Geary's C measure
+% morph.Fmorph_geary_c = getGearyC(vol,res); % NEEDS TO BE VECTORIZED FOR FASTER CALCULATION!
 
 end

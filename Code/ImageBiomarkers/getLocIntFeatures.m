@@ -34,6 +34,6 @@ function locInt = getLocIntFeatures(imgObj,roiObj,res)
 locInt.Floc_peak_loc = getLocPeak(imgObj,roiObj,res);
 
 % Global grey level peak
-% locInt.Floc_peak_glob = getGlobPeak(imgObj,roiObj,res); % NEEDS TO BE VECTORIZED FOR FASTER CALCULATION!
+% locInt.Floc_peak_glob = getGlobPeak(imgObj,roiObj,res); % NEEDS TO BE VECTORIZED FOR FASTER CALCULATION! OR SIMPLY JUST CONVOLUTE A 3D AVERAGING FILTER!
 
 end

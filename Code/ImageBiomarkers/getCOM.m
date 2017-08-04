@@ -1,10 +1,11 @@
-function com = getCOM(Xgl,XYZ)
+function com = getCOM(Xgl_int,Xgl_morph,XYZ_int,XYZ_morph)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
 % -------------------------------------------------------------------------
 % HISTORY:
 % - Creation: April 2017
+% - Revision I: August 2017
 % -------------------------------------------------------------------------
 % DISCLAIMER:
 % "I'm not a programmer, I'm just a scientist doing stuff!"
@@ -35,14 +36,14 @@ function com = getCOM(Xgl,XYZ)
 
 
 % Getting the geometric centre of mass
-Nv = numel(Xgl);
-com_geom = sum(XYZ)/Nv; % [1 X 3] vector
+Nv = numel(Xgl_morph);
+com_geom = sum(XYZ_morph)/Nv; % [1 X 3] vector
 
 % Getting the density centre of mass
-XYZ(:,1) = Xgl.*XYZ(:,1);
-XYZ(:,2) = Xgl.*XYZ(:,2);
-XYZ(:,3) = Xgl.*XYZ(:,3);
-com_gl = sum(XYZ)/sum(Xgl); % [1 X 3] vector
+XYZ_int(:,1) = Xgl_int.*XYZ_int(:,1);
+XYZ_int(:,2) = Xgl_int.*XYZ_int(:,2);
+XYZ_int(:,3) = Xgl_int.*XYZ_int(:,3);
+com_gl = sum(XYZ_int)/sum(Xgl_int); % [1 X 3] vector
 
 % Calculating the shift
 com = norm(com_geom - com_gl);

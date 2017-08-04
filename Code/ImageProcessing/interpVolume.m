@@ -80,7 +80,7 @@ lowLimitsS = [spatialRefS.XWorldLimits(1),spatialRefS.YWorldLimits(1),spatialRef
 
 
 % CREATING QUERIED "imref3d" OBJECT CENTERED ON SAMPLED VOLUME
-sizeQ = round(extentS./resQ); temp = sizeQ(1); sizeQ(1) = sizeQ(2); sizeQ(2) = temp; % Switching to IJK (matlab) reference frame for "imref3d" computation
+sizeQ = ceil(extentS./resQ); temp = sizeQ(1); sizeQ(1) = sizeQ(2); sizeQ(2) = temp; % Switching to IJK (matlab) reference frame for "imref3d" computation.% Putting a "ceil", according to IBSI standards. This is safer than "round".
 spatialRefQ = imref3d(sizeQ,resQ(1),resQ(2),resQ(3));
 extentQ = [spatialRefQ.ImageExtentInWorldX,spatialRefQ.ImageExtentInWorldY,spatialRefQ.ImageExtentInWorldZ];
 lowLimitsQ = [spatialRefQ.XWorldLimits(1),spatialRefQ.YWorldLimits(1),spatialRefQ.ZWorldLimits(1)];
