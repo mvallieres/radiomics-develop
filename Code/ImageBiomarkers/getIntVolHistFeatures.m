@@ -64,7 +64,7 @@ end
 % Calculating intensity fraction
 fractInt = (levels - min(levels))/(max(levels) - min(levels));
 
-% Volume at intensity fraction 10
+% Volume at intensity fraction 10 
 V10 = findVX(fractInt,fractVol,10);
 intVolHist.Fivh_V10 = V10;
 
@@ -72,18 +72,18 @@ intVolHist.Fivh_V10 = V10;
 V90 = findVX(fractInt,fractVol,90);
 intVolHist.Fivh_V90 = V90;
 
-% Intensity at volume fraction 10
+% Intensity at volume fraction 10 --> For initial arbitrary intensities, we will always be discretising (1000 bins). So intensities are definite here.
 I10 = findIX(levels,fractVol,10);
 intVolHist.Fivh_I10 = I10;
 
-% Intensity at volume fraction 90
+% Intensity at volume fraction 90 --> For initial arbitrary intensities, we will always be discretising (1000 bins). So intensities are definite here.
 I90 = findIX(levels,fractVol,90);
 intVolHist.Fivh_I90 = I90; 
 
 % Volume at intensity fraction difference V10-V90
 intVolHist.Fivh_V10minusV90 = V10 - V90;
 
-% Intensity at volume fraction difference I10-I90
+% Intensity at volume fraction difference I10-I90 --> For initial arbitrary intensities, we will always be discretising (1000 bins). So intensities are definite here.
 intVolHist.Fivh_I10minusI90 = I10 - I90;
 
 % Area under IVH curve

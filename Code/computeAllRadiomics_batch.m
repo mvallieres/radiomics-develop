@@ -1,4 +1,4 @@
-function computeAllRadiomics_batch(pathRead,pathSave,roiNames,imParam,roiType,nBatch,matlabPATH)
+function computeAllRadiomics_batch(pathRead,pathSave,roiNames,imParams,roiType,nBatch,matlabPATH)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
@@ -47,12 +47,12 @@ if numel(patientNames) < nBatch
     nBatch = numel(patientNames);
 end
 [patients] = batchPatients(numel(patientNames),nBatch);
-cd(pathBatch), save('workspace','pathRead','pathSave','patients','patientNames','nameROI','nameSet','imParam','roiType'), pause(2);
+cd(pathBatch), save('workspace','pathRead','pathSave','patients','patientNames','nameROI','nameSet','imParams','roiType'), pause(2);
 for i = 1:nBatch
     nameScript = ['batch',num2str(i),'_script.m'];
     fid = fopen(nameScript,'w');
     fprintf(fid,'load(''workspace'')\n');
-    fprintf(fid,['computeAllRadiomics(pathRead,pathSave,patientNames(patients{',num2str(i),'}),nameROI(patients{',num2str(i),'}),nameSet(patients{',num2str(i),'}),imParam,roiType)\n']);
+    fprintf(fid,['computeAllRadiomics(pathRead,pathSave,patientNames(patients{',num2str(i),'}),nameROI(patients{',num2str(i),'}),nameSet(patients{',num2str(i),'}),imParams,roiType)\n']);
     fprintf(fid,['system(''touch batch',num2str(i),'_end'');\n']);
     fprintf(fid,'clear all');
     fclose(fid);
