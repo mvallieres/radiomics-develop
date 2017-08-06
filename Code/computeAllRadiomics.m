@@ -44,7 +44,7 @@ for p = 1:nPatient
     [radiomics] = computePatientRadiomics(sData,nameROI{p},nameSet{p},imParamScan);
     indDot = strfind(nameRead{p},'.');
     nameSave = [nameRead{p}(1:(indDot(1)-1)),'(',roiType,')',nameRead{p}(indDot(1):end)];
-    cd(pathSave), save(nameSave,'radiomics')
+    cd(pathSave), save(nameSave,'radiomics') % IMPORTANT: HERE, WE COULD ADD SOME CODE TO APPEND A NEW "radiomics" STRUCTURE TO AN EXISTING ONE WITH THE SAME NAME IN "pathSave"
     time = toc(tStart);
     fprintf('TOTAL TIME: %.2f seconds\n',time)
 end

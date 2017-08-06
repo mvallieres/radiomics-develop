@@ -1,4 +1,4 @@
-function [subbands] = getWaveletSubbands(vol,wavelet)
+function [subbands] = getWaveletSubbands(vol,waveletName)
 
 % IMPORTANT: 
 % - THIS FUNCTION IS TEMPORARY AND NEEDS BENCHMARKING. ALSO, IT
@@ -53,30 +53,32 @@ end
 % Initialization
 sizeV = size(vol);
 subbands = struct; names = {'LLL','LLH','LHL','LHH','HLL','HLH','HHL','HHH'}; nSub = numel(names);
+wavNameSave = replaceCharacter(waveletName,'.','dot');
 for s = 1:nSub
+    names{s} = [names{s},'_',wavNameSave];
     subbands.(names{s}) = zeros(sizeV);
 end
 
 % First pass using 2D stationary wavelet transform in axial direction
 for k = 1:sizeV(3)
-    [LL,LH,HL,HH] = swt2(vol(:,:,k),1,wavelet); 
-    subbands.LLL(:,:,k) = LL; subbands.LLH(:,:,k) = LL;
-    subbands.LHL(:,:,k) = LH; subbands.LHH(:,:,k) = LH;
-    subbands.HLL(:,:,k) = HL; subbands.HLH(:,:,k) = HL;
-    subbands.HHL(:,:,k) = HH; subbands.HHH(:,:,k) = HH;
+    [LL,LH,HL,HH] = swt2(vol(:,:,k),1,waveletName); 
+    subbands.(['LLL_',wavNameSave])(:,:,k) = LL; subbands.(['LLH_',wavNameSave])(:,:,k) = LL;
+    subbands.(['LHL_',wavNameSave])(:,:,k) = LH; subbands.(['LHH_',wavNameSave])(:,:,k) = LH;
+    subbands.(['HLL_',wavNameSave])(:,:,k) = HL; subbands.(['HLH_',wavNameSave])(:,:,k) = HL;
+    subbands.(['HHL_',wavNameSave])(:,:,k) = HH; subbands.(['HHH_',wavNameSave])(:,:,k) = HH;
 end
 
 % Second pass using 1D stationary wavelet transform for all axial lines
 for j = 1:sizeV(2)
     for i = 1:sizeV(1)
-        vector = squeeze(subbands.LLL(i,j,:)); [L,H] = swt(vector,1,wavelet);
-        subbands.LLL(i,j,:) = L; subbands.LLH(i,j,:) = H;
-        vector = squeeze(subbands.LHL(i,j,:)); [L,H] = swt(vector,1,wavelet);
-        subbands.LHL(i,j,:) = L; subbands.LHH(i,j,:) = H;
-        vector = squeeze(subbands.HLL(i,j,:)); [L,H] = swt(vector,1,wavelet);
-        subbands.HLL(i,j,:) = L; subbands.HLH(i,j,:) = H;
-        vector = squeeze(subbands.HHL(i,j,:)); [L,H] = swt(vector,1,wavelet);
-        subbands.HHL(i,j,:) = L; subbands.HHH(i,j,:) = H;
+        vector = squeeze(subbands.(['LLL_',wavNameSave])(i,j,:)); [L,H] = swt(vector,1,waveletName);
+        subbands.(['LLL_',wavNameSave])(i,j,:) = L; subbands.(['LLH_',wavNameSave])(i,j,:) = H;
+        vector = squeeze(subbands.(['LHL_',wavNameSave])(i,j,:)); [L,H] = swt(vector,1,waveletName);
+        subbands.(['LHL_',wavNameSave])(i,j,:) = L; subbands.(['LHH_',wavNameSave])(i,j,:) = H;
+        vector = squeeze(subbands.(['HLL_',wavNameSave])(i,j,:)); [L,H] = swt(vector,1,waveletName);
+        subbands.(['HLL_',wavNameSave])(i,j,:) = L; subbands.(['HLH_',wavNameSave])(i,j,:) = H;
+        vector = squeeze(subbands.(['HHL_',wavNameSave])(i,j,:)); [L,H] = swt(vector,1,waveletName);
+        subbands.(['HHL_',wavNameSave])(i,j,:) = L; subbands.(['HHH_',wavNameSave])(i,j,:) = H;
     end
 end
 % -------------------------------------------------------------------------

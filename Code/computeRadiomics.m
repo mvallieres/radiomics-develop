@@ -34,12 +34,12 @@ function [radiomics] = computeRadiomics(volObjInit,roiObjInit,imParamScan)
 
 
 % INITIALIZATION
-radiomics = struct;
+radiomics.image = struct;
 scaleNonText = imParamScan.image.interp.scaleNonText; 
 volInterp = imParamScan.image.interp.volInterp; roiInterp = imParamScan.image.interp.roiInterp;
 glRound = imParamScan.image.interp.glRound;
 roiPV = imParamScan.image.interp.roiPV;
-range = imParamScan.image.reSeg.range;
+range = imParamScan.image.reSeg.range; if isempty(range), userSetMinVal = imParamScan.image.userSetMinVal; end
 outliers = imParamScan.image.reSeg.outliers;
 IH = imParamScan.image.discretisation.IH;
 IVH = imParamScan.image.discretisation.IVH;
@@ -48,28 +48,36 @@ algo = imParamScan.image.discretisation.texture.type;
 grayLevels = imParamScan.image.discretisation.texture.val;
 nScale = numel(scaleText); nAlgo = numel(algo); nGl = numel(grayLevels{1}); nExp = nScale*nAlgo*nGl;
 glcm = cell(nScale,nAlgo,nGl); glrlm = cell(nScale,nAlgo,nGl); glszm = cell(nScale,nAlgo,nGl); ngtdm = cell(nScale,nAlgo,nGl); gldzm = cell(nScale,nAlgo,nGl); ngldm = cell(nScale,nAlgo,nGl);
+userSetMinVal = imParamScan.image.userSetMinVal;
 type = imParamScan.image.type;
-intensity = imParamScan.image.intensity; % Variable used to determine if there is 'arbitrary' (e.g., MRI) or 'definite' intensities (
+intensity = imParamScan.image.intensity; % Variable used to determine if there is 'arbitrary' (e.g., MRI) or 'definite' (e.g., CT) intensities.
 
-% SETTING UP userSetMinVal
-if ~isempty(range)
-    userSetMinVal = range(1);
-else
-    if strcmp(type,'PTscan')
-        userSetMinVal = 0; % SUV is defined from 0 to inf.
-    elseif strcmp(type,'CTscan')
-        userSetMinVal = -1000; % No assumption on range of HU.
-    elseif strcmp(type,'MRscan')
-        userSetMinVal = 0; % This a dummy value, has no consequence on the rest of the code since FBS discretisation is not used for MRI.
+% FILTERS INITIALIZATION
+if isfield(imParamScan,'filter')
+    filter = true;
+    IHfilter = imParamScan.filter.discretisation.IH;
+    IVHfilter = imParamScan.filter.discretisation.IVH;
+    intensityFilter = imParamScan.filter.intensity;
+    filtersType = imParamScan.filter.ToCompute; nFilters = numel(filtersType);
+    for f = 1:nFilters
+        if ~isempty(strfind(filtersType{f},'wavelet'))
+            ind = strfind(filtersType{f},'_'); waveletName = filtersType{f}(ind+1:end); waveletName = replaceCharacter(waveletName,'.','dot');
+            waveletType = {'LLL','LLH','LHL','LHH','HLL','HLH','HHL','HHH'}; nWav = numel(waveletType);
+            for w = 1:nWav
+                radiomics.([waveletType{w},'_',waveletName]) = struct;
+            end
+        else
+            radiomics.(filtersType{f}) = struct;
+        end
     end
+else
+    filter = false;
 end
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%% COMPUTATION OF NON-TEXTURE FEATURES %%%%%%%%%%%%%%%%%%%%%%%
 try
-    tic, fprintf('--> Computation of non-texture features (1/1): ')
-    
+    tic, fprintf('--> Computation of non-texture features in image space: ')
     % STEP 1: INTERPOLATION
     [volObj] = interpVolume(volObjInit,scaleNonText,volInterp,glRound,'image');
     [roiObj_Morph] = interpVolume(roiObjInit,scaleNonText,roiInterp,roiPV,'roi');
@@ -79,66 +87,35 @@ try
     [roiObj_Int.data] = rangeReSeg(volObj.data,roiObj_Int.data,range);
     [roiObj_Int.data] = outlierReSeg(volObj.data,roiObj_Int.data,outliers);
     
-    % Initialization
-    volInt_RE = roiExtract(volObj.data,roiObj_Int.data);
-    
-    try
-        % STEP 3: CALCULATION OF MORPHOLOGICAL FEATURES
-        radiomics.morph = getMorphFeatures(volObj.data,roiObj_Int.data,roiObj_Morph.data,scaleNonText,intensity); % For scans with arbitrary units, some features will not be computed.
-    catch
-        fprintf('PROBLEM WITH COMPUTATION OF MORPHOLOGICAL FEATURES ')
-        radiomics.morph = 'ERROR_COMPUTATION';
-    end
-    
-    try
-        % STEP 4: CALCULATION OF LOCAL INTENSITY FEATURES
-        radiomics.locInt = getLocIntFeatures(volObj.data,roiObj_Int.data,scaleNonText,intensity); % For scans with arbitrary units, all of these features will not be computed.
-    catch
-        fprintf('PROBLEM WITH COMPUTATION OF LOCAL INTENSITY FEATURES ')
-        radiomics.locInt = 'ERROR_COMPUTATION';        
-    end
-    
-    try
-        % STEP 5: CALCULATION OF STATISTICAL FEATURES
-        radiomics.stats = getStatsFeatures(volInt_RE,intensity); % For scans with arbitrary units, some features will not be computed.
-    catch
-        fprintf('PROBLEM WITH COMPUTATION OF STATISTICAL FEATURES ')
-        radiomics.stats = 'ERROR_COMPUTATION';           
-    end
-    
-    try
-        % STEP 6: CALCULATION OF INTENSITY HISTOGRAM FEATURES
-        [volQuant_RE] = discretisation(volInt_RE,IH.type,IH.val,userSetMinVal); % There would actually be no need to include "userSetMinVal" here as fourth argument, as discretisation for IH features is (logically) always set to "FBN". This value will not be used for "FBN", see discretisation.m code.
-        radiomics.intHist = getIntHistFeatures(volQuant_RE);
-    catch
-        fprintf('PROBLEM WITH COMPUTATION OF INTENSITY HISTOGRAM FEATURES ')
-        radiomics.intHist = 'ERROR_COMPUTATION';           
-    end
-    
-    try
-        % STEP 7: CALCULATION OF INTENSITY-VOLUME HISTOGRAM FEATURES
-        if ~isempty(IVH), [volQuant_RE,wb] = discretisation(volInt_RE,IVH.type,IVH.val,userSetMinVal,'ivh'); else volQuant_RE = volInt_RE; wb = 1; end % FOR CT, WE DO NOT WANT TO DISCRETISE. AN EMPTY IVH STRUCT ([]) DEFINES WHAT WE WANT TO USE FOR CT. FOR PET: FBS/0.1; FOR MRI: FBN/1000.
-        if ~isempty(IVH)
-            if strcmp(IVH.type,'FBS') || strcmp(IVH.type,'FBSequal')
-                radiomics.intVolHist = getIntVolHistFeatures(volQuant_RE,wb,range);
-            else
-                radiomics.intVolHist = getIntVolHistFeatures(volQuant_RE,wb);
-            end
-        else
-            radiomics.intVolHist = getIntVolHistFeatures(volQuant_RE,wb,range);
-        end
-    catch
-        fprintf('PROBLEM WITH COMPUTATION OF INTENSITY-VOLUME HISTOGRAM FEATURES ')
-        radiomics.intVolHist = 'ERROR_COMPUTATION';         
-    end
-    
+    % STEP 3: COMPUTE ALL NON-TEXTURE FEATURES IN IMAGE SPACE
+    [imageStruct] = computeNonTextureFeatures(volObj,roiObj_Int,roiObj_Morph,scaleNonText,intensity,range,userSetMinVal,IH,IVH);
+    [radiomics.image] = concatenateStruct(radiomics.image,imageStruct);
     toc
+    
+    % STEP 4: COMPUTE ALL NON-TEXTURE FEATURES IN ALL FILTERED SPACES
+    if filter
+        for f = 1:nFilters
+            tic, fprintf('--> Computation of non-texture features in %s space: ',filtersType{f})
+            [filterStruct] = computeNonTextureFeatures(volObj,roiObj_Int,roiObj_Morph,scaleNonText,intensityFilter,[],[],IHfilter,IVHfilter,filtersType{f});
+            if ~isempty(strfind(filtersType{f},'wavelet'))
+                for w = 1:nWav
+                    radiomics.([waveletType{w},'_',waveletName]) = concatenateStruct(radiomics.([waveletType{w},'_',waveletName]),filterStruct.([waveletType{w},'_',waveletName]));
+                end
+            else
+                [radiomics.(filtersType{f})] = concatenateStruct(radiomics.(filtersType{f}),filterStruct);
+            end
+            toc
+        end
+    end
+    
 catch
     fprintf('PROBLEM WITH PRE-PROCESSING OF NON-TEXTURE FEATURES')
-    radiomics.morph = 'ERROR_PROCESSING'; radiomics.locInt = 'ERROR_PROCESSING'; radiomics.stats = 'ERROR_PROCESSING'; radiomics. intHist = 'ERROR_PROCESSING'; radiomics.intVolHist = 'ERROR_PROCESSING';
+    radiomics.image = 'ERROR_PROCESSING';
 end
 % -------------------------------------------------------------------------
 
+
+% JE SUIS RENDU ICI!!
 
 
 %%%%%%%%%%%%%%%%%%%%%%% COMPUTATION OF TEXTURE FEATURES %%%%%%%%%%%%%%%%%%%%%%%
