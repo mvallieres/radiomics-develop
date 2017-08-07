@@ -1,4 +1,4 @@
-function computeAllRadiomics_batch(pathRead,pathSave,roiNames,imParams,roiType,nBatch,matlabPATH)
+function computeRadiomics_batchAllPatients(pathRead,pathSave,roiNames,imParams,roiType,nBatch,matlabPATH)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
@@ -52,7 +52,7 @@ for i = 1:nBatch
     nameScript = ['batch',num2str(i),'_script.m'];
     fid = fopen(nameScript,'w');
     fprintf(fid,'load(''workspace'')\n');
-    fprintf(fid,['computeAllRadiomics(pathRead,pathSave,patientNames(patients{',num2str(i),'}),nameROI(patients{',num2str(i),'}),nameSet(patients{',num2str(i),'}),imParams,roiType)\n']);
+    fprintf(fid,['computeRadiomics_AllPatients(pathRead,pathSave,patientNames(patients{',num2str(i),'}),nameROI(patients{',num2str(i),'}),nameSet(patients{',num2str(i),'}),imParams,roiType)\n']);
     fprintf(fid,['system(''touch batch',num2str(i),'_end'');\n']);
     fprintf(fid,'clear all');
     fclose(fid);

@@ -1,4 +1,4 @@
-function computeAllRadiomics(pathRead,pathSave,nameRead,nameROI,nameSet,imParams,roiType)
+function computeRadiomics_AllPatients(pathRead,pathSave,nameRead,nameROI,nameSet,imParams,roiType)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
@@ -34,14 +34,37 @@ fprintf('\n')
 for p = 1:nPatient
     fprintf(['\n*********************** COMPUTING FEATURES: %s, ***********************'],nameRead{p});
     tStart = tic;
+    
+    % Initialization
     cd(pathRead)
     load(nameRead{p}) % Variable 'sData' now in MATLAB Workspace;
     scanType = sData{2}.type;
     imParamScan = imParams.(scanType);
-    if strcmp(scanType,'PTscan') % MOVE THIS IN THE READIND DATA PART AND ALSO APPLY PVE CORRECTIONS AND DENOISING (for MRI(N3/N4 method) and CT too)? YES, THIS IS NEEDED ESPECIALLY FOR MRI AND PET. FUTURE WORK ON ITS WAY (image post-processing).
+    if strcmp(scanType,'PTscan') % MOVE THIS IN THE READING DATA PART AND ALSO APPLY PVE CORRECTIONS AND DENOISING (for MRI(N3/N4 method) and CT too)?  FUTURE WORK ON ITS WAY (image post-processing)?
         sData{2}.scan.volume.data = computeSUVmap(sData{2}.scan.volume.data,sData{3}(1));
     end
-    [radiomics] = computePatientRadiomics(sData,nameROI{p},nameSet{p},imParamScan);
+    
+    % Computation of ROI mask
+    tic, fprintf('\n--> Computation of ROI mask: ')
+    box = 'box10'; % 10 voxels in all three dimensions are added to the smallest bounding box.
+    errorROI = false;
+    try
+        contourNumber = findContour(sData,nameROI{p},nameSet{p});
+        [volObjInit,roiObjInit] = getROI(sData,contourNumber,box); % This takes care of the "Volume resection" step as well using the argument "box". No fourth argument: 'interp' by default.
+        clear sData % Clear up RAM
+    catch
+        fprintf('\nPROBLEM WITH ROI')
+        radiomics = 'ERROR_ROI';
+        errorROI = true;
+    end
+    toc
+    
+    % Computing radiomics features
+    if ~errorROI
+        [radiomics] = computeRadiomics(volObjInit,roiObjInit,imParamScan);
+    end
+    
+    % Saving radiomics structure
     indDot = strfind(nameRead{p},'.');
     nameSave = [nameRead{p}(1:(indDot(1)-1)),'(',roiType,')',nameRead{p}(indDot(1):end)];
     cd(pathSave), save(nameSave,'radiomics') % IMPORTANT: HERE, WE COULD ADD SOME CODE TO APPEND A NEW "radiomics" STRUCTURE TO AN EXISTING ONE WITH THE SAME NAME IN "pathSave"

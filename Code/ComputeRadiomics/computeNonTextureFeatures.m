@@ -1,4 +1,4 @@
-function resultsStruct = computeNonTextureFeatures(volObjImage,roiObj_Int,roiObj_Morph,scaleNonText,intensity,range,userSetMinVal,IH,IVH,filterType)
+function [resultsStruct] = computeNonTextureFeatures(volObjImage,roiObj_Int,roiObj_Morph,scaleNonText,intensity,range,userSetMinVal,IH,IVH,filterType)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
@@ -35,7 +35,7 @@ function resultsStruct = computeNonTextureFeatures(volObjImage,roiObj_Int,roiObj
 
 % *************************************************************************
 % INITIALIZATIONS (this is a bit complicated, it should be simplifed)
-if nargin ==10
+if nargin == 10
     filter = true;
 else
     filter = false;
@@ -52,7 +52,7 @@ if ~isempty(strfind(IH.type,'FBS')) % The minimum value defines the computation.
     if ~isempty(userSetMinVal)
         minValName = num2str(userSetMinVal); minValName = replaceCharacter(minValName,'.','dot'); minValName = replaceCharacter(minValName,'-','M');
         minValName = ['_min',minValName];
-    else % Otherwise, minimum value of ROI will be used, so no need to report it (not recommended).
+    else % Otherwise, minimum value of ROI will be used (not recommended), so no need to report it.
         minValName = [];
     end
 else
@@ -94,13 +94,15 @@ IVHname = [IVHAlgoName,'_',IHvalName,rangeName];
 % -------------------------------------------------------------------------
 
 
+
+% PREPARATION OF COMPUTATION
 if filter && ~isempty(strfind(filterType,'wavelet'))
     ind = strfind(filterType,'_'); waveletName = filterType(ind+1:end);
     [subbands] = getWaveletSubbands(volObjImage.data,waveletName);
     nameTypes = fieldnames(subbands); nType = numel(nameTypes); volObjCell = cell(1,nType);
     for s = 1:nType
         volObjCell{s} = volObjImage; volObjCell{s}.data = subbands.(nameTypes{s});
-        subbands.(nameTypes{s}) = [];
+        subbands.(nameTypes{s}) = []; % Just to clear some memory
     end
 else
     volObjCell = cell(1);
@@ -109,10 +111,12 @@ else
 end
 
 
+
 % COMPUTATION
 resultsStruct = struct;
 nObjects = numel(volObjCell);
 for o = 1:nObjects
+    results = struct;
     volObj = volObjCell{o};
     volInt_RE = roiExtract(volObj.data,roiObj_Int.data);
     try
@@ -120,7 +124,7 @@ for o = 1:nObjects
         results.morph.(scaleName) = getMorphFeatures(volObj.data,roiObj_Int.data,roiObj_Morph.data,scaleNonText,intensity); % For scans with arbitrary units, some features will not be computed.
     catch
         fprintf('PROBLEM WITH COMPUTATION OF MORPHOLOGICAL FEATURES ')
-        results.morph.(scaleName) = 'ERROR_COMPUTATION';
+        results.morph.(scaleName).error = 'ERROR_COMPUTATION';
     end
 
     try
@@ -128,7 +132,7 @@ for o = 1:nObjects
         results.locInt.(scaleName) = getLocIntFeatures(volObj.data,roiObj_Int.data,scaleNonText,intensity); % For scans with arbitrary units, all of these features will not be computed.
     catch
         fprintf('PROBLEM WITH COMPUTATION OF LOCAL INTENSITY FEATURES ')
-        results.locInt.(scaleName) = 'ERROR_COMPUTATION';        
+        results.locInt.(scaleName).error = 'ERROR_COMPUTATION';        
     end
 
     try
@@ -136,7 +140,7 @@ for o = 1:nObjects
         results.stats.(scaleName) = getStatsFeatures(volInt_RE,intensity); % For scans with arbitrary units, some features will not be computed.
     catch
         fprintf('PROBLEM WITH COMPUTATION OF STATISTICAL FEATURES ')
-        results.stats.(scaleName) = 'ERROR_COMPUTATION';           
+        results.stats.(scaleName).error = 'ERROR_COMPUTATION';           
     end
 
     try
@@ -145,7 +149,7 @@ for o = 1:nObjects
         results.intHist.(IHname) = getIntHistFeatures(volQuant_RE);
     catch
         fprintf('PROBLEM WITH COMPUTATION OF INTENSITY HISTOGRAM FEATURES ')
-        results.intHist.(IHname) = 'ERROR_COMPUTATION';           
+        results.intHist.(IHname).error = 'ERROR_COMPUTATION';           
     end
 
     try
@@ -162,7 +166,7 @@ for o = 1:nObjects
         end
     catch
         fprintf('PROBLEM WITH COMPUTATION OF INTENSITY-VOLUME HISTOGRAM FEATURES ')
-        results.intVolHist.(IVHname) = 'ERROR_COMPUTATION';         
+        results.intVolHist.(IVHname).error = 'ERROR_COMPUTATION';         
     end
     
     if nObjects == 1

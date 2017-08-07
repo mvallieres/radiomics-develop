@@ -57,6 +57,9 @@ if isfield(imParamScan,'filter')
     filter = true;
     IHfilter = imParamScan.filter.discretisation.IH;
     IVHfilter = imParamScan.filter.discretisation.IVH;
+    algoFilter = imParamScan.filter.discretisation.texture.type;
+    grayLevelsFilter = imParamScan.filter.discretisation.texture.val;
+    nAlgoFilter = numel(algoFilter); nGlFilter = numel(grayLevelsFilter{1}); nExpFilter = nScale*nAlgoFilter*nGlFilter;
     intensityFilter = imParamScan.filter.intensity;
     filtersType = imParamScan.filter.ToCompute; nFilters = numel(filtersType);
     for f = 1:nFilters
@@ -77,7 +80,7 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%% COMPUTATION OF NON-TEXTURE FEATURES %%%%%%%%%%%%%%%%%%%%%%%
 try
-    tic, fprintf('--> Computation of non-texture features in image space: ')
+    tic, fprintf(['--> Non-texture features: pre-processing (interp + reSeg) for "Scale=',num2str(scaleNonText(1)),'": '])
     % STEP 1: INTERPOLATION
     [volObj] = interpVolume(volObjInit,scaleNonText,volInterp,glRound,'image');
     [roiObj_Morph] = interpVolume(roiObjInit,scaleNonText,roiInterp,roiPV,'roi');
@@ -86,8 +89,10 @@ try
     roiObj_Int = roiObj_Morph; % Now is the time to create the intensity mask
     [roiObj_Int.data] = rangeReSeg(volObj.data,roiObj_Int.data,range);
     [roiObj_Int.data] = outlierReSeg(volObj.data,roiObj_Int.data,outliers);
+    toc
     
     % STEP 3: COMPUTE ALL NON-TEXTURE FEATURES IN IMAGE SPACE
+    tic, fprintf('--> Computation of non-texture features in image space: ')
     [imageStruct] = computeNonTextureFeatures(volObj,roiObj_Int,roiObj_Morph,scaleNonText,intensity,range,userSetMinVal,IH,IVH);
     [radiomics.image] = concatenateStruct(radiomics.image,imageStruct);
     toc
@@ -102,7 +107,7 @@ try
                     radiomics.([waveletType{w},'_',waveletName]) = concatenateStruct(radiomics.([waveletType{w},'_',waveletName]),filterStruct.([waveletType{w},'_',waveletName]));
                 end
             else
-                [radiomics.(filtersType{f})] = concatenateStruct(radiomics.(filtersType{f}),filterStruct);
+                radiomics.(filtersType{f}) = concatenateStruct(radiomics.(filtersType{f}),filterStruct);
             end
             toc
         end
@@ -110,25 +115,36 @@ try
     
 catch
     fprintf('PROBLEM WITH PRE-PROCESSING OF NON-TEXTURE FEATURES')
-    radiomics.image = 'ERROR_PROCESSING';
+    radiomics.image.(['scale',replaceCharacter(num2str(scaleNonText(1)),'.','dot')]) = 'ERROR_PROCESSING';
 end
 % -------------------------------------------------------------------------
 
 
-% JE SUIS RENDU ICI!!
-
 
 %%%%%%%%%%%%%%%%%%%%%%% COMPUTATION OF TEXTURE FEATURES %%%%%%%%%%%%%%%%%%%%%%%
-
-% INITIALIZATION
-
-
-count = 0;
+nameTextTypes = {'glcm','glrlm','glszm','gldzm','ngtdm','ngldm'}; nTextTypes = numel(nameTextTypes);
+for t = 1:nTextTypes
+    radiomics.image.texture.(nameTextTypes{t}) = struct;
+end
+if filter
+    for f = 1:nFilters
+        if ~isempty(strfind(filtersType{f},'wavelet'))
+            for w = 1:nWav
+                for t = 1:nTextTypes
+                    radiomics.([waveletType{w},'_',waveletName]).texture.(nameTextTypes{t}) = struct;
+                end                
+            end
+        else
+            for t = 1:nTextTypes
+                radiomics.(filtersType{f}).texture.(nameTextTypes{t}) = struct;
+            end
+        end
+    end
+end
+countText = 0; countFilt = 0;
 for s = 1:nScale
-    
     try
-        tic, fprintf(['--> Pre-processing (interp + reSeg) for "Scale=',num2str(scaleText{s}(1)),'": '])
-        
+        tic, fprintf(['--> Texture features: pre-processing (interp + reSeg) for "Scale=',num2str(scaleText{s}(1)),'": '])
         % STEP 1: INTERPOLATION
         [volObj] = interpVolume(volObjInit,scaleText{s},volInterp,glRound,'image');
         [roiObj_Morph] = interpVolume(roiObjInit,scaleText{s},roiInterp,roiPV,'roi');
@@ -137,84 +153,50 @@ for s = 1:nScale
         roiObj_Int = roiObj_Morph; % Now is the time to create the intensity mask
         [roiObj_Int.data] = rangeReSeg(volObj.data,roiObj_Int.data,range);
         [roiObj_Int.data] = outlierReSeg(volObj.data,roiObj_Int.data,outliers);
-        
         toc
-
+        
+        % STEP 3: COMPUTE ALL TEXTURE FEATURES IN IMAGE SPACE
         for a = 1:nAlgo
             for n = 1:nGl
-                
-                try
-                    count = count + 1;
-                    tic, fprintf(['--> Computation of texture features for "Scale=',num2str(scaleText{s}(1)),'", "Algo=',algo{a},'", "GL=',num2str(grayLevels{a}(n)),'" (',num2str(count),'/',num2str(nExp),'): '])
-                
-                    % Initialization
-                    volInt_RE = roiExtract(volObj.data,roiObj_Int.data);
-                    
-                    % STEP 3: DISCRETISATION FOR TEXTURE FEATURES
-                    [volQuant_RE] = discretisation(volInt_RE,algo{a},grayLevels{a}(n),userSetMinVal);
-
-                    % STEP 4: COMPUTING ALL TEXTURE FEATURES
-                    try
-                        glcm{s,a,n} = getGLCMfeatures(volQuant_RE);
-                    catch
-                        fprintf('PROBLEM WITH COMPUTATION OF GLCM FEATURES ')
-                        glcm{s,a,n} = 'ERROR_COMPUTATION';
+                countText = countText + 1;
+                tic, fprintf(['--> Computation of texture features in image space for "Scale=',num2str(scaleText{s}(1)),'", "Algo=',algo{a},'", "GL=',num2str(grayLevels{a}(n)),'" (',num2str(countText),'/',num2str(nExp),'): '])
+                [imageStruct] = computeTextureFeatures(volObj,roiObj_Int,roiObj_Morph,scaleText{s},algo{a},grayLevels{a}(n),userSetMinVal);
+                for t = 1:nTextTypes
+                    [radiomics.image.texture.(nameTextTypes{t})] = concatenateStruct(radiomics.image.texture.(nameTextTypes{t}),imageStruct.(nameTextTypes{t}));
+                end
+                toc
+            end
+        end
+        
+        % STEP 4: COMPUTE ALL TEXTURE FEATURES IN ALL FILTERED SPACES
+        if filter
+            for f = 1:nFilters
+                for a = 1:nAlgoFilter
+                    for n = 1:nGlFilter
+                        countFilt = countFilt + 1;
+                        tic, fprintf(['--> Computation of texture features in ',filtersType{f},' space for "Scale=',num2str(scaleText{s}(1)),'", "Algo=',algoFilter{a},'", "GL=',num2str(grayLevelsFilter{a}(n)),'" (',num2str(countFilt),'/',num2str(nExpFilter),'): '])
+                        [filterStruct] = computeTextureFeatures(volObj,roiObj_Int,roiObj_Morph,scaleText{s},algoFilter{a},grayLevelsFilter{a}(n),[],filtersType{f});
+                        if ~isempty(strfind(filtersType{f},'wavelet'))
+                            for w = 1:nWav
+                                for t = 1:nTextTypes
+                                    radiomics.([waveletType{w},'_',waveletName]).texture.(nameTextTypes{t}) = concatenateStruct(radiomics.([waveletType{w},'_',waveletName]).texture.(nameTextTypes{t}),filterStruct.([waveletType{w},'_',waveletName]).(nameTextTypes{t}));
+                                end
+                            end
+                        else
+                            for t = 1:nTextTypes
+                                radiomics.(filtersType{f}).texture.(nameTextTypes{t}) = concatenateStruct(radiomics.(filtersType{f}).texture.(nameTextTypes{t}),filterStruct.(nameTextTypes{t}));
+                            end
+                        end
+                        toc
                     end
-                    try
-                        glrlm{s,a,n} = getGLRLMfeatures(volQuant_RE);
-                    catch
-                        fprintf('PROBLEM WITH COMPUTATION OF GLRLM FEATURES ')
-                        glrlm{s,a,n} = 'ERROR_COMPUTATION';                        
-                    end
-                    try
-                        glszm{s,a,n} = getGLSZMfeatures(volQuant_RE);
-                    catch
-                        fprintf('PROBLEM WITH COMPUTATION OF GLSZM FEATURES ')
-                        glszm{s,a,n} = 'ERROR_COMPUTATION';                         
-                    end
-                    try
-                        gldzm{s,a,n} = getGLDZMfeatures(volQuant_RE,roiObj_Morph.data);
-                    catch
-                        fprintf('PROBLEM WITH COMPUTATION OF GLDZM FEATURES ')
-                        gldzm{s,a,n} = 'ERROR_COMPUTATION';                            
-                    end
-                    try
-                        ngtdm{s,a,n} = getNGTDMfeatures(volQuant_RE);
-                    catch
-                        fprintf('PROBLEM WITH COMPUTATION OF NGTDM FEATURES ')
-                        ngtdm{s,a,n} = 'ERROR_COMPUTATION';                           
-                    end
-                    try
-                        ngldm{s,a,n} = getNGLDMfeatures(volQuant_RE);
-                    catch
-                        fprintf('PROBLEM WITH COMPUTATION OF NGLDM FEATURES ')
-                        ngldm{s,a,n} = 'ERROR_COMPUTATION';                          
-                    end
-
-                    toc
-                catch
-                    fprintf('PROBLEM WITH DISCRETISATION')
-                    glcm{s,a,n} = 'ERROR_DISCRETISATION'; glrlm{s,a,n} = 'ERROR_DISCRETISATION'; glszm{s,a,n} = 'ERROR_DISCRETISATION'; gldzm{s,a,n} = 'ERROR_DISCRETISATION'; ngtdm{s,a,n} = 'ERROR_DISCRETISATION'; ngldm{s,a,n} = 'ERROR_DISCRETISATION';
                 end
             end
         end
+        
     catch 
-        fprintf('PROBLEM WITH PRE-PROCESSING OF TEXTURE FEATURES')
-        for a = 1:nAlgo
-            for n = 1:nGl
-                count = count + 1;
-                glcm{s,a,n} = 'ERROR_PROCESSING'; glrlm{s,a,n} = 'ERROR_PROCESSING'; glszm{s,a,n} = 'ERROR_PROCESSING'; gldzm{s,a,n} = 'ERROR_PROCESSING'; ngtdm{s,a,n} = 'ERROR_PROCESSING'; ngldm{s,a,n} = 'ERROR_PROCESSING';
-            end
-        end
+        radiomics.image.(['scale',replaceCharacter(num2str(scaleText{s}(1)),'.','dot')]) = 'ERROR_PROCESSING';
     end
 end
-
-radiomics.glcm = glcm;
-radiomics.glrlm = glrlm;
-radiomics.glszm = glszm;
-radiomics.gldzm = gldzm;
-radiomics.ngtdm = ngtdm;
-radiomics.ngldm = ngldm;
 % -------------------------------------------------------------------------
 
 radiomics.imParam = imParamScan;
