@@ -163,14 +163,18 @@ fprintf('\n\n************************* RADIOMIC FEATURE COMPUTATION ************
 
 % 1. ROI CHOICE (optional, see above) OR LOADING PREVIOUSLY CONSTRUCTED roiNames.mat
 if manualROIchoice
-   roiNames = roiChoice(pathWORK,pathDATA); % User will be prompted to choose each ROI for each scan of each patient and to verify if the chosen ROI read by the program is correctly positioned onto the imaging volume. Warning: at the end of the function, a new roiNames.mat files will be saved in the WORKSPACE, and potentially already existing ones will be given another name.
+   flagRadiomics = roiChoice(pathWORK,pathDATA); % User will be prompted to choose each ROI for each scan of each patient and to verify if the chosen ROI read by the program is correctly positioned onto the imaging volume. Warning: at the end of the function, a new roiNames.mat files will be saved in the WORKSPACE, and potentially already existing ones will be given another name.
+else
+    flagRadiomics = true;
 end
 cd(pathWORK), load('roiNames') % Variable roiNames is now in MATLAB workspace.
 
-% 2. COMPUTING RADIOMIC FEATURES 
+% 2. COMPUTING RADIOMIC FEATURES
+if flagRadiomics % In the function "roiChoice.m" (manualROIchoice), the user may have decided to stop the whole process.
 tic, fprintf('\n--> COMPUTING RADIOMIC FEATURES WITH %u CORES ... ',nBatch)
 computeRadiomics_batchAllPatients(pathDATA,pathFEATURES,roiNames,imParams,roiType,nBatch,matlabPATH)
 fprintf('DONE!\n'), toc
+end
 
 time = toc(tStart);
 fprintf('\n\nTOTAL TIME FOR RADIOMIC FEATURE COMPUTATION: %f seconds\n',time)
