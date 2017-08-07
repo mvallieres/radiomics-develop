@@ -4,21 +4,29 @@
 
 --> After consecutively running script_ReadData.m and script_ComputeRadiomics.m, you will find another folder created in WORKSPACE. A "radiomics" structure is then saved for all combinations of patient-scans initially read. The format of the saved files is $PATIENT ID FOLDER NAME_$IMAGING FOLDER NAME($ROItype).$MODALITY.mat, where $ROItype refers to the parameter option "roiType" at the beginning of script_ComputeRadiomics.m. The structure of the "radiomics" structure goes as follows:
 
-radiomics.morph      : Morphological feature values (structure)
-	 .locInt     : Local intensity feature values (structure)
-	 .stats      : Statistical feature values (structure)
-	 .intHist    : Intensity histogram feature values (structure)
-         .intVolHist : Intensity-volume histrogram feature values (structure)
-	 .glcm       : Gray-Level Co-Occurence Matrix feature values (cell array of structures)
-	 .glrlm      : Gray-Level Run-Length Matrix feature values (cell array of structures)
-	 .glszm      : Gray-Level Size Zone Matrix feature values (cell array of structures)
-	 .ngtdm      : Neighborhood Gray-Tone Difference Matrix (cell array of structures)
-	 .gldzm      : Gray-Level Distance Zone Matrix feature values (cell array of structures)
-	 .ngldm      : Neighborhood Gray-Level Dependence Matrix feature values (cell array of structures)
-	 .imParam    : Structure defining the image processing parameters for the computation of the different radiomic features.
+radiomics.image.morph.$param              : Morphological feature values
+	       .locInt.$param             : Local intensity feature values
+	       .stats.$param              : Statistical feature values
+	       .intHist.$param            : Intensity histogram feature values
+               .intVolHist.$param         : Intensity-volume histrogram feature values
+	       .texture.glcm.$param       : Gray-Level Co-Occurence Matrix feature values
+	               .glrlm.$param      : Gray-Level Run-Length Matrix feature values
+	               .glszm.$param      : Gray-Level Size Zone Matrix feature values
+                       .gldzm.$param      : Gray-Level Distance Zone Matrix feature values	 
+                       .ngtdm.$param      : Neighborhood Gray-Tone Difference Matrix feature values
+	               .ngldm.$param      : Neighborhood Gray-Level Dependence Matrix feature values
+	 .$filter1                        : All of the above computed for $filter1 (e.g., HLH_coif1 wavelet subband)
+	 .$filter2                        : All of the above computed for $filter1 (e.g., HLL_coif1 wavelet subband) 
+	 .imParam                         : Structure defining the image processing parameters for the computation of the different radiomic features.
+
+
 
 --> Please see https://arxiv.org/abs/1612.07003 for more details about the different features and the different image processing parameters. Do not hesitate to also contact Martin Vallières for further details.
 
---> For the GLCM, GLRLM, GLSZM, NGTDM, GLDZM and NGLDM texture features, the computation was performed for different combinations of isotropic resolutions (scale), quantization algorithms (algo) and number of gray-levels (Ng). Please see the parameter options in script_ComputeRadiomics.m and radiomics.imParam for more details. Typically, for all imaging volumes (either PET, CT OR MR), texture features are computed at four different isotropic resolutions (resampled via linear interpolation). Then, 4 different quantization algorithms are tested for PET, 2 for MR and 4 for CT. Finally, 4 different number of gray-levels are tested for all scans. As an example application, please see: https://doi.org/10.1088/0031-9155/60/14/5471.
+--> The "image" structure is dedicated to features computed in the original image space. All other upper level structures are at the moment dedicated to filter-based spaces (e.g., wavelet).
 
---> As a consequence of the computation of texture features with different extraction parameters (scale,algo,Ng), radiomics.glcm, radiomics.glrlm, radiomics.glszm, radiomics.ngtdm, radiomics.gldzm and radiomics.ngldm are cell arrays of structures. Each entry of a given cell array contains a structure with feature values for a given combination of scale-algo-Ng. The first dimension of the array varies the scale, the second the algo and the third Ng.
+--> "$param" represents the name of a structure field that describes the extraction parameters used for features computation. The format is scaleX_algoX_binX for "FBN" discretisation algorithms, and scaleX_algoX_binX_minX for "FBS" discretisation algorithms. "X" is the value of the parameter. Dots are replaced by the word "dot" and minus signs by the letter "M". The format for IVH features vary depending on the image processing parameters used, and may also be scaleX_algoX_binX_minX_maxX. Basically, everytime the minimum value of a definite imaging intensity defines the computation (i.e. using "FBS" algorithms), "minX" will be present (likewise for maximum values for IVH features).
+
+--> Some feature values will not be present (empty array: []) depending on the intensity definition. For example, CT has definite intensity values (HU), so all features are calculated. Same goes for PET (SUV). However, MRI has arbitrary intensity values, so "stats" features are meaningless and are not computed, for example. You can change this behavior to compute all feature for all types of scans by setting the OPTION "imParam.intensity" to 'definite' everywhere at the beginning of "script_ComputeRadiomics.m".
+
+--> For the GLCM, GLRLM, GLSZM, NGTDM, GLDZM and NGLDM texture features, the computation was performed for different combinations of isotropic resolutions (scale), quantization algorithms (algo) and number of gray-levels (Ng). Please see the parameter options in script_ComputeRadiomics.m and radiomics.imParam for more details. Typically, for all imaging volumes (either PET, CT OR MR), texture features are computed at four different isotropic resolutions (resampled via linear interpolation). Then, 4 different quantization algorithms are tested for PET, 2 for MR and 4 for CT. Finally, 4 different number of gray-levels are tested for all scans. As an example application, please see: https://doi.org/10.1088/0031-9155/60/14/5471.

@@ -1,11 +1,16 @@
 # Welcome to _radiomics-develop_!
 
-This is a private repository dedicated to the development of programming code for new radiomics applications via collaborative work with other scientific colleagues. I really look forward to work with you! Please do not hesitate to contact me if you have any question: Martin Vallières, +1 514 839 0248, mart.vallieres@gmail.com
+This is a private repository dedicated to the development of programming code for new radiomics applications via collaborative work with other scientific colleagues. I really look forward to work with you! Please do not hesitate to contact me if you have any question: Martin Vallières, +33 07 67 13 14 86, mart.vallieres@gmail.com
 
+## Recent developments (August 2017)
+- Wavelet features
+- Re-organization of radiomics structure
+- Definition of definite/aboslute/filter imaging intensities
+- Visualization tool to check ROIs on images with manualROIchoice=true
 
 ## System requirements
 - MAC or Linux operating systems. If you are using Windows, please install a Linux virtual box on your system.
-- MATLAB 2014 and above.
+- MATLAB 2016a and above.
 - Python version 2.7 and above. 
 
 All software code have up to now been tested on: 
