@@ -11,7 +11,8 @@ This is a private repository dedicated to the development of programming code fo
 ## System requirements
 - MAC or Linux operating systems. If you are using Windows, please install a Linux virtual box on your system.
 - MATLAB 2016a and above.
-- Python version 2.7 and above. 
+- Python version 2.7 and above: "sudo apt-get install python" in linux.
+- pydicom package: "sudo apt-get install python-dicom" in linux.
 
 All software code have up to now been tested on: 
 - MATLAB 2016a using Linux Ubuntu 16.04.
