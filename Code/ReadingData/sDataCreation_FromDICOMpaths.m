@@ -277,6 +277,7 @@ for rs = 1:nRS
     end
 end
 sData{2}.scan.orientation = orientation;
+sData{2}.scan.patientPosition = sData{3}(1).PatientPosition;
 
 
 % SAVING sData
