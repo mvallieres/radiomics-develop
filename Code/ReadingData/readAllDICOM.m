@@ -12,7 +12,7 @@ function readAllDICOM(pathRead,pathSave,nBatch,matlabPATH,nameSaveOption)
 % RTplan structures(if present in the sub-folder tree of the starting 
 % directory). 
 % All sData structures hereby created are saved in 'pathSave' with a name 
-% varying with the variable 'nameSaveOption'. 
+% varying with the variable 'nameSaveOption'.
 %
 % DIFFERENTIATION/ASSOCIATION OF DICOM FILES: 1)imaging, 2)RTstruct, 3)REG, 4)RTdose, 5)RTplan. 
 % 1) Imaging volumes are differentiated by the 'SeriesInstanceUID' field
@@ -30,7 +30,7 @@ function readAllDICOM(pathRead,pathSave,nBatch,matlabPATH,nameSaveOption)
 % If multiple imaging volumes have the same 'FrameOfReferenceUID' field, 
 % they will all be assigned a RTstruct, REG, RTdose and RTplan possessing 
 % that same field.
-% 
+%
 % IMPORTANT: This function has only been tested on Ubuntu 14.04. May work 
 %            using MAC, will fail using Windows.
 % -------------------------------------------------------------------------

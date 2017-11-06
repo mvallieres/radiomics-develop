@@ -25,13 +25,19 @@ function [volObjQ] = interpVolume(volObjS,voxDim,interpMet,roundVal,type)
 % Martin Vallieres for this matter.
 % -------------------------------------------------------------------------
 
-% --> voxDim: Must be in XYZ reference frame.
+% --> voxDim: The following format is used [Xin,Yin,Zslice], where Xin and Yin are the X (left to right) and Y (bottom to top) IN-PLANE resolutions, and Zslice is the slice spacing, NO MATTER THE ORIENTATION OF THE VOLUME (i.e. axial , sagittal, coronal).   
 
 % -------------------------------------------------------------------------
 % PARSING ARGUMENTS
-if isempty(voxDim)
+if isempty(voxDim) || sum(voxDim) == 0
     volObjQ = volObjS;
     return
+else
+    if numel(voxDim) == 2
+        twoD = true;
+    else
+        twoD = false;
+    end
 end
 if nargin ~= 5
     error('The number of arguments must be 5')
@@ -68,6 +74,7 @@ end
 
 % INITIALIZATION
 resQ = voxDim;
+if twoD, resQ = [resQ,volObjS.spatialRef.PixelExtentInWorldZ]; end % If 2D, the resolution of the slice dimension of he queried volume is set to the same as the sampled volume.
 resS = [volObjS.spatialRef.PixelExtentInWorldX,volObjS.spatialRef.PixelExtentInWorldY,volObjS.spatialRef.PixelExtentInWorldZ];
 if isequal(resS,resQ)
     volObjQ = volObjS;
@@ -81,6 +88,7 @@ lowLimitsS = [spatialRefS.XWorldLimits(1),spatialRefS.YWorldLimits(1),spatialRef
 
 % CREATING QUERIED "imref3d" OBJECT CENTERED ON SAMPLED VOLUME
 sizeQ = ceil(extentS./resQ); temp = sizeQ(1); sizeQ(1) = sizeQ(2); sizeQ(2) = temp; % Switching to IJK (matlab) reference frame for "imref3d" computation.% Putting a "ceil", according to IBSI standards. This is safer than "round".
+if twoD, sizeQ(3) = volObjS.spatialRef.ImageSize(3); end % If 2D, forcing the size of the queried volume in the slice dimension to be the same as the sample volume.
 spatialRefQ = imref3d(sizeQ,resQ(1),resQ(2),resQ(3));
 extentQ = [spatialRefQ.ImageExtentInWorldX,spatialRefQ.ImageExtentInWorldY,spatialRefQ.ImageExtentInWorldZ];
 lowLimitsQ = [spatialRefQ.XWorldLimits(1),spatialRefQ.YWorldLimits(1),spatialRefQ.ZWorldLimits(1)];

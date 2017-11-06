@@ -38,6 +38,9 @@ help script_ComputeRadiomics, pathWORK = pwd;
 %                          PARAMETER OPTIONS                              %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Change parameters where you see the word "OPTION" in the comment.
+% NOTES: - All scale parameters below have the following format: [Xin,Yin,Zslice], where Xin and Yin are the X (left to right) and Y (bottom to top) IN-PLANE resolutions, and Zslice is the slice spacing, NO MATTER THE ORIENTATION OF THE VOLUME (i.e. axial , sagittal, coronal).   
+%        - If interpolation in the slice direction (no matter the orientation) is not wanted (i.e. 2D case), please used vectors with only two entries [Xin,Yin] for the scale parameters below (e.g. scale = [2,2]).
+%        - If no interpolation at all is wanted, use 0 as the scale parameter (e.g. scale = 0). It will be recorded as such in the final radiomics structure for differentiation purposes.
 
 % RADIOMIC PARAMETERS OPTIONS ---------------------------------------------
 

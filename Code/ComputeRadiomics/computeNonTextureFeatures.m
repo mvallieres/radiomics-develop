@@ -40,6 +40,13 @@ if nargin == 10
 else
     filter = false;
 end
+if sum(scaleNonText) == 0 % In case the user chose to not interpolate
+    scaleNonText = [volObjImage.spatialRef.PixelExtentInWorldX,volObjImage.spatialRef.PixelExtentInWorldY,volObjImage.spatialRef.PixelExtentInWorldZ];
+else
+    if numel(scaleNonText) == 2 % In case not interpolation is performed in the slice direction (e.g. 2D case)
+        scaleNonText = [scaleNonText,volObjImage.spatialRef.PixelExtentInWorldZ];
+    end
+end
 
 % Scale name
 scaleName = num2str(scaleNonText(1)); scaleName = replaceCharacter(scaleName,'.','dot'); % Always isotropic resampling, so the first entry is ok.

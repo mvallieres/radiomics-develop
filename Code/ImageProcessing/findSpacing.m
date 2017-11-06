@@ -25,6 +25,9 @@ function sliceSpacing = findSpacing(points,scanType)
 % Martin Vallieres for this matter.
 % -------------------------------------------------------------------------
 
+% README --> This function works for points from at least 2 slices. If only
+% one slice is present, the function returns a NaN.
+
 
 if strcmp(scanType,'MRscan')
     slices = unique(round(points*10)/10); % Rounding to the nearest 0.1 mm, MRI is more problematic due to arbitrary orientations allowed for imaging volumes.

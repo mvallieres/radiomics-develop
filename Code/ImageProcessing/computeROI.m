@@ -55,6 +55,7 @@ while strcmp(interp,'interp')
 
     % Creating new imref3d object for sample points (with slice dimension similar to original volume where RTstruct was created)
     sliceSpacing = double(findSpacing(ROI_XYZ(:,dimIJK),scanType)); % Slice spacing in mm
+    if isnan(sliceSpacing), sliceSpacing = spatialRef.(['PixelExtentInWorld',direction]); end % Only one slice found in the function "findSpacing" on the above line. We thus must set "sliceSpacing" to the slice spacing of the queried volume, and no interpolation will be performed.
     newSize = ceil(spatialRef.(['ImageExtentInWorld',direction])/sliceSpacing); %  Using "round" would yield the closest new size we can get. But using "ceil" is safer.
     resXYZ(dimXYZ) = sliceSpacing; 
     sz = spatialRef.ImageSize; sz(dimIJK) = newSize;
@@ -77,6 +78,7 @@ while strcmp(interp,'interp')
     % Getting sampled mask --> newSpatialRef is actually for the "old original" volume (the sampled volume) on which the RTstruct was created.
     %V = getPolyMask(ROI_XYZ,newSpatialRef,orientation); % Using the poly2mask.m function. 
     V = getPolygonMask(ROI_XYZ,newSpatialRef,orientation); % Using the inpolygon.m function. To be further tested.
+    %V = getPolygonMaskWithEdges(ROI_XYZ,newSpatialRef,orientation); % Using the inpolygon.m function. To be further tested.
 
     % Getting query points (Xq,Yq,Zq) of output ROImask
     szQ = spatialRef.ImageSize;
@@ -97,6 +99,7 @@ end
 if strcmp(interp,'noInterp')
     %ROImask = getPolyMask(ROI_XYZ,spatialRef,orientation); % Using the poly2mask.m function.
     ROImask = getPolygonMask(ROI_XYZ,spatialRef,orientation); % Using the inpolygon.m function. To be further tested.
+    %ROImask = getPolygonMaskWithEdges(ROI_XYZ,spatialRef,orientation); % Using the inpolygon.m function. To be further tested.
 end
 
 end
