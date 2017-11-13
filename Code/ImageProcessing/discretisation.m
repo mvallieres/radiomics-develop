@@ -93,7 +93,7 @@ switch type
         volQuant_RE(volQuant_RE == min(volQuant_RE(:))) = 1;
 end
 
-if nargin == 5 && strcmp(ivh,'ivh')
+if nargin == 5 && strcmp(ivh,'ivh') && (strcmp(type,'FBS') || strcmp(type,'FBSequal'))
     volQuant_RE = minVal + (volQuant_RE - 0.5)*wb;
 end
 

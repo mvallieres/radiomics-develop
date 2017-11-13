@@ -48,8 +48,11 @@ else
     minVal = min(X);
     maxVal = max(X);
 end
-if maxVal == Inf % For PET, if we set up the maximum re-segmentation range to infinity. We must then use the maximum value of the volume as maxVal.
+if maxVal == Inf
     maxVal = max(X);
+end
+if minVal == -Inf
+    minVal = min(X);
 end
 levels = (minVal:wb:maxVal)'; % Vector of grey-levels
 Ng = numel(levels);

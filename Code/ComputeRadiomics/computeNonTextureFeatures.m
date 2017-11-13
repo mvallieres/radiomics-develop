@@ -163,13 +163,31 @@ for o = 1:nObjects
         % STEP 7: CALCULATION OF INTENSITY-VOLUME HISTOGRAM FEATURES
         if ~isempty(IVH), [volQuant_RE,wb] = discretisation(volInt_RE,IVH.type,IVH.val,userSetMinVal,'ivh'); else volQuant_RE = volInt_RE; wb = 1; end % FOR CT, WE DO NOT WANT TO DISCRETISE. AN EMPTY IVH STRUCT ([]) DEFINES WHAT WE WANT TO USE FOR CT. FOR PET: FBS/0.1; FOR MRI: FBN/1000.
         if ~isempty(IVH)
-            if strcmp(IVH.type,'FBS') || strcmp(IVH.type,'FBSequal')
-                results.intVolHist.(IVHname) = getIntVolHistFeatures(volQuant_RE,wb,range);
-            else
-                results.intVolHist.(IVHname) = getIntVolHistFeatures(volQuant_RE,wb);
+            if strcmp(IVH.type,'FBS') || strcmp(IVH.type,'FBSequal') % PET example case (definite intensity units -- continuous case)
+                rangeFBS = zeros(1,2);
+                if isempty(range)
+                    rangeFBS(1) = min(volInt_RE(:));
+                    rangeFBS(2) = max(volInt_RE(:));
+                else
+                    if range(1) == -Inf
+                        rangeFBS(1) = min(volInt_RE(:));
+                    else
+                        rangeFBS(1) = range(1);
+                    end
+                    if range(2) == Inf
+                        rangeFBS(2) = max(volInt_RE(:));
+                    else
+                        rangeFBS(2) = range(2);
+                    end
+                end
+                rangeFBS(1) = rangeFBS(1) + 0.5*wb;
+                rangeFBS(2) = rangeFBS(2) - 0.5*wb;
+                results.intVolHist.(IVHname) = getIntVolHistFeatures(volQuant_RE,wb,rangeFBS);
+            else % MRI example case (arbitrary intensity units)
+                results.intVolHist.(IVHname) = getIntVolHistFeatures(volQuant_RE,wb); 
             end
-        else
-            results.intVolHist.(IVHname) = getIntVolHistFeatures(volQuant_RE,wb,range);
+        else % CT example case (definite intensity units -- discrete case)
+            results.intVolHist.(IVHname) = getIntVolHistFeatures(volQuant_RE,wb,range); 
         end
     catch
         fprintf('PROBLEM WITH COMPUTATION OF INTENSITY-VOLUME HISTOGRAM FEATURES ')

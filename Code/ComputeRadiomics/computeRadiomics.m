@@ -39,7 +39,7 @@ scaleNonText = imParamScan.image.interp.scaleNonText;
 volInterp = imParamScan.image.interp.volInterp; roiInterp = imParamScan.image.interp.roiInterp;
 glRound = imParamScan.image.interp.glRound;
 roiPV = imParamScan.image.interp.roiPV;
-range = imParamScan.image.reSeg.range; if isempty(range), userSetMinVal = imParamScan.image.userSetMinVal; end
+range = imParamScan.image.reSeg.range;
 outliers = imParamScan.image.reSeg.outliers;
 IH = imParamScan.image.discretisation.IH;
 IVH = imParamScan.image.discretisation.IVH;
@@ -48,9 +48,18 @@ algo = imParamScan.image.discretisation.texture.type;
 grayLevels = imParamScan.image.discretisation.texture.val;
 nScale = numel(scaleText); nAlgo = numel(algo); nGl = numel(grayLevels{1}); nExp = nScale*nAlgo*nGl;
 glcm = cell(nScale,nAlgo,nGl); glrlm = cell(nScale,nAlgo,nGl); glszm = cell(nScale,nAlgo,nGl); ngtdm = cell(nScale,nAlgo,nGl); gldzm = cell(nScale,nAlgo,nGl); ngldm = cell(nScale,nAlgo,nGl);
-userSetMinVal = imParamScan.image.userSetMinVal;
 type = imParamScan.image.type;
 intensity = imParamScan.image.intensity; % Variable used to determine if there is 'arbitrary' (e.g., MRI) or 'definite' (e.g., CT) intensities.
+
+% SETTING UP userSetMinVal
+if ~isempty(range)
+    userSetMinVal = range(1);
+    if userSetMinVal == -Inf
+        userSetMinVal = []; % In case no re-seg range is defined for the FBS algorithm, the minimum value of ROI will be used (not recommended).
+    end
+else
+    userSetMinVal = []; % In case no re-seg range is defined for the FBS algorithm, the minimum value of ROI will be used (not recommended).
+end
 
 % FILTERS INITIALIZATION
 if isfield(imParamScan,'filter')
