@@ -237,7 +237,7 @@ for rs = 1:nRS
     for roi = 1:nROI
         points = [];
         contourNum = contourNum + 1;
-        itemROI = ['Item_',num2str(roi)];
+        itemROI = ['Item_',num2str(roi)]; % IMPORTANT: We should define another variable here --> roiNumb located at sData{4}(rs).StructureSetROISequence.(itemROI).ROINumber. This is probably the real link to sData{4}(rs).ROIContourSequence.(roiNumb).ContourSequence (TO BE VERIFIED FIRST IN DICOM DOCUMENTATION).
         try
             nameSet = sData{4}(rs).StructureSetName;
             nameSetInfo = 'StructureSetName';
@@ -266,7 +266,7 @@ for rs = 1:nRS
             for s = 1:nSlice
                  itemSlice = ['Item_',num2str(s)];
                  pts_temp = sData{4}(rs).ROIContourSequence.(itemROI).ContourSequence.(itemSlice).ContourData; % points stored in the RTstruct file
-                 if ~isempty(pts_temp)
+                 if ~isempty(pts_temp) && isnumeric(pts_temp)
                      ind = 1:numel(pts_temp)/3;
                      points = [points;pts_temp(ind*3-2),pts_temp(ind*3-1),pts_temp(ind*3)];
                  end
