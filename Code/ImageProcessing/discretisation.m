@@ -1,4 +1,4 @@
-function [volQuant_RE,wb] = discretisation(vol_RE,type,nQ,userSetMinVal,ivh)
+function [volQuant_RE,wd] = discretisation(vol_RE,type,nQ,userSetMinVal,ivh)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
@@ -70,24 +70,24 @@ end
 maxVal = max(volQuant_RE(:));
 switch type
     case 'FBS'
-        wb = nQ;
+        wb = nQ; wd = wb;
         volQuant_RE = ceil((volQuant_RE - minVal)/nQ);
         if min(volQuant_RE(:)) == 0
             volQuant_RE(volQuant_RE == min(volQuant_RE(:))) = 1;
         end
     case 'FBN'
-        wb = (maxVal - minVal)/nQ;
+        wb = (maxVal - minVal)/nQ; wd = 1;
         volQuant_RE = ceil(nQ * ((volQuant_RE - minVal)/(maxVal - minVal)));
         volQuant_RE(volQuant_RE == min(volQuant_RE(:))) = 1;
     case 'FBSequal'
-        wb = nQ;
+        wb = nQ; wd = wb;
         volQuant_RE = equalization(volQuant_RE);
         volQuant_RE = ceil((volQuant_RE - minVal)/nQ);
         if min(volQuant_RE(:)) == 0
             volQuant_RE(volQuant_RE == min(volQuant_RE(:))) = 1;
         end
     case 'FBNequal'
-        wb = (maxVal - minVal)/nQ;
+        wb = (maxVal - minVal)/nQ; wd = 1;
         volQuant_RE = equalization(volQuant_RE);
         volQuant_RE = ceil(nQ * ((volQuant_RE - minVal)/(maxVal - minVal)));
         volQuant_RE(volQuant_RE == min(volQuant_RE(:))) = 1;

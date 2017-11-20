@@ -1,4 +1,4 @@
-function intVolHist = getIntVolHistFeatures(vol,wb,userSetRange)
+function intVolHist = getIntVolHistFeatures(vol,wd,userSetRange)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
@@ -54,7 +54,7 @@ end
 if minVal == -Inf
     minVal = min(X);
 end
-levels = (minVal:wb:maxVal)'; % Vector of grey-levels
+levels = (minVal:wd:maxVal)'; % Vector of grey-levels
 Ng = numel(levels);
 Nv = numel(X);
 
