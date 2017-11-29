@@ -68,7 +68,7 @@ end
 IHname = [scaleName,'_algo',IH.type,'_',IHvalName,minValName];
 
 % IVH name
-if isempty(IVH)
+if isempty(IVH) % CT case
     IVHAlgoName = 'algoNone'; IVHvalName = ['bin1'];
     if ~isempty(range) % The range defines the computation.
         minValName = num2str(range(1)); minValName = replaceCharacter(minValName,'.','dot'); minValName = replaceCharacter(minValName,'-','M');
@@ -81,12 +81,14 @@ else
     IVHAlgoName = ['algo',IVH.type];
     IVHvalName = num2str(IVH.val); IVHvalName = replaceCharacter(IVHvalName,'.','dot');
     IVHvalName = ['bin',IVHvalName];
-    if ~isempty(strfind(IH.type,'FBS')) % The range defines the computation.
+    if ~isempty(strfind(IVH.type,'FBS')) % The range defines the computation.
         if ~isempty(range)
             minValName = num2str(range(1)); minValName = replaceCharacter(minValName,'.','dot'); minValName = replaceCharacter(minValName,'-','M');
             maxValName = num2str(range(2)); maxValName = replaceCharacter(maxValName,'.','dot'); maxValName = replaceCharacter(maxValName,'-','M');
             if strcmp(maxValName,'Inf') % In this case, the maximum value of the ROI is used, so no need to report it.
                 rangeName = ['_min',minValName];
+            elseif strcmp(minValName,'-Inf') % In this case, the minimum value of the ROI is used, so no need to report it.
+                rangeName = ['_max',maxValName];
             else
                 rangeName = ['_min',minValName,'_max',maxValName];
             end
@@ -97,7 +99,7 @@ else
         rangeName  = [];
     end
 end
-IVHname = [IVHAlgoName,'_',IHvalName,rangeName];
+IVHname = [scaleName,'_',IVHAlgoName,'_',IVHvalName,rangeName];
 % -------------------------------------------------------------------------
 
 
