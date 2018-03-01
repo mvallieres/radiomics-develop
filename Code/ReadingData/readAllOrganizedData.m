@@ -1,10 +1,10 @@
-function name = replaceCharacter(name,bad,good)
+function readAllOrganizedData(pathRead,pathSave,namePatients)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
 % -------------------------------------------------------------------------
 % HISTORY:
-% - Creation: August 2017
+% - Creation: March 2018
 % -------------------------------------------------------------------------
 % DISCLAIMER:
 % "I'm not a programmer, I'm just a scientist doing stuff!"
@@ -25,12 +25,20 @@ function name = replaceCharacter(name,bad,good)
 % Martin Vallieres for this matter.
 % -------------------------------------------------------------------------
 
-% ONLY GOOD TO REPLACE A SINGLE CHARACTER
+startpath = pwd;
 
-ind = strfind(name,bad);
-while ~isempty(ind)
-    name = [name(1:ind(1)-1),good,name(ind(1)+1:end)];
-    ind = strfind(name,bad);
+nPatients = numel(namePatients);
+
+fprintf('\n');
+tStart = tic;
+for p = 1:nPatients
+    namePatient = namePatients{p};
+    fprintf('\n--> Reading "%s" ... ',namePatient);
+    readOrganizedData(fullfile(pathRead,namePatient),pathSave,namePatient);
+    fprintf('DONE');
 end
+time = toc(tStart);
+fprintf('\n\n TOTAL TIME FOR READING %u PATIENTS: %f min',nPatients,time/60);
 
+cd(startpath)
 end

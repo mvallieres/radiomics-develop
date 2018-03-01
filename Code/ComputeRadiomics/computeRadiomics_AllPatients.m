@@ -37,20 +37,42 @@ for p = 1:nPatient
     
     % Initialization
     cd(pathRead)
-    load(nameRead{p}) % Variable 'sData' now in MATLAB Workspace;
+    try
+        load(nameRead{p}) % Variable 'sData' now in MATLAB Workspace;
+    catch
+        fprintf('\nERROR LOADING PATIENT')
+        continue
+    end
     scanType = sData{2}.type;
     imParamScan = imParams.(scanType);
     if strcmp(scanType,'PTscan') % MOVE THIS IN THE READING DATA PART AND ALSO APPLY PVE CORRECTIONS AND DENOISING (for MRI(N3/N4 method) and CT too)?  FUTURE WORK ON ITS WAY (image post-processing)?
-        sData{2}.scan.volume.data = computeSUVmap(sData{2}.scan.volume.data,sData{3}(1));
+        try
+            sData{2}.scan.volume.data = computeSUVmap(single(sData{2}.scan.volume.data),sData{3}(1));
+            if isfield(sData{2},'nrrd')
+                sData{2}.nrrd.volume.data = computeSUVmap(single(sData{2}.nrrd.volume.data),sData{3}(1));
+            end
+            if isfield(sData{2},'img')
+                sData{2}.img.volume.data = computeSUVmap(single(sData{2}.img.volume.data),sData{3}(1));
+            end
+        catch
+            fprintf('\nERROR COMPUTING SUV MAP (no DICOM headers?)')
+            continue
+        end
     end
     
     % Computation of ROI mask
     tic, fprintf('\n--> Computation of ROI mask: ')
-    box = 'box10'; % 10 voxels in all three dimensions are added to the smallest bounding box.
+    boxString = 'box10'; % 10 voxels in all three dimensions are added to the smallest bounding box.
     errorROI = false;
     try
-        contourNumber = findContour(sData,nameROI{p},nameSet{p});
-        [volObjInit,roiObjInit] = getROI(sData,contourNumber,box); % This takes care of the "Volume resection" step as well using the argument "box". No fourth argument: 'interp' by default.
+        contourString = findContour(sData,nameROI{p},nameSet{p}); % OUTPUT IS FOR EXAMPLE '3' or '1-3+2'
+        if isfield(sData{2},'nrrd')
+            [volObjInit,roiObjInit] = getMask(sData,contourString,'nrrd',boxString); % This function uses the spatialRef calculated from the DICOM data. DICOM MUST BE PRESENT.
+        elseif isfield(sData{2},'img')
+            [volObjInit,roiObjInit] = getMask(sData,contourString,'img',boxString); % This function uses the spatialRef calculated from the DICOM data. DICOM MUST BE PRESENT.
+        else
+            [volObjInit,roiObjInit] = getROI(sData,contourString,boxString); % This takes care of the "Volume resection" step as well using the argument "box". No fourth argument means 'interp' by default.
+        end
         clear sData % Clear up RAM
     catch
         fprintf('\nPROBLEM WITH ROI')

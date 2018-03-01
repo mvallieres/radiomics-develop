@@ -77,7 +77,7 @@ it is desirable. The next multivariable modeling script should handle missing da
 
 
 --------------- 2. FORMAT FOR PATIENT ID FOLDER NAME -----------------------------------------------
---> $CancerType-$Institution-$PatientNumber
+--> $CancerType$-$Institution$-PatientNumber
 --> Example: HN-UCSF-017, for head and neck cancer, University of San Francisco, patient 17.
 --> Important: No special character nor underscores should be used in the name, but only hyphens.
 --> The actual patient ID in the DICOM data does not need to be set to that name, as the script 

@@ -30,8 +30,14 @@
 % * -------------------------------------------------------------------------- *
 % ******************************************************************************
 
-clc,clear,fprintf('\n'), warning off
-help script_ComputeRadiomics, pathWORK = pwd;
+clc,clear,fprintf('\n'), warning off, pathWORK = pwd;
+if isempty(mfilename) % That means we are running the script from the command line using the following format (mandatory): matlab -nodisplay -nodesktop -nosplash -singleCompThread < script_ComputeRadiomics.m >& script_ComputeRadiomics.log &
+    [scriptFileName,logFileName] = scriptCommandLine_FindNames(pathWORK);
+else
+    scriptFileName = [mfilename,'.m'];
+end
+help(scriptFileName)
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -128,12 +134,13 @@ end
 % -------------------------------------------------------------------------
 
 % ROI OPTIONS
-roiType = 'GTV'; % OPTION: Name you want to give to the type of ROI being analyzed, for file saving purposes. This script currently computes radiomic features for one ROI at a time.
-manualROIchoice = false; % OPTION: % If set to true, the user will be prompted to choose which ROI(s) to use for a given imaging scan (and verify the chosen ROI definition on the imagin scans), so no need to create a roiNames.mat file --> this option is convenient for small datasets. If set to false, the algorithm will use the roiNames.mat file present in WORKSPACE --> this option is convenienent for large datasets, as manual reading and choice for all imaging scans in this script will be long.
+roiTypes = {'GTV'}; % Name of radiomics experiments to run. Each entry in the cell must correspond to one of the $nameExperiment$ in the "roiNames_$nameExperiment$.csv"files /WORKSPACE/CSV. Thus, this cell could have multiple entries.
+% THIS OPTION BELOW IS DISABLED. AS OF MARCH 2018, THE USER MUST PROVIDE THE .csv FILES. THESE FILES MUST BE THOROUGHLY CHECKED BY THE USER BEFORE RUNNING THIS SCRIPT. THIS OPTION WILL SOON BE REPLACED BY AN OPTION ALLOWING TO MANUALLY VERIFY EACH ROI.
+%manualROIchoice = false; % OPTION: % If set to true, the user will be prompted to choose which ROI(s) to use for a given imaging scan (and verify the chosen ROI definition on the imagin scans), so no need to create a roiNames.mat file --> this option is convenient for small datasets. If set to false, the algorithm will use the roiNames.mat file present in WORKSPACE --> this option is convenienent for large datasets, as manual reading and choice for all imaging scans in this script will be long.
 
 % PARALLEL OPTIONS
 nBatch = 4; % OPTION: To compute radiomic features using parallelization. Put this number to the total number of cores that you have on your machine, but beware of RAM usage.
-matlabPATH = 'matlab'; % OPTION: IMPORTANT --> Full path to the matlab executable on the system. --> Ex: '/home/martin/Programs/MATLAB/R2016a/bin/matlab'. Here, a symbolic link to the full MATLAB path has previously been created on Martin Vallieres' computer. 
+matlabPATH = 'matlab'; % OPTION: IMPORTANT --> Full path to the matlab executable on the system. --> Ex: '/home/martin/Programs/MATLAB/R2017b/bin/matlab'. Here, a symbolic link to the full MATLAB path has previously been created on Martin Vallieres' computer. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -143,26 +150,30 @@ matlabPATH = 'matlab'; % OPTION: IMPORTANT --> Full path to the matlab executabl
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                    RADIOMIC FEATURE COMPUTATION CODE                    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-pathDATA = fullfile(pathWORK,'DATA');
+pathDATA = fullfile(pathWORK,'DATA'); pathCSV = fullfile(pathWORK,'CSV');
 mkdir('FEATURES'), pathFEATURES = fullfile(pathWORK,'FEATURES'); cd(pathWORK)
 
 tStart = tic;
 fprintf('\n\n************************* RADIOMIC FEATURE COMPUTATION *************************')
 
-% 1. ROI CHOICE (optional, see above) OR LOADING PREVIOUSLY CONSTRUCTED roiNames.mat
-if manualROIchoice
-   flagRadiomics = roiChoice(pathWORK,pathDATA); % User will be prompted to choose each ROI for each scan of each patient and to verify if the chosen ROI read by the program is correctly positioned onto the imaging volume. Warning: at the end of the function, a new roiNames.mat files will be saved in the WORKSPACE, and potentially already existing ones will be given another name.
-else
-    flagRadiomics = true;
-end
-cd(pathWORK), load('roiNames') % Variable roiNames is now in MATLAB workspace.
+% DISABLED AS OF MARCH 2018
+% % 1. ROI CHOICE (optional, see above) OR LOADING PREVIOUSLY CONSTRUCTED roiNames.mat
+% if manualROIchoice
+%    flagRadiomics = roiChoice(pathWORK,pathDATA); % User will be prompted to choose each ROI for each scan of each patient and to verify if the chosen ROI read by the program is correctly positioned onto the imaging volume. Warning: at the end of the function, a new roiNames.mat files will be saved in the WORKSPACE, and potentially already existing ones will be given another name.
+% else
+%     flagRadiomics = true;
+% end
+% cd(pathWORK), load('roiNames') % Variable roiNames is now in MATLAB workspace.
+
+
+% 1. MANUAL CHECK OF ROIs (optional, but recommended)
+% --> To come soon in future release.
+
 
 % 2. COMPUTING RADIOMIC FEATURES
-if flagRadiomics % In the function "roiChoice.m" (manualROIchoice), the user may have decided to stop the whole process.
-    tic, fprintf('\n--> COMPUTING RADIOMIC FEATURES WITH %u CORES ... ',nBatch)
-    computeRadiomics_batchAllPatients(pathDATA,pathFEATURES,roiNames,imParams,roiType,nBatch,matlabPATH)
-    fprintf('DONE!\n'), toc
-end
+tic, fprintf('\n--> COMPUTING RADIOMIC FEATURES WITH %u CORES ... ',nBatch)
+computeRadiomics_batchAllPatients(pathDATA,pathCSV,pathFEATURES,imParams,roiTypes,nBatch,matlabPATH)
+fprintf('DONE!\n'), toc
 
 time = toc(tStart);
 fprintf('\n\nTOTAL TIME FOR RADIOMIC FEATURE COMPUTATION: %f seconds\n',time)

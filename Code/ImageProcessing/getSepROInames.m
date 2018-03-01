@@ -1,4 +1,4 @@
-function nameROIout = getSepROInames(nameROIin,delimiter)
+function [nameROIout,vectPlusMinus] = getSepROInames(nameROIin,delimiters)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
@@ -25,8 +25,11 @@ function nameROIout = getSepROInames(nameROIin,delimiter)
 % Martin Vallieres for this matter.
 % -------------------------------------------------------------------------
 
-
-ind = strfind(nameROIin,delimiter);
+% FOR DELIMITERS "+" and "-"
+indPlus = strfind(nameROIin,delimiters{1}); vectPlus = ones(1,numel(indPlus));
+indMinus = strfind(nameROIin,delimiters{2}); vectMinus = ones(1,numel(indMinus))*-1;
+[ind,seq] = sort([indPlus,indMinus]);
+vectPlusMinus = [vectPlus,vectMinus]; vectPlusMinus = vectPlusMinus(seq);
 if isempty(ind)
     nameROIout = {nameROIin};
 else

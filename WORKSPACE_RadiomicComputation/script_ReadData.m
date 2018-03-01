@@ -28,16 +28,24 @@
 % * -------------------------------------------------------------------------- *
 % ******************************************************************************
 
-clc,clear,fprintf('\n'), warning off
-help script_ReadData, pathWORK = pwd;
+clc,clear,fprintf('\n'), warning off, pathWORK = pwd;
+if isempty(mfilename) % That means we are running the script from the command line using the following format (mandatory): matlab -nodisplay -nodesktop -nosplash -singleCompThread < script_ReadData.m >& script_ReadData.log &
+    [scriptFileName,logFileName] = scriptCommandLine_FindNames(pathWORK);
+else
+    scriptFileName = [mfilename,'.m'];
+end
+help(scriptFileName)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                          PARAMETER OPTIONS                              %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% PRE-ANONYMIZATION OPTION
+flagAnon = false; % Use "true" if pre-anonymization of PatientIDs is required, "false" othwerwise.
+
 % PARALLEL OPTIONS
-nBatch_Read = 2; % For the initial reading of the data using parallelization. Beware: RAM usage limitations. In doubt, just put 1.
+nBatch_Read = 4; % For the initial reading of the data using parallelization. Beware: RAM usage limitations. In doubt, just put 1.
 matlabPATH = 'matlab'; % IMPORTANT: Full path to the matlab executable on the system. --> Ex: '/home/martin/Programs/MATLAB/R2016a/bin/matlab'. Here, a symbolic link to the full MATLAB path has previously been created on Martin Vallieres' computer. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -55,17 +63,19 @@ cd(pathWORK)
 tStart = tic;
 fprintf('\n\n************************* READING ALL DICOM DATA *************************')
 
-% 1 PRE-ANONYMIZING THE DATA USING "anonymize_dicom.py"
-tic, fprintf('\n--> PRE-ANONYMIZING THE DATA ... ')
-preAnonymize(pathDICOM)
-fprintf('DONE!\n'), toc
+% 1 PRE-ANONYMIZING THE DATA USING "anonymize_dicom.py" (organization of patient and scans folders as defined in instruction is mandatory)
+if flagAnon
+    tic, fprintf('\n--> PRE-ANONYMIZING THE DATA ... ')
+    preAnonymize(pathDICOM)
+    fprintf('DONE!\n'), toc
+end
 
-% 2 READING DATA (organization of patient and scans folders is crucial here)
+% 2 READING DATA (organization of patient and scans folders as defined in instruction is mandatory)
 tic, fprintf('\n--> READING DATA USING %u CORES ... ',nBatch_Read)
-readAllDICOM(pathDICOM,pathDATA,nBatch_Read,matlabPATH,'folder')
+readAllOrganizedData_batch(pathDICOM,pathDATA,nBatch_Read,matlabPATH) % If data is not organized and only in DICOM format, it is still possible to use the function "readAllDICOM.m'.
 fprintf('DONE!\n'), toc
 
 time = toc(tStart);
-fprintf('\n\nTOTAL TIME FOR READING ALL DICOM DATA: %f seconds\n',time)
+fprintf('\n\nTOTAL TIME FOR READING ALL DATA: %f seconds\n',time)
 fprintf('-------------------------------------------------------------------------------------')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

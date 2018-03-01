@@ -307,8 +307,9 @@ for k = 1:numel(ind)
 end
 cd(pathSave)
 nameComplete = [sData{3}(1).PatientID,'_',nameSave,'.',type,'.mat'];
+nameComplete = replaceCharacter(nameComplete,'/','_');
 save(nameComplete,'sData','-v7.3')
-fprintf('\n--> Creation of sData for %s: DONE',nameComplete(1:end-4));
+%fprintf('\n--> Creation of sData for %s: DONE',nameComplete(1:end-4));
 
 cd(startpath)
 end

@@ -1,10 +1,10 @@
-function name = replaceCharacter(name,bad,good)
+function [contourNumber,operations] = parseContourString(contourString)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
 % -------------------------------------------------------------------------
 % HISTORY:
-% - Creation: August 2017
+% - Creation: March 2018
 % -------------------------------------------------------------------------
 % DISCLAIMER:
 % "I'm not a programmer, I'm just a scientist doing stuff!"
@@ -25,12 +25,30 @@ function name = replaceCharacter(name,bad,good)
 % Martin Vallieres for this matter.
 % -------------------------------------------------------------------------
 
-% ONLY GOOD TO REPLACE A SINGLE CHARACTER
+indPlus = strfind(contourString,'+');
+indMinus = strfind(contourString,'-');
+indOperations = sort([indPlus,indMinus]); 
 
-ind = strfind(name,bad);
-while ~isempty(ind)
-    name = [name(1:ind(1)-1),good,name(ind(1)+1:end)];
-    ind = strfind(name,bad);
+% Parsing operations
+if isempty(indOperations)
+    operations = [];
+else
+    nOp = numel(indOperations); operations = cell(1,nOp);
+    for o = 1:nOp
+        operations{o} = contourString(indOperations(o));
+    end
+end
+
+% Parsing contour numbers
+if isempty(indOperations)
+    contourNumber = str2num(contourString);
+else
+    contourNumber = zeros(1,nOp+1);
+    contourNumber(1) = str2num(contourString(1:indOperations(1)-1));
+    for c = 2:nOp
+        contourNumber(c) = str2num(contourString((indOperations(c-1)+1):(indOperations(c)-1)));
+    end
+    contourNumber(end) = str2num(contourString((indOperations(end)+1):end));
 end
 
 end

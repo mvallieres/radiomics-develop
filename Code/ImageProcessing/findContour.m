@@ -1,4 +1,4 @@
-function contourNumber = findContour(sData,nameROI,nameStructureSet)
+function [contourString] = findContour(sData,nameROI,nameStructureSet)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
@@ -31,24 +31,36 @@ function contourNumber = findContour(sData,nameROI,nameStructureSet)
 % THE FIRST CONTOUR IT FINDS, SO BEWARE. BETTER TO ALWAYS SUPPLY A
 % STRUCTURE SET NAME.
 
-delimiter = ',';
-nContourData = numel(sData{2}.scan.contour);
+delimiters = {'+','-'};
+if isfield(sData{2},'nrrd') % Used by default if present
+    nContourData = numel(sData{2}.nrrd.mask);
+elseif isfield(sData{2},'img') % Used as second default if present
+    nContourData = numel(sData{2}.img.mask);
+else % Otherwise we use DICOM data
+    nContourData = numel(sData{2}.scan.contour);
+end
 
-nameROI = getSepROInames(nameROI,delimiter);
+[nameROI,vectPlusMinus] = getSepROInames(nameROI,delimiters);
 contourNumber = zeros(1,numel(nameROI));
-if nargin == 3
-    nameStructureSet = getSepROInames(nameStructureSet,delimiter);
+if ~isempty(nameStructureSet)
+    [nameStructureSet,~] = getSepROInames(nameStructureSet,delimiters);
     if numel(nameROI) ~= numel(nameStructureSet)
         error('The numbers of defined ROI names and Structure Set names are not the same')
     end
 end
 
-for i = 1:numel(nameROI);
+for i = 1:numel(nameROI)
     for j = 1:nContourData
-        nameTemp = sData{2}.scan.contour(j).name;
+        if isfield(sData{2},'nrrd') % Used by default if present
+            nameTemp = sData{2}.nrrd.mask(j).name;
+        elseif isfield(sData{2},'img') % Used as second default if present
+            nameTemp = sData{2}.img.mask(j).name;
+        else % Otherwise we use DICOM data
+            nameTemp = sData{2}.scan.contour(j).name;
+        end
         if strcmp(nameTemp,nameROI{i})
-            if nargin == 3
-                nameSetTemp = sData{2}.scan.contour(j).nameSet;
+            if ~isempty(nameStructureSet)
+                nameSetTemp = sData{2}.scan.contour(j).nameSet; % FOR DICOM + RTSTRUCT
                 if strcmp(nameSetTemp,nameStructureSet{i})
                     contourNumber(i) = j;
                     break
@@ -60,7 +72,15 @@ for i = 1:numel(nameROI);
         end
     end
 end
-ind = ~contourNumber;
-contourNumber = contourNumber(~ind); % Removing contours that were not found. WARNING: We may never notice that one contour is not used due to a mistake in nameROI as input.
+nROI = numel(contourNumber);
+contourString = [num2str(contourNumber(1))];
+for i = 2:nROI
+    if vectPlusMinus(i-1) == 1
+        sign = '+';
+    elseif vectPlusMinus(i-1) == -1
+        sign = '-';
+    end
+    contourString = [contourString,sign,num2str(contourNumber(i))];
+end
 
 end
