@@ -71,8 +71,9 @@ end
 waitBatch(pathBatch,time,nBatch)
 
 
-% CHECKING AND MODIFYING ADC DATA
-modifADCdata(pathSave)
+% DISABLED FOR NOW: MORE CHECKS ABOUT THE IMAGING DATA RANGE OF ALL PATIENTS FIRST NEED TO BE DEVELOPED
+% % CHECKING AND MODIFYING ADC DATA
+% modifADCdata(pathSave)
 
 cd(startpath)
 end
