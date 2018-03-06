@@ -82,7 +82,7 @@ imParamCT.discretisation.IH.type = 'FBN'; % OPTION: Using fixed bin number for i
 imParamCT.discretisation.IH.val = 64; % OPTION: Using 64 grey-levels for intensity-histogram features.
 imParamCT.discretisation.IVH = []; % OPTION: No need to discretise for CT, natural integer discretisation due to HU. Using "[]" is similar to FBS with a bin width of 1, but without a minimum value set up like in the case of PET (SUV = 0). But shall we also use a set minimal value (e.g. -500 HU as defined in imParam.reSgeg.range(1)) for CT for IVH features as well? If yes, use the two lines below instead (commented for now).
 imParamCT.discretisation.texture.type = {'FBN','FBNequal','FBS','FBSequal'}; % OPTION: Using four different types of quantization algorithms. If "FBS" or "FBSequal" is used, imParam.reSeg.range must be defined, as userSetMinVal will be assigned to imParam.reSeg.range(1).
-imParamCT.discretisation.texture.val = {[8,16,32,64],[8,16,32,64],[12.5,25,50,100],[12.5,25,50,100]}; % OPTION: Gray-levels to test for each algorithm on the above line (definition depends on the algorithm). The total number must be the same in each cell entry.
+imParamCT.discretisation.texture.val = {[8,16,32,64],[8,16,32,64],[12.5,25,50,100],[12.5,25,50,100]}; % OPTION: Gray-levels to test for each algorithm on the above line (definition depends on the algorithm). The total number must be the same in each cell entry. For the FBS algorithm, we assume values are in units of HU.
 imParamCT.type = 'CTscan';
 imParamCT.intensity = 'definite'; % OPTION: Definite intensity units (HU). 
 imParams.CTscan.image = imParamCT;
@@ -101,15 +101,29 @@ imParamPET.discretisation.IH.val = 64; % OPTION: Using 64 grey-levels for intens
 imParamPET.discretisation.IVH.type = 'FBS'; % OPTION: Using fixed bin size for intensity-volume histogram features with PET. imParam.reSeg.range must be defined, as userSetMinVal will be assigned to imParam.reSeg.range(1).
 imParamPET.discretisation.IVH.val = 0.1; % OPTION: Using 0.1 SUV bin width for intensity-histogram features.
 imParamPET.discretisation.texture.type = {'FBN','FBNequal','FBS','FBSequal'}; % OPTION: Using four different types of quantization algorithms. If "FBS" or "FBSequal" is used, imParam.reSeg.range must be defined, as userSetMinVal will be assigned to imParam.reSeg.range(1).
-imParamPET.discretisation.texture.val = {[8,16,32,64],[8,16,32,64],[0.25,0.5,1,2],[0.25,0.5,1,2]}; % OPTION: Gray-levels to test for each algorithm on the above line (definition depends on the algorithm). The total number must be the same in each cell entry.
+imParamPET.discretisation.texture.val = {[8,16,32,64],[8,16,32,64],[0.25,0.5,1,2],[0.25,0.5,1,2]}; % OPTION: Gray-levels to test for each algorithm on the above line (definition depends on the algorithm). The total number must be the same in each cell entry. For the FBS algorithm, we assume values are in units of SUV.
 imParamPET.type = 'PTscan';
 imParamPET.intensity = 'definite'; % OPTION: Definite intensity units (SUV).
 imParams.PTscan.image = imParamPET;
 
 % ADC MAP PARAMETERS: To be done specifically for that type of maps. Later, we may add KTrans as well. 
-% In addition, I need to change the "scanType" when reading data.
-% These intensities mean something, so these params will not be the same as for MRI.
-% imParam.ADCscan.image = imParamADC; % TO BE DONE.
+imParamADC.interp.scaleNonText = [3,3,3]; % OPTION: Resolution in mm for the computation of non-texture features. Here, given the large difference between commonly seen in-plane resolution (~ 1 mm) and slice thickness (~ 5 mm), we take some middle point.
+imParamADC.interp.scaleText = {[1,1,1],[2,2,2],[3,3,3],[4,4,4]}; % OPTION: Different resolutions in mm tested for the computation of texture features. Each cell entry is a [X,Y,Z] resolution in MATLAB world coordinate.
+imParamADC.interp.volInterp = 'linear'; % OPTION: Using cubic interpolation for imaging intensities. Conservative choice to prevent interpolation craziness.
+imParamADC.interp.glRound = []; % OPTION: No grey-level rounding for ADC maps.
+imParamADC.interp.roiInterp = 'linear'; % OPTION: Using cubic interpolation for ROI mask. Conservative choice to prevent interpolation craziness.
+imParamADC.interp.roiPV = 0.5; % OPTION: After interpolation, a value >=0.5 is assigned to a 1, and <0.5 to a 0.
+imParamADC.reSeg.range = [0,inf]; % OPTION: We are working with ADC maps, going from 0 to infinity. The minimal value is of special importance for FBS discretisation. If the lower bound of the re-segmentation range is not defined, the minimum value of the ROI will be used in FBS discretisation (not recommended).
+imParamADC.reSeg.outliers = 'Collewet'; % OPTION: Using Collewet normalization to remove outliers for MRI.
+imParamADC.discretisation.IH.type = 'FBN'; % OPTION: Using fixed bin number for intensity-histogram features.
+imParamADC.discretisation.IH.val = 64; % OPTION: Using 64 grey-levels for intensity-histogram features.
+imParamADC.discretisation.IVH.type = 'FBS'; % OPTION: Using fixed bin size for intensity-volume histogram features with PET. imParam.reSeg.range must be defined, as userSetMinVal will be assigned to imParam.reSeg.range(1).
+imParamADC.discretisation.IVH.val = 1; % OPTION: Using 1 um^2/s bin width for intensity-histogram features.
+imParamADC.discretisation.texture.type = {'FBN','FBNequal','FBS','FBSequal'}; % OPTION: Using four different types of quantization algorithms. If "FBS" or "FBSequal" is used, imParam.reSeg.range must be defined, as userSetMinVal will be assigned to imParam.reSeg.range(1).
+imParamADC.discretisation.texture.val = {[8,16,32,64],[8,16,32,64],[12.5,25,50,100],[12.5,25,50,100]}; % OPTION: Gray-levels to test for each algorithm on the above line (definition depends on the algorithm). The total number must be the same in each cell entry. For the FBS algorithm, we assume values are in units of um^2/s.
+imParamADC.type = 'ADCscan';
+imParamADC.intensity = 'definite'; % OPTION: Definite intensity units (SUV).
+imParams.ADCscan.image = imParamADC; 
 
 % FILTER PARAMETERS (considered as arbitrary intensities). No FBS algorithm should ever be used at the moment, or otherwise the code will fail (TO SOLVE TO ALLOW THE USE OF THE MINIMUM VALUE OF THE ROI?).
 imParamFilter.discretisation.IH.type = 'FBN'; % Using fixed bin number for intensity-histogram features.
@@ -129,7 +143,7 @@ if computeWavelet
     imParams.MRscan.filter = imParamFilter;
     imParams.CTscan.filter = imParamFilter;
     imParams.PTscan.filter = imParamFilter;
-    % imParams.ADCscan.filter = imParamFilter; % TO BE DONE.
+    imParams.ADCscan.filter = imParamFilter;
 end
 % -------------------------------------------------------------------------
 

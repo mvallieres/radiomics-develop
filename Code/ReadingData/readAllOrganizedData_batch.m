@@ -70,5 +70,9 @@ end
 % WAITING LOOP
 waitBatch(pathBatch,time,nBatch)
 
+
+% CHECKING AND MODIFYING ADC DATA
+modifADCdata(pathSave)
+
 cd(startpath)
 end

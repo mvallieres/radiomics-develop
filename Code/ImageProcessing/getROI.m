@@ -82,7 +82,7 @@ end
 % INTIALIZATIONS
 nContour = numel(contourNumber);
 ROImask_cell = cell(1,nContour);
-if strcmp(sData{2}.type,'PTscan') || strcmp(sData{2}.type,'CTscan') || strcmp(sData{2}.type,'MRscan')
+if strcmp(sData{2}.type,'PTscan') || strcmp(sData{2}.type,'CTscan') || strcmp(sData{2}.type,'MRscan') || strcmp(sData{2}.type,'ADCscan')
     scan = 'scan'; volume = 'volume';
 elseif strcmp(sData{2}.type,'PTsim')
     scan = 'model'; volume = 'activity';
