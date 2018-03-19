@@ -25,6 +25,12 @@ function [contourNumber,operations] = parseContourString(contourString)
 % Martin Vallieres for this matter.
 % -------------------------------------------------------------------------
 
+if isnumeric(contourString)
+    contourNumber = contourString;
+    operations = [];
+    return
+end
+
 indPlus = strfind(contourString,'+');
 indMinus = strfind(contourString,'-');
 indOperations = sort([indPlus,indMinus]); 

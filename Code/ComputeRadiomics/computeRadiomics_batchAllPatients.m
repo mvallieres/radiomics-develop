@@ -39,7 +39,11 @@ for r = 1:nROItypes
     cd(pathCSV), tableROI = readtable(['roiNames_',roiType,'.csv']);
     patientNames = getPatientNames([tableROI.PatientID,tableROI.ImagingScanName,tableROI.ImagingModality]);
     nameROI = tableROI.ROIname;
-    nameSet = tableROI.StructureSetName;
+    if sum(contains(tableROI.Properties.VariableNames,'StructureSetName'))
+        nameSet = tableROI.StructureSetName;
+    else
+        nameSet = cell(size(tableROI,1),1); % Creation of cell with empty entries.
+    end
     
     
     % INITIALIZATION

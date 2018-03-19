@@ -26,7 +26,8 @@ function [contourString] = findContour(sData,nameROI,nameStructureSet)
 % -------------------------------------------------------------------------
 
 
-% THIRD ARGUMENT IS OPTIONAL. HOWEVER, IF TWO ROIs WITH THE SAME NAME BUT
+% THIRD ARGUMENT IS OPTIONAL AND IS MEANT TO BE USED ONLY FOR RTstructs. 
+% HOWEVER, IF TWO ROIs WITH THE SAME NAME BUT
 % FROM DIFFERENT STRUCTURE SETS ARE PRESENT, THE ALGORITHM WILL JUST OUTPUT
 % THE FIRST CONTOUR IT FINDS, SO BEWARE. BETTER TO ALWAYS SUPPLY A
 % STRUCTURE SET NAME.
@@ -42,6 +43,9 @@ end
 
 [nameROI,vectPlusMinus] = getSepROInames(nameROI,delimiters);
 contourNumber = zeros(1,numel(nameROI));
+if nargin == 2
+    nameStructureSet = [];
+end  
 if ~isempty(nameStructureSet)
     [nameStructureSet,~] = getSepROInames(nameStructureSet,delimiters);
     if numel(nameROI) ~= numel(nameStructureSet)
