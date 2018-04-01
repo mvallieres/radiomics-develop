@@ -394,9 +394,9 @@ if nargin < 5
                             end
                         end
                         if nScanIndex == 1
-                            system(['mv ',name,' ',nameComp{scanIndex(k)}(1:ind1(1)),type{j}(2:3),nameComp{scanIndex(k)}(ind2(1):end)]);
+                            system(['mv "',name,'" "',nameComp{scanIndex(k)}(1:ind1(1)),type{j}(2:3),nameComp{scanIndex(k)}(ind2(1):end),'"']);
                         else
-                            system(['mv ',name,' ',nameComp{scanIndex(k)}(1:ind1(1)),type{j}(2:3),num2str(k),nameComp{scanIndex(k)}(ind2(1):end)]);
+                            system(['mv "',name,'" "',nameComp{scanIndex(k)}(1:ind1(1)),type{j}(2:3),num2str(k),nameComp{scanIndex(k)}(ind2(1):end),'"']);
                         end
                     end
                 end
