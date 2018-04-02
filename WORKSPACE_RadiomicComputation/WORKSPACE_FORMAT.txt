@@ -42,9 +42,9 @@
 *                *
 *                 --> roiNames.mat (optional, see options of script_ComputeRadiomics.m)
 *                *
-* 		  --> script_ReadData.m
+* 		  --> script_ReadData.m (SOME OPTIONS TO SELECT IN THE SCRIPT)
 *                *
-*                 --> script_ComputeRadiomics.m
+*                 --> script_ComputeRadiomics.m (MANY OPTIONS TO SELECT IN THE SCRIPT)
 *                *******************************************************************************
 ************************************************************************************************
 
@@ -55,23 +55,19 @@
 - T2FS: T2-weighted fat-saturated sequence from magnetic resonance imaging scan.
 
 --> NOTES:
-1. For imaging modalities acquired in the same reference frame (e.g. during the same scan: PET/CT 
-or MR-T1/MR-T2FS), it is not necessary to have one RTstruct per imaging volume. The algorithm 
-will handle this. However, constructing one RTstruct per imaging volume often produces better ROI 
-results.
-
-2. Be sure to include the anonymize_dicom.py script in the DICOM folder next to all PATIENT ID folders.
+1. Be sure to include the anonymize_dicom.py script in the DICOM folder next to all PATIENT ID folders.
 It will be used to pre-anonymize the data and change the patient IDs inside all .dcm files. Beware,
 as dates of scans, etc. will be lost after running the script, so be sure to record them beforehand 
 if needed. Be sure to install python on your computer prior to running masterScript.m: on Linux, this 
 is simply performed by running "sudo apt-get install python" in the terminal.
 
-3. Running script_ReadData.m in MATLAB will correctly read and organize all data.
+2. Running script_ReadData.m in will read the imaging data contained in the DICOM folder and organize 
+all data in MATLAB format in a newly created DATA folder.
 
-4. Running script_ComputeRadiomics.m in MATLAB will compute all radiomic features and save them
-in a newly created FEATURES folder.
+3. Running script_ComputeRadiomics.m will read all organized data contained in the DATA folder, 
+compute all radiomic features and save feature in a structure format a newly created FEATURES folder.
 
-5. It is not necessary to have all imaging modalities available for all patients (complete data), but
+4. It is not necessary to have all imaging modalities available for all patients (complete data), but
 it is desirable. The next multivariable modeling script should handle missing data.
 ----------------------------------------------------------------------------------------------------
 
