@@ -3,59 +3,68 @@
 ************************************************************************************************
 * --> WORKSPACE  *******************************************************************************  
 *	          --> DICOM ********************************************************************
-*		 *	     --> STS-McGill-001 ************************************************
-*		 *	    * 		         --> PET ***************************************
+*		 *	     --> $CancerA$-$InstitutionB$-$###$ ********************************
+*		 *	    * 		         --> $Scan1$ ***********************************
 *                *          * 	                *	  --> DICOM Images
-*                *          * 			*	  --> DICOM RTstruct
+*                *          * 			*	  --> DICOM RTstruct or .nrrd or .img/.hdr
+*                *          *                   *         --> imagingVolume  (if no RTstruct)
 *                *          * 			*	  --> DICOM RTdose   (if available)
 *	 	 *	    *			*	  --> DICOM RTplan   (if available)
 * 	         *          *     		*	  --> DICOM REG      (if available)
-*		 *	    * 		         --> CT ***************************************
+*		 *	    * 		         --> $Scan2$ ***********************************
 *                * 	    * 			*	  --> DICOM Images
-*                *          * 			*	  --> DICOM RTstruct
+*                *          * 			*	  --> DICOM RTstruct or .nrrd or .img/.hdr
+*                *          *                   *         --> imagingVolume  (if no RTstruct)
 *                *          * 			*	  --> DICOM RTdose   (if available)
 *	 	 *	    *			*	  --> DICOM RTplan   (if available)
 * 	         *          *	        	*	  --> DICOM REG      (if available)
-*                *          * 		         --> T1 ************************************
+*                *          * 		         --> $Scan3$ ***********************************
 *                * 	    * 			*	  --> DICOM Images
-*                *          * 			*	  --> DICOM RTstruct
+*                *          * 			*	  --> DICOM RTstruct or .nrrd or .img/.hdr
+*                *          *                   *         --> imagingVolume  (if no RTstruct)
 *                *          * 			*	  --> DICOM RTdose   (if available)
 *	 	 *	    *			*	  --> DICOM RTplan   (if available)
 * 	         *          *	        	*         --> DICOM REG      (if available)
-*		 *	    * 		         --> T2FS **********************************
+*		 *	    * 		         --> $ScanN$ ***********************************
 *                * 	    * 			*	  --> DICOM IMAGES
-*                *          * 			*	  --> DICOM RTstruct
+*                *          * 			*	  --> DICOM RTstruct or .nrrd or .img/.hdr
+*                *          *                   *         --> imagingVolume  (if no RTstruct)
 *                *          * 			*	  --> DICOM RTdose   (if available)
 *	 	 *	    *			*	  --> DICOM RTplan   (if available)
 * 	         *          *         		*	  --> DICOM REG      (if available)
 *                *          *                   ************************************************
 *                *          * 
-*                *           --> HN-UCSF-017    ************************************************
-*                *          *   	         --> DATA (not necessarily the same as above)  
-*                *           --> Lung-PMH-101   ************************************************
-*                *          *		         --> DATA (not necessarily the same as above)
-*                *          *                   ************************************************
+*                *           --> $CancerC-$InstitutionD$-### ***********************************
+*                *          *   	               --> DATA (not necessarily the same as above)  
+*                *           --> $CancerE-$InstitutionF$-### ***********************************
+*                *          *		               --> DATA (not necessarily the same as above)
+*                *          *                          *****************************************
 *                *          *
-*                *           --> anonymize_dicom.py
+*                *           --> anonymize_dicom.py (optional, see script_ReadData.m)
 *                *          ********************************************************************
 *                *
 *                *
-*                 --> roiNames.mat (optional, see options of script_ComputeRadiomics.m)
+*                 --> CSV   ********************************************************************
+*                *           --> roiNames_$nameExperiment1$.csv
+* 		 *           --> roiNames_$nameExperiment2$.csv
+*                *           --> roiNames_$nameExperimentN$.csv
+*                *          ********************************************************************
 *                *
-* 		  --> script_ReadData.m (SOME OPTIONS TO SELECT IN THE SCRIPT)
+*                 --> script_ReadData.m
 *                *
-*                 --> script_ComputeRadiomics.m (MANY OPTIONS TO SELECT IN THE SCRIPT)
-*                *******************************************************************************
+*                 --> script_ComputeRadiomics.m
+************************************************************************************************
 ************************************************************************************************
 
 --> In the above example:
-- PET: Positron tomography scan.
-- CT: Computed tomography scan.
-- T1: T1-weighted sequence from magnetic resonance imaging scan.
-- T2FS: T2-weighted fat-saturated sequence from magnetic resonance imaging scan.
+- What is between two "$" signs represent the name of a variable to be determined by the user.
+- The hierarchy of folders is as follows: Name of study, DICOM files, PatientID, name of scan.
+- PLEASE, PLEASE, see the full content of "WORKSPACE_RadiomicComputation" for more details.
+----------------------------------------------------------------------------------------------------
+
 
 --> NOTES:
-1. Be sure to include the anonymize_dicom.py script in the DICOM folder next to all PATIENT ID folders.
+1. Place the anonymize_dicom.py script in the DICOM folder next to all PATIENT ID folders (optional).
 It will be used to pre-anonymize the data and change the patient IDs inside all .dcm files. Beware,
 as dates of scans, etc. will be lost after running the script, so be sure to record them beforehand 
 if needed. Be sure to install python on your computer prior to running masterScript.m: on Linux, this 
@@ -68,54 +77,92 @@ all data in MATLAB format in a newly created DATA folder.
 compute all radiomic features and save feature in a structure format a newly created FEATURES folder.
 
 4. It is not necessary to have all imaging modalities available for all patients (complete data), but
-it is desirable. The next multivariable modeling script should handle missing data.
+it is desirable. The next multivariable modeling script will handle missing data.
 ----------------------------------------------------------------------------------------------------
 
 
---------------- 2. FORMAT FOR PATIENT ID FOLDER NAME -----------------------------------------------
---> $CancerType$-$Institution$-PatientNumber
---> Example: HN-UCSF-017, for head and neck cancer, University of San Francisco, patient 17.
+--------------- 1. FORMAT FOR PATIENT ID FOLDER NAME -----------------------------------------------
+--> Format: $CancerType$-$Institution$-$PatientNumber$
+--> Example: HN-McGill-017, for head and neck cancer, McGill University, patient 17.
+    Always use three numbers for the patient numbers.
 --> Important: No special character nor underscores should be used in the name, but only hyphens.
---> The actual patient ID in the DICOM data does not need to be set to that name, as the script 
-    anonymize_dicom.py will take care of this.
+--> At this point, it is not necessary that the actual patient ID in the DICOM headers of each 
+    image file to be set up to the Patient ID folder name, although it is desirable.
 --> You can have patient folders from multiple institutions and multiple cancer sites in the DICOM 
-    folder. It is also not necessary to have consecutive patient numbers (001, 002, 003, etc.). The
-    above example, with different institutions, different cancer sites, and non-consecutive patient
-    numbers, is OK!
+    folder. It is also not necessary to have consecutive patient numbers (001, 002, 003, etc.).
+    Obviously, it is also ok to have consecutive patient numbers, all of the same cancer type, and 
+    with all the same type of scans (conventional stuff)!
 ----------------------------------------------------------------------------------------------------
 
 
---------------- 3. FORMAT FOR IMAGING FOLDER NAME --------------------------------------------------
+--------------- 2. FORMAT FOR IMAGING FOLDER NAME --------------------------------------------------
 --> Important: No special character nor underscores should be used in the name, but only hyphens.
+--> Patients with identical types of scans must have the exact same spelling.
 ----------------------------------------------------------------------------------------------------
 
 
---------------- 4. FORMAT FOR DICOM DATA -----------------------------------------------------------
---> Make sure all files ends with the extension .dcm
+--------------- 4. FORMAT FOR DICOM DATA (mandatory) -----------------------------------------------
+--> Make sure all files end with the extension .dcm.
+--> Those files are the ones that could be imported into 3D slicer for contouring (if no RTstruct is 
+    available). However, DO NOT EXPORT THEM BACK from 3D slicer to use them in this workspace, as 
+    important information could be missing in the exported DICOM headers.
 ----------------------------------------------------------------------------------------------------
 
 
---------------- 5. FORMAT FOR roiNames.mat ---------------------------------------------------------
---> This file is a cell array of size (nPatient*nScan) X 5, where nPatient is the number of patients
-    to read, and nScan the number of scan per patient. The first column defines the patient ID folder 
-    name. The second column defines the IMAGING folder name for a given patient that the user is wlling 
-    to assign for all similar scans in the DICOM folder. The third column defines the imaging modality 
-    type (use "MRscan" for any MRI, "CTscan" for CT, "PTscan" for PET). The third column defines the
-    name of the ROI name to analyze for a given patient. The fourth column defines the name of the
-    structure set name. Please see roiNames.xlsx and the files created in the DATA folder after 
-    running script_ReadData.m for more details.
+--------------- 5. FORMAT FOR DICOM RTstruct or .nrrd or .img/.hdr (mandatory) ---------------------
+--> A file defining the ROI(s) for radiomics computation must be present in all scan folders of all
+    patients. At the moment, this file must either be a RTstruct.dcm file (one file can contain all 
+    desired ROIs), or one or multiple .nnrd or .img/.hdr file(s) exported from 3D Slicer after 
+    contouring. Please see "WORKSPACE_RadiomicComputation/DICOM" for examples of such files.
+----------------------------------------------------------------------------------------------------
 
---> By using commas in-between corresponding ROI names and Structure Set names, you are allowed to 
-    create a single ROI consisting of the union of all the single ROIs. That means that all single ROI 
-    names and structure set names must not contain any commas. In roiNames.xlsx, the ROI for the PET imaging 
-    volume of STS-McGill-001 would be the union of 1) GTV_Mass/RTstruct_PET, 2) GTV_Edema/RTstruct_PET
-    contours, and the ROI for the MRI-T1 imaging volume of STS-McGill-003 would be the union of 
-    1) GTV_Mass/RTstruct_T1, 2) GTV_Edema/RTstruct_T1, 3) GTV_Mass/RTstruct_STIR.
 
---> The ROI name is defined as the "StructureSetROISequence.(itemROI).ROIName" in the DICOM headers 
-    of an RTstruct. The structure set name is defined as the "StructureSetName" in the DICOM headers 
-    of an RTstruct. If the field "StructureSetName" is not present, then use the field 
-    "StructureSetDescription". If the field "StructureSetDescription" is also not present, then use 
-    the field "SeriesDescription". If the field "SeriesDescription" is also not present, then use the
-    field "SeriesInstanceUID".
+--------------- 6. FORMAT FOR 3D Slicer LABEL MAPS (optional) --------------------------------------
+--> Contouring in 3D slicer is an alternative if no RTstruct is available. Exported label maps 
+    from 3D Slicer then define the ROI(s) for radiomics computation.
+--> Each label map CONTAINS ONLY 1 ROI exported as a ".nrrd" or ".img/.hdr" file from 3D slicer. Make 
+    sure that the desired label of the ROI in the "3D Slicer label map .nrrd or .img/.hdr file" has a 
+    numerical value of 1 (any other numerical values in the "3D Slicer label map" will be ignored). 
+    Also, it is crucial that you  "associate" the label map to the imaging volume in 3D slicer before 
+    exporting the label map. Ask Martin Vallieres for a demo before performing this crucial step.
+--> Format: segMask_$nameROI$.nrrd, where $nameROI$ is the name the user is setting up for that ROI. 
+    See the folder "EXAMPLE_STUDY" for more details.
+--> More than one label map with different $nameROI$ can be present in a given folder. The algorithm 
+    will read and record them all. Remember, one label map equals one ROI, so you must create multiple 
+    label maps if you want to analyze multiple ROIs.
+--> If for some reasons you are not able to save the 3D Slicer label map with a numerical value of 1
+    for the desired ROI (e.g., other value is saved due to some bug or miscellaneous manipulation), 
+    please save the ".nrrd" or ".img/.hdr" file with the following name format: "segMask_$nameROI
+    $_label$X$.nrrd", where X is the numerical value (other than 1) assigned to the desired ROI in the 
+    map. See the PET scan of Cervix-CHRU-095 for an example of such file. Note: if the numerical value 
+    is set to 1 for the desired ROI, you do not have to add the extra "_label$X$" in the name of the 
+    3D Slicer label map and you can ignore this point. 
+----------------------------------------------------------------------------------------------------
+
+
+--------------- 7. FORMAT FOR 3D SLICER IMAGING VOLUME (mandatory if not using RTstructs) ----------
+--> This file is mandatory if 3D Slicer is used for contouring (i.e. no RTstruct available).
+--> In addition to the DICOM imaging data initially imported in 3D Slicer, each patient-scan folder 
+    must also contain that same imaging volume as exported from 3D Slicer in ".nrrd" or ".img/.hdr" 
+    format. This file must always be named "imagingVolume.nrrd" or 
+    "imagingVolume.img/imagingVolume.hdr".
+--> This imaging volume as exported from 3D slicer is the one to be used in radiomics computations
+    to ensure correct spatial correspondence with 3D Slicer label maps. The DICOM data is also
+    mandatory and needed, as it contains important metadata information (in the DICOM headers).
+--> Please see "WORKSPACE_RadiomicComputation/DICOM" for examples of such files. 
+----------------------------------------------------------------------------------------------------
+
+
+--------------- 8. FORMAT FOR roiNames_$nameExperiment1$.csv (mandatory) ---------------------------
+--> The roiNames_$nameExperiment$.csv files determine the different types of ROIs for which 
+    the radiomics features will be automatically computed (e.g. GTV, CTV, PTV, etc.). 
+--> Format: roiNames_$nameExperiment$.csv, where $nameExperiment$ is determined by the user.
+    See "WORKSPACE_RadiomicComputation/CSV" for examples of such files. The $nameExperiment$ must 
+    correspond to one of the cell entries of the "roiType" variable in script_ComputeRadiomics.m.
+--> Column 1 of roiNames_$nameExperiment$.csv: PATIENT ID FOLDER NAME as defined in point 1 above.
+--> Column 2 of roiNames_$nameExperiment$.csv: IMAGING FOLDER NAME as defined in point 2 above.
+--> Column 3 of roiNames_$nameExperiment$.csv: Either "PTscan", "CTscan" or "MRscan".
+--> Column 4 of roiNames_$nameExperiment$.csv: One of the name in the StructureSetROISequence.   
+    (itemROI).ROIName field as defined in the RTstruct file, or $nameROI$ if using a 3D Slicer label 
+    map (point 6 above).
 ----------------------------------------------------------------------------------------------------

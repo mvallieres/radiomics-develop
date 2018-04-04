@@ -1,0 +1,10 @@
+PatientID,ImagingScanName,ImagingModality,ROIname
+STS-McGill-001,PET,PTscan,GTV_Mass
+STS-McGill-001,CT,CTscan,GTV_Mass
+STS-McGill-001,T1,MRscan,GTV_Mass
+STS-McGill-001,T2FS,MRscan,GTV_Mass
+Meningioma-UCSF-128,SPGR,MRscan,RTV
+Cervix-CHRU-095,ADC,MRscan,GTV
+Cervix-CHRU-095,GADO,MRscan,GTV
+Cervix-CHRU-095,PET,PTscan,GTV
+Cervix-CHRU-095,T2,MRscan,GTV

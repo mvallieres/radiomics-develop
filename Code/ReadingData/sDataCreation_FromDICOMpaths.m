@@ -301,13 +301,13 @@ else
         end
     end
 end
-ind = strfind(nameSave,'/');
-for k = 1:numel(ind)
-    nameSave(ind(k)) = '-';
-end
+nameSave = replaceCharacter(nameSave,'/','-');
+nameSave = replaceCharacter(nameSave,'\','-');
+nameSave = replaceCharacter(nameSave,' ','-');
+nameSave = replaceCharacter(nameSave,'(','-');
+nameSave = replaceCharacter(nameSave,')','-');
 cd(pathSave)
 nameComplete = [sData{3}(1).PatientID,'_',nameSave,'.',type,'.mat'];
-nameComplete = replaceCharacter(nameComplete,'/','_');
 save(nameComplete,'sData','-v7.3')
 %fprintf('\n--> Creation of sData for %s: DONE',nameComplete(1:end-4));
 

@@ -1,0 +1,3 @@
+PatientID,ImagingScanName,ImagingModality,ROIname
+STS-McGill-001,T2FS,MRscan,GTV_Edema-GTV_Mass
+Meningioma-UCSF-128,SPGR,MRscan,RTV_E2mm-RTV_E1mm+RTV_C2mm

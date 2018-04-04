@@ -40,7 +40,7 @@ for s = 1:nScans
     
     % STEP 1: READING DICOM DATA (there must be DICOM data present in the directory for now --> minimim requirement is to report on image acquisition parameters).
     try
-        readAllDICOM(pwd,pwd,0,'matlab');
+        readAllDICOM(pwd,pwd,0,'matlab','modality');
         listMat = dir('*.mat'); % There must be only one scan series in the organized patient-scan folder
         sData = load(listMat(1).name); sData = struct2cell(sData); sData = sData{1};
         delete('*.mat')
