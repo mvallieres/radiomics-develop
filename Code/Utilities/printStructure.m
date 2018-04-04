@@ -1,10 +1,7 @@
-function [structure] = concatenateStruct(structure,subStructure)
+function printStructure(structure,nameCSV)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
-% -------------------------------------------------------------------------
-% HISTORY:
-% - Creation: August 2017
 % -------------------------------------------------------------------------
 % DISCLAIMER:
 % "I'm not a programmer, I'm just a scientist doing stuff!"
@@ -25,9 +22,28 @@ function [structure] = concatenateStruct(structure,subStructure)
 % Martin Vallieres for this matter.
 % -------------------------------------------------------------------------
 
-nameFields = fieldnames(subStructure); nFields = numel(nameFields);
+% THIS FUNCTION WORKS ONLY A ONE LEVEL STRUCTURE WITH NUMERICAL VALUES
+
+
+% CREATE THE VECTOR OF VALUES
+nameFields = fieldnames(structure); nFields = numel(nameFields);
+vector = zeros(nFields,1);
 for f = 1:nFields
-    structure.(nameFields{f}) = subStructure.(nameFields{f});
+    value = structure.(nameFields{f});
+    if ~isnumeric(value) || isempty(value)
+        vector(f) = NaN;
+    else
+        vector(f) = value;
+    end
 end
+
+
+% CREATE TABLE
+VALUE = vector;
+tableValue = table(VALUE,'RowNames',nameFields);
+tableValue.Properties.DimensionNames{1} = 'FEATURE';
+
+% WRITE TABLE
+writetable(tableValue,[nameCSV,'.csv'],'WriteRowNames',true);
 
 end

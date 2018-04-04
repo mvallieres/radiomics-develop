@@ -1,6 +1,6 @@
-function [NGTDM,countValid] = getNGTDMmatrix(ROIOnly,levels)
+function [NGTDM,countValid] = getNGTDMmatrix(ROIOnly,levels,distCorrection)
 % -------------------------------------------------------------------------
-% function [NGTDM,countValid] = getNGTDM(ROIOnly,levels)
+% function [NGTDM,countValid] = getNGTDM(ROIOnly,levels,distCorrection)
 % -------------------------------------------------------------------------
 % DESCRIPTION:
 % This function computes the Neighborhood Gray-Tone Difference Matrix 
@@ -25,6 +25,10 @@ function [NGTDM,countValid] = getNGTDMmatrix(ROIOnly,levels)
 %            set to NaNs.
 % - levels: Vector containing the quantized gray-levels in the tumor region
 %           (or reconstruction levels of quantization).
+% - distCorrection: (optional). Set this variable to true in order to use 
+%                   discretization length difference corrections as used 
+%                   here: https://doi.org/10.1088/0031-9155/60/14/5471. 
+%                   Set this variable to false to replicate IBSI results.
 %
 % ** 'ROIonly' and 'levels' should be outputs from 'prepareVolume.m' **
 % -------------------------------------------------------------------------
@@ -58,6 +62,16 @@ function [NGTDM,countValid] = getNGTDMmatrix(ROIOnly,levels)
 % "radiomics-develop" team is however highly encouraged. Please contact 
 % Martin Vallieres for this matter.
 % -------------------------------------------------------------------------
+
+
+% PARSING "distCorrection" ARGUMENT
+if nargin < 3
+    distCorrection = true; % By default
+else
+    if ~islogical(distCorrection) % The user did not input either "true" or "false", so the default behavior is used.
+        distCorrection = true; % By default
+    end
+end
 
 
 % PRELIMINARY
@@ -102,8 +116,12 @@ if twoD
     [i,j] = ind2sub(size(ROIOnly),find(~isnan(ROIOnly)));
     posValid = [i,j];
     nValid_temp = size(posValid,1);
-    % w8 = 1; w4 = 1; % No correction
-    w8 = 1/sqrt(2); w4 = 1; % Weights given to different neighbors to correct for discretization length differences
+    w4 = 1;
+    if distCorrection
+        w8 = 1/sqrt(2);  % Weights given to different neighbors to correct for discretization length differences
+    else
+        w8 = 1;
+    end
     weights = [w8 w4 w8; w4 w4 w4; w8 w4 w8]; 
     weights = weights(:);
     for n = 1:nValid_temp
@@ -123,8 +141,12 @@ else
     [i,j,k] = ind2sub(size(ROIOnly),find(~isnan(ROIOnly)));
     posValid = [i,j,k];
     nValid_temp = size(posValid,1);
-    %w26 = 1; w18 = 1; w6 = 1; % No correction
-    w26 = 1/sqrt(3); w18 = 1/sqrt(2); w6=1; % Weights given to different neighbors to correct for discretization length differences
+    w6 = 1;
+    if distCorrection
+        w26 = 1/sqrt(3); w18 = 1/sqrt(2); % Weights given to different neighbors to correct for discretization length differences
+    else
+        w26 = 1; w18 = 1;
+    end
     weights = [w26 w18 w26; w18 w6 w18; w26 w18 w26];
     weights(:,:,2) = [w18 w6 w18; w6 w6 w6; w18 w6 w18];
     weights(:,:,3) = weights(:,:,1);

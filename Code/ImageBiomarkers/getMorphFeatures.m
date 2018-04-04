@@ -288,5 +288,8 @@ end
 % 
 % % Geary's C measure
 % morph.Fmorph_geary_c = getGearyC(vol,res); % NEEDS TO BE VECTORIZED FOR FASTER CALCULATION!
+morph.Fmorph_moran_i = [];
+morph.Fmorph_geary_c = [];
+
 
 end

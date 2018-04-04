@@ -1,4 +1,4 @@
-function ngtdm = getNGTDMfeatures(vol)
+function ngtdm = getNGTDMfeatures(vol,distCorrection)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
@@ -26,11 +26,16 @@ function ngtdm = getNGTDMfeatures(vol)
 % -------------------------------------------------------------------------
 
 % - vol: 3D volume, isotropically resampled, quantized (e.g. Ng = 32, levels = [1, ..., Ng]), with NaNs outside the region of interest
+% - distCorrection: % Set this variable to true in order to use discretization length difference corrections as used here: https://doi.org/10.1088/0031-9155/60/14/5471. Set this variable to false to replicate IBSI results.
 
 
 % GET THE NGTDM MATRIX
 levels = 1:max(vol(~isnan(vol(:)))); % Correct definition, without any assumption
-[NGTDM,countValid] = getNGTDMmatrix(vol,levels);
+if nargin == 2
+    [NGTDM,countValid] = getNGTDMmatrix(vol,levels,distCorrection);
+else
+    [NGTDM,countValid] = getNGTDMmatrix(vol,levels);
+end
 nTot = sum(countValid);
 countValid = countValid./nTot; % Now representing the probability of gray-level occurences
 NL = length(NGTDM);

@@ -1,4 +1,4 @@
-function glrlm = getGLRLMfeatures(vol)
+function glrlm = getGLRLMfeatures(vol,distCorrection)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
@@ -26,11 +26,17 @@ function glrlm = getGLRLMfeatures(vol)
 % -------------------------------------------------------------------------
 
 % - vol: 3D volume, isotropically resampled, quantized (e.g. Ng = 32, levels = [1, ..., Ng]), with NaNs outside the region of interest
+% - distCorrection: % Set this variable to true in order to use discretization length difference corrections as used here: https://doi.org/10.1088/0031-9155/60/14/5471. Set this variable to false to replicate IBSI results.
 
 
 % GET THE GLRLM MATRIX
 levels = 1:max(vol(~isnan(vol(:)))); % Correct definition, without any assumption
-[GLRLM] = getGLRLMmatrix(vol,levels); Ns = sum(GLRLM(:));
+if nargin == 2
+    [GLRLM] = getGLRLMmatrix(vol,levels,distCorrection);
+else
+    [GLRLM] = getGLRLMmatrix(vol,levels); 
+end
+Ns = sum(GLRLM(:));
 GLRLM = GLRLM./sum(GLRLM(:)); % Normalization of GLRLM
 sz = size(GLRLM); % Size of GLRLM
 cVect = 1:sz(2); rVect = 1:sz(1);% Row and column vectors

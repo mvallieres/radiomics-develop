@@ -1,4 +1,4 @@
-function glcm = getGLCMfeatures(vol)
+function glcm = getGLCMfeatures(vol,distCorrection)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
@@ -26,11 +26,16 @@ function glcm = getGLCMfeatures(vol)
 % -------------------------------------------------------------------------
 
 % - vol: 3D volume, isotropically resampled, quantized (e.g. Ng = 32, levels = [1, ..., Ng]), with NaNs outside the region of interest
+% - distCorrection: % Set this variable to true in order to use discretization length difference corrections as used here: https://doi.org/10.1088/0031-9155/60/14/5471. Set this variable to false to replicate IBSI results.
 
 
 % GET THE GLCM MATRIX
 levels = 1:max(vol(~isnan(vol(:)))); % Correct definition, without any assumption
-[GLCM] = getGLCMmatrix(vol,levels);
+if nargin == 2
+    [GLCM] = getGLCMmatrix(vol,levels,distCorrection);
+else
+    [GLCM] = getGLCMmatrix(vol,levels);
+end
 p_ij = GLCM./(sum(GLCM(:))); % Normalization of GLCM
 p_i = sum(p_ij,2); p_j = sum(p_ij);
 p_iminusj = gclm_DiagProb(p_ij);

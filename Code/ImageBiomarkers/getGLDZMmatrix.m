@@ -38,7 +38,7 @@ mask = padarray(mask,[1,1,1],0);
 perimeter = bwperim(mask,6); % Computing the smallest ROI edge possible. Source of difference?
 perimeter = perimeter(2:end-1,2:end-1,2:end-1); % Removing the padding.
 mask = mask(2:end-1,2:end-1,2:end-1); % Removing the padding
-distMap = bwdist(perimeter,'cityblock') + 1; % +1 according to the definition of Oncoray
+distMap = bwdist(perimeter,'cityblock') + 1; % +1 according to the definition of the IBSI
 
 
 % INITIALIZATION

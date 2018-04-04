@@ -25,7 +25,7 @@ function intHist = getIntHistFeatures(vol)
 % Martin Vallieres for this matter.
 % -------------------------------------------------------------------------
 
-% - vol: 3D volume, QUANTIZED (e.g. nBins = 100, levels = [min, ..., max]), with NaNs outside the region of interest
+% - vol: 3D volume, QUANTIZED (e.g. nBins = 100, levels = [1, ..., max]), with NaNs outside the region of interest
 
 
 % INITIALIZATION

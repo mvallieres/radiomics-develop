@@ -1,6 +1,6 @@
-function [GLCM] = getGLCMmatrix(ROIonly,levels)
+function [GLCM] = getGLCMmatrix(ROIonly,levels,distCorrection)
 % -------------------------------------------------------------------------
-% function [GLCM] = getGLCM(ROIonly,levels)
+% function [GLCM] = getGLCM(ROIonly,levels,distCorrection)
 % -------------------------------------------------------------------------
 % DESCRIPTION: 
 % This function computes the Gray-Level Co-occurence Matrix (GLCM) of the 
@@ -27,6 +27,10 @@ function [GLCM] = getGLCMmatrix(ROIonly,levels)
 %            set to NaNs.
 % - levels: Vector containing the quantized gray-levels in the tumor region
 %           (or reconstruction levels of quantization).
+% - distCorrection: (optional). Set this variable to true in order to use 
+%                   discretization length difference corrections as used 
+%                   here: https://doi.org/10.1088/0031-9155/60/14/5471. 
+%                   Set this variable to false to replicate IBSI results.
 %
 % ** 'ROIonly' and 'levels' should be outputs from 'prepareVolume.m' **
 % -------------------------------------------------------------------------
@@ -59,13 +63,24 @@ function [GLCM] = getGLCMmatrix(ROIonly,levels)
 % Martin Vallieres for this matter.
 % -------------------------------------------------------------------------
 
-% PRELIMINARY
-nLevel = length(levels);
-if nLevel > 100
-    adjust = 10000;
+
+% PARSING "distCorrection" ARGUMENT
+if nargin < 3
+    distCorrection = true; % By default
 else
-    adjust = 1000;
+    if ~islogical(distCorrection) % The user did not input either "true" or "false", so the default behavior is used.
+        distCorrection = true; % By default
+    end
 end
+
+
+% PRELIMINARY
+% nLevel = length(levels);
+% if nLevel > 100
+%     adjust = 10000;
+% else
+%     adjust = 1000;
+% end
 levelTemp = max(levels)+1;
 ROIonly(isnan(ROIonly)) = levelTemp;
 levels = [levels,levelTemp];
@@ -109,7 +124,11 @@ for i = 1:dim(1)
 							continue;
                         else
 							val_neighbor = q3(I2,J2,K2);
-                            GLCM(val_q3,val_neighbor) = GLCM(val_q3,val_neighbor) + sqrt(abs(I2-i)+abs(J2-j)+abs(K2-k)); % Discretization length correction (M. Vallieres)
+                            if distCorrection
+                                GLCM(val_q3,val_neighbor) = GLCM(val_q3,val_neighbor) + sqrt(abs(I2-i)+abs(J2-j)+abs(K2-k)); % Discretization length correction (M. Vallieres)
+                            else
+                                GLCM(val_q3,val_neighbor) = GLCM(val_q3,val_neighbor) + 1;
+                            end
 						end
 					end
 				end

@@ -61,5 +61,6 @@ end
 % else
 %     locInt.Floc_peak_glob = [];
 % end
+locInt.Floc_peak_glob = [];
 
 end

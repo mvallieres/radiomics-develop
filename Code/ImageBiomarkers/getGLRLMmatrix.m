@@ -1,6 +1,6 @@
-function [GLRLM] = getGLRLMmatrix(ROIonly,levels)
+function [GLRLM] = getGLRLMmatrix(ROIonly,levels,distCorrection)
 % -------------------------------------------------------------------------
-% function [GLRLM] = getGLRLM(ROIonly,levels)
+% function [GLRLM] = getGLRLM(ROIonly,levels,distCorrection)
 % -------------------------------------------------------------------------
 % DESCRIPTION:
 % This function computes the Gray-Level Run-Length Matrix (GLRLM) of the 
@@ -30,6 +30,10 @@ function [GLRLM] = getGLRLMmatrix(ROIonly,levels)
 %            set to NaNs.
 % - levels: Vector containing the quantized gray-levels in the tumor region
 %           (or reconstruction levels of quantization).
+% - distCorrection: (optional). Set this variable to true in order to use 
+%                   discretization length difference corrections as used 
+%                   here: https://doi.org/10.1088/0031-9155/60/14/5471. 
+%                   Set this variable to false to replicate IBSI results.
 %
 % ** 'ROIonly' and 'levels' should be outputs from 'prepareVolume.m' **
 % -------------------------------------------------------------------------
@@ -88,6 +92,23 @@ function [GLRLM] = getGLRLMmatrix(ROIonly,levels)
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 % POSSIBILITY OF SUCH DAMAGE.
 % -------------------------------------------------------------------------
+
+
+% PARSING "distCorrection" ARGUMENT
+if nargin < 3
+    distCorrection = true; % By default
+else
+    if ~islogical(distCorrection) % The user did not input either "true" or "false", so the default behavior is used.
+        distCorrection = true; % By default
+    end
+end
+if distCorrection
+    factCorr2 = sqrt(2);
+    factCorr3 = sqrt(3);
+else
+    factCorr2 = 1;
+    factCorr3 = 1;
+end
 
 
 % PRELIMINARY
@@ -150,13 +171,13 @@ for i = 1:nComp
     seq = zigzag(image);
     GLRLMtemp = rle_45(seq,NLtemp);
     nRun = size(GLRLMtemp,2);
-    GLRLM(indexRow(1:NLtemp),1:nRun) = GLRLM(indexRow(1:NLtemp),1:nRun) + GLRLMtemp(1:NLtemp,1:nRun)*sqrt(2); % Discretisation length difference correction
+    GLRLM(indexRow(1:NLtemp),1:nRun) = GLRLM(indexRow(1:NLtemp),1:nRun) + GLRLMtemp(1:NLtemp,1:nRun)*factCorr2; % Discretisation length difference correction
     
     % [-1 1 0]
     seq = zigzag(fliplr(image));
     GLRLMtemp = rle_45(seq,NLtemp);
     nRun = size(GLRLMtemp,2);
-    GLRLM(indexRow(1:NLtemp),1:nRun) = GLRLM(indexRow(1:NLtemp),1:nRun) + GLRLMtemp(1:NLtemp,1:nRun)*sqrt(2); % Discretisation length difference correction
+    GLRLM(indexRow(1:NLtemp),1:nRun) = GLRLM(indexRow(1:NLtemp),1:nRun) + GLRLMtemp(1:NLtemp,1:nRun)*factCorr2; % Discretisation length difference correction
 end
 
 if numel(size(ROIonly)) == 3 % 3D DIRECTIONS
@@ -186,13 +207,13 @@ if numel(size(ROIonly)) == 3 % 3D DIRECTIONS
         seq = zigzag(image);
         GLRLMtemp = rle_45(seq,NLtemp);
         nRun = size(GLRLMtemp,2);
-        GLRLM(indexRow(1:NLtemp),1:nRun) = GLRLM(indexRow(1:NLtemp),1:nRun) + GLRLMtemp(1:NLtemp,1:nRun)*sqrt(2); % Discretisation length difference correction
+        GLRLM(indexRow(1:NLtemp),1:nRun) = GLRLM(indexRow(1:NLtemp),1:nRun) + GLRLMtemp(1:NLtemp,1:nRun)*factCorr2; % Discretisation length difference correction
         
         % [-1 0 1]
         seq = zigzag(fliplr(image));
         GLRLMtemp = rle_45(seq,NLtemp);
         nRun = size(GLRLMtemp,2);
-        GLRLM(indexRow(1:NLtemp),1:nRun) = GLRLM(indexRow(1:NLtemp),1:nRun) + GLRLMtemp(1:NLtemp,1:nRun)*sqrt(2); % Discretisation length difference correction
+        GLRLM(indexRow(1:NLtemp),1:nRun) = GLRLM(indexRow(1:NLtemp),1:nRun) + GLRLMtemp(1:NLtemp,1:nRun)*factCorr2; % Discretisation length difference correction
     end
 
     % Directions [0,1,1] and [0 -1 1]
@@ -216,13 +237,13 @@ if numel(size(ROIonly)) == 3 % 3D DIRECTIONS
         seq = zigzag(image);
         GLRLMtemp = rle_45(seq,NLtemp);
         nRun = size(GLRLMtemp,2);
-        GLRLM(indexRow(1:NLtemp),1:nRun) = GLRLM(indexRow(1:NLtemp),1:nRun) + GLRLMtemp(1:NLtemp,1:nRun)*sqrt(2); % Discretisation length difference correction
+        GLRLM(indexRow(1:NLtemp),1:nRun) = GLRLM(indexRow(1:NLtemp),1:nRun) + GLRLMtemp(1:NLtemp,1:nRun)*factCorr2; % Discretisation length difference correction
         
         % [0 -1 1]
         seq = zigzag(fliplr(image));
         GLRLMtemp = rle_45(seq,NLtemp);
         nRun = size(GLRLMtemp,2);
-        GLRLM(indexRow(1:NLtemp),1:nRun) = GLRLM(indexRow(1:NLtemp),1:nRun) + GLRLMtemp(1:NLtemp,1:nRun)*sqrt(2); % Discretisation length difference correction
+        GLRLM(indexRow(1:NLtemp),1:nRun) = GLRLM(indexRow(1:NLtemp),1:nRun) + GLRLMtemp(1:NLtemp,1:nRun)*factCorr2; % Discretisation length difference correction
     end
 
     % Four corners: [1,1,1], [-1,1,1], [-1,1,-1], [1,1,-1]
@@ -286,11 +307,11 @@ if numel(size(ROIonly)) == 3 % 3D DIRECTIONS
         seq = zigzag(image1);
         GLRLMtemp = rle_45(seq,NLtemp);
         nRun = size(GLRLMtemp,2);
-        GLRLM(indexRow(1:NLtemp),1:nRun) = GLRLM(indexRow(1:NLtemp),1:nRun) + GLRLMtemp(1:NLtemp,1:nRun)*sqrt(3); % Discretisation length difference correction
+        GLRLM(indexRow(1:NLtemp),1:nRun) = GLRLM(indexRow(1:NLtemp),1:nRun) + GLRLMtemp(1:NLtemp,1:nRun)*factCorr3; % Discretisation length difference correction
         seq = zigzag(fliplr(image1));
         GLRLMtemp = rle_45(seq,NLtemp);
         nRun = size(GLRLMtemp,2);
-        GLRLM(indexRow(1:NLtemp),1:nRun) = GLRLM(indexRow(1:NLtemp),1:nRun) + GLRLMtemp(1:NLtemp,1:nRun)*sqrt(3); % Discretisation length difference correction
+        GLRLM(indexRow(1:NLtemp),1:nRun) = GLRLM(indexRow(1:NLtemp),1:nRun) + GLRLMtemp(1:NLtemp,1:nRun)*factCorr3; % Discretisation length difference correction
         
         % 2 last corners
         uniqueIm = unique(image2);
@@ -304,11 +325,11 @@ if numel(size(ROIonly)) == 3 % 3D DIRECTIONS
         seq = zigzag(image2);
         GLRLMtemp = rle_45(seq,NLtemp);
         nRun = size(GLRLMtemp,2);
-        GLRLM(indexRow(1:NLtemp),1:nRun) = GLRLM(indexRow(1:NLtemp),1:nRun) + GLRLMtemp(1:NLtemp,1:nRun)*sqrt(3); % Discretisation length difference correction
+        GLRLM(indexRow(1:NLtemp),1:nRun) = GLRLM(indexRow(1:NLtemp),1:nRun) + GLRLMtemp(1:NLtemp,1:nRun)*factCorr3; % Discretisation length difference correction
         seq = zigzag(fliplr(image2));
         GLRLMtemp = rle_45(seq,NLtemp);
         nRun = size(GLRLMtemp,2);
-        GLRLM(indexRow(1:NLtemp),1:nRun) = GLRLM(indexRow(1:NLtemp),1:nRun) + GLRLMtemp(1:NLtemp,1:nRun)*sqrt(3); % Discretisation length difference correction
+        GLRLM(indexRow(1:NLtemp),1:nRun) = GLRLM(indexRow(1:NLtemp),1:nRun) + GLRLMtemp(1:NLtemp,1:nRun)*factCorr3; % Discretisation length difference correction
     end
 end
 
