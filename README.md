@@ -26,8 +26,8 @@ All software code have up to now been tested on:
 2. Clone this online repository to your prefered location on your computer by running `git clone https://github.com/mvallieres/radiomics-develop` in the terminal. 
 
 ## Instructions
-- **COMPUTATION OF RADIOMIC FEATURES**: Please follow the instructions in the _INSTRUCTIONS.txt_ file in <https://github.com/mvallieres/radiomics-develop/WORKSPACE_RadiomicComputation>
-- **IBSI calibration test -- Phase 1: Feature calculation with digital phantom**: Please follow the instructions in the _INSTRUCTIONS.txt_ file in <https://github.com/mvallieres/radiomics-develop/Tests/IBSI_FeatureCalculation>
+- **COMPUTATION OF RADIOMIC FEATURES**: Please follow the instructions in the _INSTRUCTIONS.txt_ file at <https://github.com/mvallieres/radiomics-develop/tree/master/WORKSPACE_RadiomicComputation>
+- **IBSI calibration test -- Phase 1: Feature calculation with digital phantom**: Please follow the instructions in the _INSTRUCTIONS.txt_ file at <https://github.com/mvallieres/radiomics-develop/tree/master/Tests/IBSI_FeatureCalculation>
 - Other applications to come (multivariable modeling) ...
 
 ## Documentation
