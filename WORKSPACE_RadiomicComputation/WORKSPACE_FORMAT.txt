@@ -82,10 +82,11 @@ it is desirable. The next multivariable modeling script will handle missing data
 
 
 --------------- 1. FORMAT FOR PATIENT ID FOLDER NAME -----------------------------------------------
---> Format: $CancerType$-$Institution$-$PatientNumber$
+--> Format: $CancerType$-$Institution$-$PatientNumber$.
 --> Example: HN-McGill-017, for head and neck cancer, McGill University, patient 17.
     Always use three numbers for the patient numbers.
---> Important: No special character nor underscores should be used in the name, but only hyphens.
+--> Important: No special character (_,-,+,etc.) can be used in $CancerType$, $Institution$ and
+    $PatientNumber$, but only letters.
 --> At this point, it is not necessary that the actual patient ID in the DICOM headers of each 
     image file to be set up to the Patient ID folder name, although it is desirable.
 --> You can have patient folders from multiple institutions and multiple cancer sites in the DICOM 
@@ -96,11 +97,12 @@ it is desirable. The next multivariable modeling script will handle missing data
 
 
 --------------- 2. FORMAT FOR IMAGING FOLDER NAME --------------------------------------------------
---> Important: No special character nor underscores should be used in the name, but only hyphens.
+--> Format: $Scan$.
+--> Important: No special character (_,-,+,etc.) can be used in $Scan$, but only letters.
 --> Patients with identical types of scans must have the exact same spelling.
 ----------------------------------------------------------------------------------------------------
 
-
+ 
 --------------- 4. FORMAT FOR DICOM DATA (mandatory) -----------------------------------------------
 --> Make sure all files end with the extension .dcm.
 --> Those files are the ones that could be imported into 3D slicer for contouring (if no RTstruct is 
@@ -129,6 +131,7 @@ it is desirable. The next multivariable modeling script will handle missing data
 --> Format: segMask_$nameROI$.nrrd, where $nameROI$ is the name the user is setting up for that ROI. 
     Please see the example DICOM dataset at "https://www.dropbox.com/s/6i9qf1i5mh1tgs2/DICOM.zip?dl=0" 
     for examples of such files.
+--> Important: No special character (_,-,+,etc.) can be used in $nameROI$, but only letters.
 --> More than one label map with different $nameROI$ can be present in a given folder. The algorithm 
     will read and record them all. Remember, one label map equals one ROI, so you must create multiple 
     label maps if you want to analyze multiple ROIs.
@@ -139,7 +142,7 @@ it is desirable. The next multivariable modeling script will handle missing data
     map. See the PET scan of Cervix-CHRU-095 for an example of such file ("https://www.dropbox.com/
     s/6i9qf1i5mh1tgs2/DICOM.zip?dl=0". Note: if the numerical value is set to 1 for the desired ROI, 
     you do not have to add the extra "_label$X$" in the name of the 3D Slicer label map and you can 
-    ignore this point. 
+    ignore this point.
 ----------------------------------------------------------------------------------------------------
 
 
@@ -163,10 +166,22 @@ it is desirable. The next multivariable modeling script will handle missing data
 --> Format: roiNames_$nameExperiment$.csv, where $nameExperiment$ is determined by the user.
     See "WORKSPACE_RadiomicComputation/CSV" for examples of such files. The $nameExperiment$ must 
     correspond to one of the cell entries of the "roiType" variable in script_ComputeRadiomics.m.
+--> Important: No special character (_,-,+,etc.) can be used in $nameExperiment$, but only letters.
 --> Column 1 of roiNames_$nameExperiment$.csv: PATIENT ID FOLDER NAME as defined in point 1 above.
 --> Column 2 of roiNames_$nameExperiment$.csv: IMAGING FOLDER NAME as defined in point 2 above.
 --> Column 3 of roiNames_$nameExperiment$.csv: Either "PTscan", "CTscan" or "MRscan".
 --> Column 4 of roiNames_$nameExperiment$.csv: One of the name in the StructureSetROISequence.   
     (itemROI).ROIName field as defined in the RTstruct file, or $nameROI$ if using a 3D Slicer label 
-    map (point 6 above).
+    map (point 6 above). A given ROI name in this column of the CSV file MUST be enclosed by {}.
+    For example, for a given ROI name (in a RTstruct or $nameROI$ for a 3D slicer label map) defined
+    as "tumour", the entry in this column of the CSV file must be {tumour}. This allows the correct
+    parsing of "+" and "-" in each entry of this column for the possible union or subtraction of 
+    different ROIs, respectively. In fact, by using "+" or "-" in-between corresponding ROI names, 
+    the algorithm will automatically create a new ROI consisting of the union or subtraction of two 
+    or more ROIs. For example, for the subtraction of a ROI named "tumour" from a ROI named 
+    "tumourAndEdema", the user must enter {tumourAndEdema}-{tumour}. Please see example CSV files in 
+    "WORKSPACE_RadiomicComputation/CSV".
+--> IMPORTANT: If a given ROIname (in a RTstruct or $nameROI$ for a 3D slicer label map) contains a
+    "{" or a "}", the algorithm will fail. Please change the name of the ROI in the RTstruct file
+     (or in $nameROI$) accordingly before running the algorithm.
 ----------------------------------------------------------------------------------------------------
