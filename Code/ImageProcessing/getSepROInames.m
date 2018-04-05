@@ -27,11 +27,13 @@ function [nameROIout,vectPlusMinus] = getSepROInames(nameROIin,delimiters)
 
 % WORKS ONLY FOR DELIMITERS "+" and "-"
 
+
 % FINDING "+" and "-"
 indPlus = strfind(nameROIin,delimiters{1}); vectPlus = ones(1,numel(indPlus));
 indMinus = strfind(nameROIin,delimiters{2}); vectMinus = ones(1,numel(indMinus))*-1;
 [ind,seq] = sort([indPlus,indMinus]);
 vectPlusMinus = [vectPlus,vectMinus]; vectPlusMinus = vectPlusMinus(seq); nDelim = numel(vectPlusMinus);
+
 
 % MAKING SURE "+" and "-" ARE NOT INSIDE A ROIname
 indStart = strfind(nameROIin,'{'); nROI = numel(indStart);
