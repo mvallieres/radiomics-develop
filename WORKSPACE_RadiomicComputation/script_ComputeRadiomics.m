@@ -149,7 +149,7 @@ end
 % -------------------------------------------------------------------------
 
 % ROI OPTIONS
-roiTypes = {'GTV'}; % Name of radiomics experiments to run. Each entry in the cell must correspond to one of the $nameExperiment$ in the "roiNames_$nameExperiment$.csv"files /WORKSPACE/CSV. Thus, this cell could have multiple entries.
+roiTypes = {'rings','tumour','tumourAndEdema'}; % Name of radiomics experiments to run. Each entry in the cell must correspond to one of the $nameExperiment$ in the "roiNames_$nameExperiment$.csv"files /WORKSPACE/CSV. Thus, this cell could have multiple entries.
 % THIS OPTION BELOW IS DISABLED. AS OF MARCH 2018, THE USER MUST PROVIDE THE .csv FILES. THESE FILES MUST BE THOROUGHLY CHECKED BY THE USER BEFORE RUNNING THIS SCRIPT. THIS OPTION WILL SOON BE REPLACED BY AN OPTION ALLOWING TO MANUALLY VERIFY EACH ROI.
 %manualROIchoice = false; % OPTION: % If set to true, the user will be prompted to choose which ROI(s) to use for a given imaging scan (and verify the chosen ROI definition on the imagin scans), so no need to create a roiNames.mat file --> this option is convenient for small datasets. If set to false, the algorithm will use the roiNames.mat file present in WORKSPACE --> this option is convenienent for large datasets, as manual reading and choice for all imaging scans in this script will be long.
 

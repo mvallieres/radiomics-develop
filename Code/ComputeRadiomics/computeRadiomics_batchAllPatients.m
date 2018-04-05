@@ -1,4 +1,4 @@
-function computeRadiomics_batchAllPatients(pathRead,pathCSV,pathSave,imParams,roiTypes,nBatch,matlabPATH)
+function computeRadiomics_batchAllPatients(pathRead,pathCSV,pathSave,imParams,roiTypes,nBatchInit,matlabPATH)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
@@ -58,6 +58,7 @@ for r = 1:nROItypes
 
     
     % PRODUCE BATCH COMPUTATIONS
+    nBatch = nBatchInit;
     if numel(patientNames) < nBatch
         nBatch = numel(patientNames);
     end
