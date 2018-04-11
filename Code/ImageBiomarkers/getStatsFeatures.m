@@ -164,9 +164,9 @@ end
 
 % Median absolute deviation
 if definite
-    stats.Fstat_medmad = sum(abs(X - med))/Nv;
+    stats.Fstat_medad = sum(abs(X - med))/Nv;
 else
-    stats.Fstat_medmad = [];
+    stats.Fstat_medad = [];
 end
 
 % Coefficient of variation

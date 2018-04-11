@@ -109,7 +109,7 @@ N_10_90 = numel(X_10_90);
 intHist.Fih_rmad = sum(abs(X_10_90 - mean(X_10_90)))/N_10_90;
 
 % Intensity histogram median absolute deviation
-intHist.Fih_medmad = sum(abs(X - med))/Nv;
+intHist.Fih_medad = sum(abs(X - med))/Nv;
 
 % Intensity histogram coefficient of variation
 intHist.Fih_cov = sqrt(var)/u;

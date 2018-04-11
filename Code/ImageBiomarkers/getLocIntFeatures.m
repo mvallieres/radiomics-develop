@@ -50,17 +50,17 @@ end
 
 % Local grey level peak
 if definite
-    locInt.Floc_peak_loc = getLocPeak(imgObj,roiObj,res);
+    locInt.Floc_peak_local = getLocPeak(imgObj,roiObj,res);
 else
-    locInt.Floc_peak_loc = [];
+    locInt.Floc_peak_local = [];
 end
 
 % % Global grey level peak
 % if definite
-%     locInt.Floc_peak_glob = getGlobPeak(imgObj,roiObj,res); % NEEDS TO BE VECTORIZED FOR FASTER CALCULATION! OR SIMPLY JUST CONVOLUTE A 3D AVERAGING FILTER!
+%     locInt.Floc_peak_global = getGlobPeak(imgObj,roiObj,res); % NEEDS TO BE VECTORIZED FOR FASTER CALCULATION! OR SIMPLY JUST CONVOLUTE A 3D AVERAGING FILTER!
 % else
-%     locInt.Floc_peak_glob = [];
+%     locInt.Floc_peak_global = [];
 % end
-locInt.Floc_peak_glob = [];
+locInt.Floc_peak_global = [];
 
 end

@@ -161,15 +161,15 @@ p_temp = p_i_temp .* p_j_temp;
 pPos = p_ij(find(p_temp(:))); pPos_temp = p_temp(find(p_temp(:)));
 temp = pPos .* log2(pPos_temp);
 HXY1 = -sum(temp(:));
-glcm.Fcm_info_corr1 = (HXY - HXY1)/HX;
+glcm.Fcm_info_corr_1 = (HXY - HXY1)/HX;
 
 % Second measure of information correlation
 temp = pPos_temp .* log2(pPos_temp);
 HXY2 = -sum(temp(:));
 if HXY > HXY2
-    glcm.Fcm_info_corr2 = 0;
+    glcm.Fcm_info_corr_2 = 0;
 else
-    glcm.Fcm_info_corr2 = sqrt(1 - exp(-2*(HXY2 - HXY)));
+    glcm.Fcm_info_corr_2 = sqrt(1 - exp(-2*(HXY2 - HXY)));
 end
 
 end

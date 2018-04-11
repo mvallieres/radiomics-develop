@@ -78,16 +78,16 @@ convHull = convhull(vertices(:,1),vertices(:,2),vertices(:,3)); % [X,Y,Z] points
 % Volume
 if ~filter
     volume = getMeshVolume(faces,vertices); % In mm^3
-    morph.Fmorph_volume = volume;
+    morph.Fmorph_vol = volume;
 else
-    morph.Fmorph_volume = [];
+    morph.Fmorph_vol = [];
 end
 
 % Approximate Volume
 if ~filter
-    morph.Fmorph_approx_volume = sum(maskMorph(:)) * prod(res);
+    morph.Fmorph_approx_vol = sum(maskMorph(:)) * prod(res);
 else
-    morph.Fmorph_approx_volume = [];
+    morph.Fmorph_approx_vol = [];
 end
 
 % Surface area
@@ -107,16 +107,16 @@ end
 
 % Compactness 1
 if ~filter
-    morph.Fmorph_comp1 = volume/((pi^(1/2))*(area^(3/2)));
+    morph.Fmorph_comp_1 = volume/((pi^(1/2))*(area^(3/2)));
 else
-    morph.Fmorph_comp1 = [];
+    morph.Fmorph_comp_1 = [];
 end
 
 % Compactness 2
 if ~filter
-    morph.Fmorph_comp2 = 36*pi*(volume^2)/(area^3);
+    morph.Fmorph_comp_2 = 36*pi*(volume^2)/(area^3);
 else
-    morph.Fmorph_comp2 = [];
+    morph.Fmorph_comp_2 = [];
 end
 
 % Spherical disproportion
