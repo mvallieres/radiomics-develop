@@ -112,7 +112,7 @@ sData{1} = struct('Cell_1','Explanation of cell content', ...
     % 1. Reading DICOM images and headers
     nSlices = numel(pathImages); cellImages = cell(nSlices,1); dicomH = struct;
     for i = 1:nSlices
-        dicomH = appendStruct(dicomH,dicominfo(pathImages{i}));
+        dicomH = appendStruct(dicomH,dicominfo_correctWarning(pathImages{i}));
         cellImages{i} = double(dicomread(pathImages{i}));
     end
     
@@ -194,7 +194,7 @@ if ~isempty(pathRS) && nargin > 2
     nRS = numel(pathRS);
     sData{4} = struct;
     for i = 1:nRS
-        sData{4} = appendStruct(sData{4},dicominfo(pathRS{i}));
+        sData{4} = appendStruct(sData{4},dicominfo_correctWarning(pathRS{i}));
     end
 end
 
@@ -204,7 +204,7 @@ if ~isempty(pathREG) && nargin > 3
     nREG = numel(pathREG);
     sData{5} = struct;
     for i = 1:nREG
-        sData{5} = appendStruct(sData{5},dicominfo(pathREG{i}));
+        sData{5} = appendStruct(sData{5},dicominfo_correctWarning(pathREG{i}));
     end
 end
 
@@ -214,7 +214,7 @@ if ~isempty(pathRD) && nargin > 4
     nRD = numel(pathRD);
     sData{6} = struct;
     for i = 1:nRD
-        sData{6} = appendStruct(sData{6},dicominfo(pathRD{i}));
+        sData{6} = appendStruct(sData{6},dicominfo_correctWarning(pathRD{i}));
     end
 end
 
@@ -224,7 +224,7 @@ if ~isempty(pathRP) && nargin > 5
     nRP = numel(pathRP);
     sData{7} = struct;
     for i = 1:nRP
-        sData{7} = appendStruct(sData{7},dicominfo(pathRP{i}));
+        sData{7} = appendStruct(sData{7},dicominfo_correctWarning(pathRP{i}));
     end
 end
 

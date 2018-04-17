@@ -152,7 +152,7 @@ while ~isempty(stackFolder)
                 cd(list(i).name), stackFolder = [stackFolder;pwd]; cd ..
             elseif isdicom(list(i).name)
                 try
-                    info = dicominfo(list(i).name);
+                    info = dicominfo_correctWarning(list(i).name);
                     if strcmp(info.Modality,'MR') || strcmp(info.Modality,'PT') || strcmp(info.Modality,'CT')
                         [indSeriesID] = findUIDcellIndex(info.SeriesInstanceUID,cellSeriesID);
                         if indSeriesID > numel(cellSeriesID) % New volume
