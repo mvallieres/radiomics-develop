@@ -1,4 +1,4 @@
-function computeRadiomics_batchAllPatients(pathRead,pathCSV,pathSave,imParams,roiTypes,nBatchInit,matlabPATH)
+function computeRadiomics_batchAllPatients(pathRead,pathCSV,pathSave,imParams,roiTypes,roiType_labels,nBatchInit,matlabPATH)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
@@ -29,14 +29,15 @@ function computeRadiomics_batchAllPatients(pathRead,pathCSV,pathSave,imParams,ro
 startpath = pwd;
 
 time = 60; % Time spent in seconds between checks by the master process to verify the end of parallel computations.
-nROItypes = numel(roiTypes);
+nROItypes = numel(roiType_labels);
 
 for r = 1:nROItypes
     roiType = roiTypes{r};
-    fprintf('\n    --> Computing features for the "%s" roi type ... ',roiType);
+    roiType_label = roiType_labels{r};
+    fprintf('\n    --> Computing features for the "%s" roi type ... ',roiType_label);
     
     % READING CSV EXPERIMENT TABLE
-    cd(pathCSV), tableROI = readtable(['roiNames_',roiType,'.csv']);
+    cd(pathCSV), tableROI = readtable(['roiNames_',roiType_label,'.csv']);
     patientNames = getPatientNames([tableROI.PatientID,tableROI.ImagingScanName,tableROI.ImagingModality]);
     nameROI = tableROI.ROIname;
     if sum(contains(tableROI.Properties.VariableNames,'StructureSetName'))
@@ -47,7 +48,7 @@ for r = 1:nROItypes
     
     
     % INITIALIZATION
-    cd(pathSave), nameBatchLog = ['batchLog_',roiType];
+    cd(pathSave), nameBatchLog = ['batchLog_',roiType_label];
     if exist(nameBatchLog,'dir')
         info = dir([nameBatchLog,'*']);
         date = info.date; ind = strfind(date,' '); date(ind) = '_';
@@ -63,12 +64,12 @@ for r = 1:nROItypes
         nBatch = numel(patientNames);
     end
     [patients] = batchPatients(numel(patientNames),nBatch);
-    cd(pathBatch), save('workspace','pathRead','pathSave','patients','patientNames','nameROI','nameSet','imParams','roiType'), pause(2);
+    cd(pathBatch), save('workspace','pathRead','pathSave','patients','patientNames','nameROI','nameSet','imParams','roiType','roiType_label'), pause(2);
     for i = 1:nBatch
         nameScript = ['batch',num2str(i),'_script.m'];
         fid = fopen(nameScript,'w');
         fprintf(fid,'load(''workspace'')\n');
-        fprintf(fid,['computeRadiomics_AllPatients(pathRead,pathSave,patientNames(patients{',num2str(i),'}),nameROI(patients{',num2str(i),'}),nameSet(patients{',num2str(i),'}),imParams,roiType)\n']);
+        fprintf(fid,['computeRadiomics_AllPatients(pathRead,pathSave,patientNames(patients{',num2str(i),'}),nameROI(patients{',num2str(i),'}),nameSet(patients{',num2str(i),'}),imParams,roiType,roiType_label)\n']);
         fprintf(fid,['system(''touch batch',num2str(i),'_end'');\n']);
         fprintf(fid,'clear all');
         fclose(fid);

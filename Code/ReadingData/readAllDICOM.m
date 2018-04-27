@@ -135,13 +135,14 @@ fidRead = fopen('readAllDICOM_log','w');
 
 % SCANNING ALL FOLDERS IN INITIAL DIRECTORY
 stackFolder = {pathRead}; % Stack of folder paths to scan
-ind = strfind(stackFolder{1},'/'); nameDir = stackFolder{1}((ind(end)+1):end);
-indUnder = strfind(nameDir,'_');
-if ~isempty(indUnder)
-    for under = numel(indUnder)
-        nameDir = [nameDir(1:indUnder(under)-1),'\',nameDir(indUnder(under):end)];
-    end
-end
+% ind = strfind(stackFolder{1},'/'); 
+% nameDir = stackFolder{1}((ind(end)+1):end);
+% indUnder = strfind(nameDir,'_');
+% if ~isempty(indUnder)
+%     for under = numel(indUnder)
+%         nameDir = [nameDir(1:indUnder(under)-1),'\',nameDir(indUnder(under):end)];
+%     end
+% end
 while ~isempty(stackFolder)
     cd(stackFolder{1})
     fprintf(fidRead,['\nScanning files in directory: ',stackFolder{1},' ... ']);

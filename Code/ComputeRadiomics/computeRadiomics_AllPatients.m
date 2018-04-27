@@ -1,4 +1,4 @@
-function computeRadiomics_AllPatients(pathRead,pathSave,nameRead,nameROI,nameSet,imParams,roiType)
+function computeRadiomics_AllPatients(pathRead,pathSave,nameRead,nameROI,nameSet,imParams,roiType,roiType_label)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
@@ -59,6 +59,8 @@ for p = 1:nPatient
             continue
         end
     end
+    patientID = sData{3}(1).PatientID; % DICOM MUST BE PRESENT
+    voxDim = [sData{2}.scan.volume.spatialRef.PixelExtentInWorldX,sData{2}.scan.volume.spatialRef.PixelExtentInWorldY,sData{2}.scan.volume.spatialRef.PixelExtentInWorldZ]; % DICOM MUST BE PRESENT
     
     % Computation of ROI mask
     tic, fprintf('\n--> Computation of ROI mask: ')
@@ -85,10 +87,13 @@ for p = 1:nPatient
     if ~errorROI
         [radiomics] = computeRadiomics(volObjInit,roiObjInit,imParamScan);
     end
+    radiomics.imParam.roiType = roiType;
+    radiomics.imParam.patientID = patientID;
+    radiomics.imParam.voxDim = voxDim;
     
     % Saving radiomics structure
     indDot = strfind(nameRead{p},'.');
-    nameSave = [nameRead{p}(1:(indDot(1)-1)),'(',roiType,')',nameRead{p}(indDot(1):end)];
+    nameSave = [nameRead{p}(1:(indDot(1)-1)),'(',roiType_label,')',nameRead{p}(indDot(1):end)];
     cd(pathSave), save(nameSave,'radiomics') % IMPORTANT: HERE, WE COULD ADD SOME CODE TO APPEND A NEW "radiomics" STRUCTURE TO AN EXISTING ONE WITH THE SAME NAME IN "pathSave"
     time = toc(tStart);
     fprintf('TOTAL TIME: %.2f seconds\n',time)

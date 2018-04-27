@@ -130,35 +130,35 @@ for o = 1:nObjects
     volInt_RE = roiExtract(volObj.data,roiObj_Int.data);
     try
         % STEP 3: CALCULATION OF MORPHOLOGICAL FEATURES
-        results.morph.(scaleName) = getMorphFeatures(volObj.data,roiObj_Int.data,roiObj_Morph.data,scaleNonText,intensity); % For scans with arbitrary units, some features will not be computed.
+        results.morph_3D.(scaleName) = getMorphFeatures(volObj.data,roiObj_Int.data,roiObj_Morph.data,scaleNonText,intensity); % For scans with arbitrary units, some features will not be computed.
     catch
         fprintf('PROBLEM WITH COMPUTATION OF MORPHOLOGICAL FEATURES ')
-        results.morph.(scaleName).error = 'ERROR_COMPUTATION';
+        results.morph_3D.(scaleName).error = 'ERROR_COMPUTATION';
     end
 
     try
         % STEP 4: CALCULATION OF LOCAL INTENSITY FEATURES
-        results.locInt.(scaleName) = getLocIntFeatures(volObj.data,roiObj_Int.data,scaleNonText,intensity); % For scans with arbitrary units, all of these features will not be computed.
+        results.locInt_3D.(scaleName) = getLocIntFeatures(volObj.data,roiObj_Int.data,scaleNonText,intensity); % For scans with arbitrary units, all of these features will not be computed.
     catch
         fprintf('PROBLEM WITH COMPUTATION OF LOCAL INTENSITY FEATURES ')
-        results.locInt.(scaleName).error = 'ERROR_COMPUTATION';        
+        results.locInt_3D.(scaleName).error = 'ERROR_COMPUTATION';        
     end
 
     try
         % STEP 5: CALCULATION OF STATISTICAL FEATURES
-        results.stats.(scaleName) = getStatsFeatures(volInt_RE,intensity); % For scans with arbitrary units, some features will not be computed.
+        results.stats_3D.(scaleName) = getStatsFeatures(volInt_RE,intensity); % For scans with arbitrary units, some features will not be computed.
     catch
         fprintf('PROBLEM WITH COMPUTATION OF STATISTICAL FEATURES ')
-        results.stats.(scaleName).error = 'ERROR_COMPUTATION';           
+        results.stats_3D.(scaleName).error = 'ERROR_COMPUTATION';           
     end
 
     try
         % STEP 6: CALCULATION OF INTENSITY HISTOGRAM FEATURES
         [volQuant_RE] = discretisation(volInt_RE,IH.type,IH.val,userSetMinVal); % There would actually be no need to include "userSetMinVal" here as fourth argument, as discretisation for IH features is (logically) always set to "FBN". This value will not be used for "FBN", see discretisation.m code. But this is a safety check in case FBS is used.
-        results.intHist.(IHname) = getIntHistFeatures(volQuant_RE);
+        results.intHist_3D.(IHname) = getIntHistFeatures(volQuant_RE);
     catch
         fprintf('PROBLEM WITH COMPUTATION OF INTENSITY HISTOGRAM FEATURES ')
-        results.intHist.(IHname).error = 'ERROR_COMPUTATION';           
+        results.intHist_3D.(IHname).error = 'ERROR_COMPUTATION';           
     end
 
     try
@@ -184,16 +184,16 @@ for o = 1:nObjects
                 end
                 rangeFBS(1) = rangeFBS(1) + 0.5*wd; % In this case, wd = wb (see discretisation.m)
                 rangeFBS(2) = rangeFBS(2) - 0.5*wd; % In this case, wd = wb (see discretisation.m)
-                results.intVolHist.(IVHname) = getIntVolHistFeatures(volQuant_RE,wd,rangeFBS);
+                results.intVolHist_3D.(IVHname) = getIntVolHistFeatures(volQuant_RE,wd,rangeFBS);
             else % MRI example case (arbitrary intensity units)
-                results.intVolHist.(IVHname) = getIntVolHistFeatures(volQuant_RE,wd); 
+                results.intVolHist_3D.(IVHname) = getIntVolHistFeatures(volQuant_RE,wd); 
             end
         else % CT example case (definite intensity units -- discrete case)
-            results.intVolHist.(IVHname) = getIntVolHistFeatures(volQuant_RE,wd,range); 
+            results.intVolHist_3D.(IVHname) = getIntVolHistFeatures(volQuant_RE,wd,range); 
         end
     catch
         fprintf('PROBLEM WITH COMPUTATION OF INTENSITY-VOLUME HISTOGRAM FEATURES ')
-        results.intVolHist.(IVHname).error = 'ERROR_COMPUTATION';         
+        results.intVolHist_3D.(IVHname).error = 'ERROR_COMPUTATION';         
     end
     
     if nObjects == 1

@@ -131,7 +131,7 @@ end
 
 
 %%%%%%%%%%%%%%%%%%%%%%% COMPUTATION OF TEXTURE FEATURES %%%%%%%%%%%%%%%%%%%%%%%
-nameTextTypes = {'glcm','glrlm','glszm','gldzm','ngtdm','ngldm'}; nTextTypes = numel(nameTextTypes);
+nameTextTypes = {'glcm_3Dmrg','glrlm_3Dmrg','glszm_3D','gldzm_3D','ngtdm_3D','ngldm_3D'}; nTextTypes = numel(nameTextTypes);
 for t = 1:nTextTypes
     radiomics.image.texture.(nameTextTypes{t}) = struct;
 end

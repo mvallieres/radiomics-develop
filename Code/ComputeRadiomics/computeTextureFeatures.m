@@ -51,7 +51,11 @@ if ~isempty(strfind(algo,'FBS')) % The minimum value defines the computation.
 else
     minValName = [];
 end
-discretisationName = ['algo',algo,'_bin',grayLevelsName,minValName];
+if contains(algo,'equal')
+    discretisationName = ['algo',algo,'64_bin',grayLevelsName,minValName]; % The number of gray-levels used for equalization is currently hard-coded to 64 in equalization.m
+else
+    discretisationName = ['algo',algo,'_bin',grayLevelsName,minValName];
+end
 
 % Processing full name
 processingName = [scaleName,'_',discretisationName];
@@ -91,49 +95,49 @@ for o = 1:nObjects
 
         % COMPUTING ALL TEXTURE FEATURES
         try
-            results.glcm.(processingName) = getGLCMfeatures(volQuant_RE);
+            results.glcm_3Dmrg.(processingName) = getGLCMfeatures(volQuant_RE);
         catch
             fprintf('PROBLEM WITH COMPUTATION OF GLCM FEATURES ')
-            results.glcm.(processingName).error = 'ERROR_COMPUTATION';
+            results.glcm_3Dmrg.(processingName).error = 'ERROR_COMPUTATION';
         end
         try
-            results.glrlm.(processingName) = getGLRLMfeatures(volQuant_RE);
+            results.glrlm_3Dmrg.(processingName) = getGLRLMfeatures(volQuant_RE);
         catch
             fprintf('PROBLEM WITH COMPUTATION OF GLRLM FEATURES ')
-            results.glrlm.(processingName).error = 'ERROR_COMPUTATION';                        
+            results.glrlm_3Dmrg.(processingName).error = 'ERROR_COMPUTATION';                        
         end
         try
-            results.glszm.(processingName) = getGLSZMfeatures(volQuant_RE);
+            results.glszm_3D.(processingName) = getGLSZMfeatures(volQuant_RE);
         catch
             fprintf('PROBLEM WITH COMPUTATION OF GLSZM FEATURES ')
-            results.glszm.(processingName).error = 'ERROR_COMPUTATION';                         
+            results.glszm_3D.(processingName).error = 'ERROR_COMPUTATION';                         
         end
         try
-            results.gldzm.(processingName) = getGLDZMfeatures(volQuant_RE,roiObj_Morph.data);
+            results.gldzm_3D.(processingName) = getGLDZMfeatures(volQuant_RE,roiObj_Morph.data);
         catch
             fprintf('PROBLEM WITH COMPUTATION OF GLDZM FEATURES ')
-            results.gldzm.(processingName).error = 'ERROR_COMPUTATION';                            
+            results.gldzm_3D.(processingName).error = 'ERROR_COMPUTATION';                            
         end
         try
-            results.ngtdm.(processingName) = getNGTDMfeatures(volQuant_RE);
+            results.ngtdm_3D.(processingName) = getNGTDMfeatures(volQuant_RE);
         catch
             fprintf('PROBLEM WITH COMPUTATION OF NGTDM FEATURES ')
-            results.ngtdm.(processingName).error = 'ERROR_COMPUTATION';                           
+            results.ngtdm_3D.(processingName).error = 'ERROR_COMPUTATION';                           
         end
         try
-            results.ngldm.(processingName) = getNGLDMfeatures(volQuant_RE);
+            results.ngldm_3D.(processingName) = getNGLDMfeatures(volQuant_RE);
         catch
             fprintf('PROBLEM WITH COMPUTATION OF NGLDM FEATURES ')
-            results.ngldm.(processingName).error = 'ERROR_COMPUTATION';                          
+            results.ngldm_3D.(processingName).error = 'ERROR_COMPUTATION';                          
         end
     catch
         fprintf('PROBLEM WITH DISCRETISATION')
-        results.glcm.(processingName).error = 'ERROR_DISCRETISATION';
-        results.glrlm.(processingName).error = 'ERROR_DISCRETISATION';
-        results.glszm.(processingName).error = 'ERROR_DISCRETISATION';
-        results.gldzm.(processingName).error = 'ERROR_DISCRETISATION';
-        results.ngtdm.(processingName).error = 'ERROR_DISCRETISATION';
-        results.ngldm.(processingName).error = 'ERROR_DISCRETISATION';
+        results.glcm_3Dmrg.(processingName).error = 'ERROR_DISCRETISATION';
+        results.glrlm_3Dmrg.(processingName).error = 'ERROR_DISCRETISATION';
+        results.glszm_3D.(processingName).error = 'ERROR_DISCRETISATION';
+        results.gldzm_3D.(processingName).error = 'ERROR_DISCRETISATION';
+        results.ngtdm_3D.(processingName).error = 'ERROR_DISCRETISATION';
+        results.ngldm_3D.(processingName).error = 'ERROR_DISCRETISATION';
     end
         
     if nObjects == 1
