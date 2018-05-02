@@ -78,14 +78,16 @@ for p = 1:nPatient
         clear sData % Clear up RAM
     catch
         fprintf('\nPROBLEM WITH ROI')
-        radiomics = 'ERROR_ROI';
-        errorROI = true;
+        continue
     end
     toc
     
     % Computing radiomics features
-    if ~errorROI
+    try
         [radiomics] = computeRadiomics(volObjInit,roiObjInit,imParamScan);
+    catch
+        fprintf('\nERROR IN RADIOMICS FEATURE COMPUTATION')
+        continue
     end
     radiomics.imParam.roiType = roiType;
     radiomics.imParam.patientID = patientID;
