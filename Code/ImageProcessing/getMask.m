@@ -29,8 +29,8 @@ function [volObj,roiObj] = getMask(sData,contourString,formatData,boxString)
 if ~strcmp(boxString,'full') && ~contains(boxString,'box')
     error('The fourth argument must either be "full" or contain the word "box"')
 end
-if ~strcmp(formatData,'nrrd') && ~strcmp(formatData,'img')
-    error('The third argument must either be ''nrrd'' or ''img''')
+if ~strcmp(formatData,'nii') && ~strcmp(formatData,'nrrd') && ~strcmp(formatData,'img')
+    error('The third argument must either be ''nii'' or ''nrrd'' or ''img''')
 end
 [contourNumber,operations] = parseContourString(contourString);
 

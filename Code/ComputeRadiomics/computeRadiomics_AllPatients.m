@@ -68,7 +68,9 @@ for p = 1:nPatient
     errorROI = false;
     try
         contourString = findContour(sData,nameROI{p},nameSet{p}); % OUTPUT IS FOR EXAMPLE '3' or '1-3+2'
-        if isfield(sData{2},'nrrd')
+        if isfield(sData{2},'nii')
+            [volObjInit,roiObjInit] = getMask(sData,contourString,'nii',boxString); % This function uses the spatialRef calculated from the DICOM data. DICOM MUST BE PRESENT.
+        elseif isfield(sData{2},'nrrd')
             [volObjInit,roiObjInit] = getMask(sData,contourString,'nrrd',boxString); % This function uses the spatialRef calculated from the DICOM data. DICOM MUST BE PRESENT.
         elseif isfield(sData{2},'img')
             [volObjInit,roiObjInit] = getMask(sData,contourString,'img',boxString); % This function uses the spatialRef calculated from the DICOM data. DICOM MUST BE PRESENT.

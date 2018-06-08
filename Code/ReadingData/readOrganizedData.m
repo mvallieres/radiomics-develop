@@ -36,33 +36,90 @@ nScans = numel(listScans);
 for s = 1:nScans
     scan = listScans(s).name;
     cd(fullfile(pathPatient,scan))
-    ok = zeros(1,3);
+    ok = zeros(1,4);
     
     % STEP 1: READING DICOM DATA (there must be DICOM data present in the directory for now --> minimim requirement is to report on image acquisition parameters).
     try
+        compressedDICOM = logical(exist('DICOMseries.tgz','file'));
+        if compressedDICOM
+            untar('DICOMseries.tgz')
+        end
         readAllDICOM(pwd,pwd,0,'matlab','modality');
         listMat = dir('*.mat'); % There must be only one scan series in the organized patient-scan folder
         sData = load(listMat(1).name); sData = struct2cell(sData); sData = sData{1};
         delete('*.mat')
-        sData{2}.scan.volume.data = uint16(sData{2}.scan.volume.data); % Usually the native format of DICOM. Could be int16 though, need to check on how to automatically detect that.
+        sData{2}.scan.volume.data = single(sData{2}.scan.volume.data); % Native format is int16. But in this function, for the moment, we save all volumes in single. TO SOLVE TO MINIMIZE SPACE.
         nameSave = [namePatient,'_',scan,'.',sData{2}.type,'.mat'];
         ok(1) = 1;
+        dcmVol = true;
     catch % PROBLEM WITH DICOM DATA. CODE DOWN THE ROAD WILL FAIL. TO MANUALLY CORRECT. DICOM DATA MUST BE PRESENT AND READABLE.
         sData = cell(1,7); % MINIMAL sData
         sData{2} = struct;
         nameSave = [namePatient,'_',scan,'.Unknown.mat'];
     end
     
+    % STEP 2: NIFITI FILES
+    % --> SOLVE THE ORIENTATION OF FILES. There A 90 degree rotation with DICOM.
+    listNIFTI = dir('*.nii*'); % The second * means that we allow compressed nifti (.nii.gz)
+    if ~isempty(listNIFTI)
+        if exist('imagingVolume.nii') || exist('imagingVolume.nii.gz')
+            ok(2) = 1;
+            while true % If the nifti file is compressed, it appears that only one gunzip call (for unzipping, inside niftiread and niftiinfo) can be executed on the system at a time. This is a big problem for parallelization. Temporary loop here. TO SOLVE.
+                try
+                    sData{2}.nii.volume.data = single(niftiread('imagingVolume'));
+                    sData{2}.nii.volume.header = niftiinfo('imagingVolume');
+                    break
+                catch
+                    pause(ceil(5*rand(1))); % Wait between 1 and 5 seconds (randomly chosen) before trying again --> different threads should not get stuck.
+                end
+            end
+            listMask = dir('segMask*.nii*'); nMask = numel(listMask);
+            sData{2}.nii.mask = struct;
+            if dcmVol
+                sData{2}.scan.volume.data = []; % For the moment, we do not save both a .nii volume and the dicom volume.
+                dcmVol = false; % In case other types of data are also present, we do not want to create an empty array in sData{2}.scan.volume.data once gain, it has already been done.
+            end
+            for m = 1:nMask
+                nameMaskFile = listMask(m).name;
+                indUnderScore = strfind(nameMaskFile,'_');
+                indDot = strfind(nameMaskFile,'.');
+                if numel(indUnderScore) == 2
+                    nameROI = nameMaskFile((indUnderScore(1)+1):(indUnderScore(2)-1));
+                    labelROI = str2num(nameMaskFile((indUnderScore(2)+6):(indDot(1)-1)));
+                else % Then there must be only one underscore
+                    nameROI = nameMaskFile((indUnderScore(1)+1):(indDot(1)-1));
+                    labelROI = 1;
+                end
+                sData{2}.nii.mask(m).name = nameROI;
+                while true % If the nifti file is compressed, it appears that only one gunzip call (for unzipping, inside niftiread and niftiinfo) can be executed on the system at a time. This is a big problem for parallelization. Temporary loop here. TO SOLVE.
+                    try
+                        sData{2}.nii.mask(m).data = niftiread(nameMaskFile);
+                        sData{2}.nii.mask(m).header = niftiinfo(nameMaskFile);
+                        break
+                    catch
+                        pause(ceil(5*rand(1))); % Wait between 1 and 5 seconds (randomly chosen) before trying again --> different threads should not get stuck.
+                    end
+                end
+                sData{2}.nii.mask(m).data(sData{2}.nii.mask(m).data ~= labelROI) = NaN;
+                sData{2}.nii.mask(m).data(sData{2}.nii.mask(m).data == labelROI) = 1;
+                sData{2}.nii.mask(m).data(isnan(sData{2}.nii.mask(m).data)) = 0;
+                sData{2}.nii.mask(m).data = uint16(sData{2}.nii.mask(m).data); % Mask has only 1's and 0's. To save as logical type?
+            end
+        end
+    end    
     
-    
-    % STEP 2: VERIFY FOR THE PRESENCE OF .nnrd files
+    % STEP 3: VERIFY FOR THE PRESENCE OF .nnrd files
     listNRRD = dir('*.nrrd');
     if ~isempty(listNRRD)
         if exist('imagingVolume.nrrd') % We recommend to always provide "imagingVolume.nrrd" if .nrrd segmentation is performed. However, it may still happen that the only imagin volume present comes from the DICOM data.
-            ok(2) = 1;
-            [sData{2}.nrrd.volume.data,sData{2}.nrrd.volume.header] = nrrdread('imagingVolume.nrrd');
+            ok(3) = 1;
+            [sData{2}.nrrd.volume.data,sData{2}.nrrd.volume.header] = single(nrrdread('imagingVolume.nrrd'));
+            if dcmVol
+                sData{2}.scan.volume.data = []; % For the moment, we do not save both a .nrrd volume and the dicom volume.
+                dcmVol = false; % In case other types of data are also present, we do not want to create an empty array in sData{2}.scan.volume.data once gain, it has already been done.
+            end
         else
-            sData{2}.nrrd.volume.data = sData{2}.scan.volume.data; % Copied from DICOM data for now.
+            sData{2}.nrrd.volume.data = sData{2}.scan.volume.data; % Copied from DICOM data for now, in case the user only provided a segmentation mask in .nrrd format (and no imaging volume in .nrrd, only DICOM).
             sData{2}.nrrd.volume.header = 'None -- Imaging volume = DICOM data';
         end
         listMask = dir('segMask*.nrrd'); nMask = numel(listMask);
@@ -83,19 +140,23 @@ for s = 1:nScans
             sData{2}.nrrd.mask(m).data(sData{2}.nrrd.mask(m).data ~= labelROI) = NaN;
             sData{2}.nrrd.mask(m).data(sData{2}.nrrd.mask(m).data == labelROI) = 1;
             sData{2}.nrrd.mask(m).data(sData{2}.nrrd.mask(m).data ~= labelROI) = 0;
-            sData{2}.nrrd.mask(m).data = uint16(sData{2}.nrrd.mask(m).data); % Apparently, this is the native format of .nrrd
+            sData{2}.nrrd.mask(m).data = uint16(sData{2}.nrrd.mask(m).data); % Mask has only 1's and 0's. To save as logical type?
        end
     end
    
-    % STEP 3: VERIFY FOR THE PRESENCE OF .img files
+    % STEP 4: VERIFY FOR THE PRESENCE OF .img files
     listIMG = dir('*.img');
     if ~isempty(listIMG)
         if exist('imagingVolume.img')
-            ok(3) = 1;
-            sData{2}.img.volume.data = niftiread('imagingVolume');
+            ok(4) = 1;
+            sData{2}.img.volume.data = single(niftiread('imagingVolume'));
             sData{2}.img.volume.header = niftiinfo('imagingVolume');
             listMask = dir('segMask*.img'); nMask = numel(listMask);
             sData{2}.img.mask = struct;
+            if dcmVol
+                sData{2}.scan.volume.data = []; % For the moment, we do not save both a .img volume and the dicom volume.
+                dcmVol = false; % In case other types of data are also present, we do not want to create an empty array in sData{2}.scan.volume.data once gain, it has already been done.
+            end
             for m = 1:nMask
                 nameMaskFile = listMask(m).name;
                 indUnderScore = strfind(nameMaskFile,'_');
@@ -113,7 +174,7 @@ for s = 1:nScans
                 sData{2}.img.mask(m).data(sData{2}.img.mask(m).data ~= labelROI) = NaN;
                 sData{2}.img.mask(m).data(sData{2}.img.mask(m).data == labelROI) = 1;
                 sData{2}.img.mask(m).data(isnan(sData{2}.img.mask(m).data)) = 0;
-                sData{2}.img.mask(m).data = single(sData{2}.img.mask(m).data); % % Apparently, this is the native format of .img
+                sData{2}.img.mask(m).data = uint16(sData{2}.img.mask(m).data); % Mask has only 1's and 0's. To save as logical type?
             end
         end
     end

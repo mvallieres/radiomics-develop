@@ -33,7 +33,9 @@ function [contourString] = findContour(sData,nameROI,nameStructureSet)
 % STRUCTURE SET NAME.
 
 delimiters = {'+','-'};
-if isfield(sData{2},'nrrd') % Used by default if present
+if isfield(sData{2},'nii') % Used by default if present
+    nContourData = numel(sData{2}.nii.mask);
+elseif isfield(sData{2},'nrrd') % Used by default if present
     nContourData = numel(sData{2}.nrrd.mask);
 elseif isfield(sData{2},'img') % Used as second default if present
     nContourData = numel(sData{2}.img.mask);
@@ -55,9 +57,11 @@ end
 
 for i = 1:numel(nameROI)
     for j = 1:nContourData
-        if isfield(sData{2},'nrrd') % Used by default if present
+        if isfield(sData{2},'nii') % Used by default if present
+            nameTemp = sData{2}.nii.mask(j).name;
+        elseif isfield(sData{2},'nrrd') % Used as second default if present
             nameTemp = sData{2}.nrrd.mask(j).name;
-        elseif isfield(sData{2},'img') % Used as second default if present
+        elseif isfield(sData{2},'img') % Used as third default if present
             nameTemp = sData{2}.img.mask(j).name;
         else % Otherwise we use DICOM data
             nameTemp = sData{2}.scan.contour(j).name;
