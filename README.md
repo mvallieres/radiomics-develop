@@ -3,6 +3,7 @@
 This is a private repository dedicated to the development of programming code for new radiomics applications via collaborative work with other scientific colleagues. I really look forward to work with you! Please do not hesitate to contact me if you have any question: Martin Vallières, +33 7 67 13 14 86, mart.vallieres@gmail.com
 
 ## Recent developments
+- IBSI calibration test -- Phase 2: Image processing with CT data (June 2018)
 - IBSI calibration test -- Phase 1: Feature calculation with digital phantom (April 2018)
 - Now using CSV files as inputs for roiNames (April 2018)
 - Addition and subtraction of ROIs now allowed, with operations parsed in roiNames.csv files (April 2018)
