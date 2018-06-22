@@ -64,7 +64,8 @@ for p = 1:nPatient
     
     % Computation of ROI mask
     tic, fprintf('\n--> Computation of ROI mask: ')
-    boxString = 'box10'; % 10 voxels in all three dimensions are added to the smallest bounding box.
+    %boxString = 'box10'; % 10 voxels in all three dimensions are added to the smallest bounding box.
+    boxString = 'full'; % TO SOLVE. INTERPOLATION DIFFERENCE WHEN USING (for example) 'box10' and 'full'. For now, safer to always use 'full'. But the problem has to be solved in interpVolume.m (centering problem).
     errorROI = false;
     try
         contourString = findContour(sData,nameROI{p},nameSet{p}); % OUTPUT IS FOR EXAMPLE '3' or '1-3+2'

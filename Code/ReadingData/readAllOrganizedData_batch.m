@@ -27,7 +27,7 @@ function readAllOrganizedData_batch(pathRead,pathSave,nBatch,pathMATLAB)
 
 warning off
 startpath = pwd;
-time = 60; % Number of seconds to wait before checking if parallel computations are done
+time = 10; % Number of seconds to wait before checking if parallel computations are done
 
 % INITIALIZATION
 cd(pathRead), listPatients = dir;

@@ -50,6 +50,11 @@ nScale = numel(scaleText); nAlgo = numel(algo); nGl = numel(grayLevels{1}); nExp
 glcm = cell(nScale,nAlgo,nGl); glrlm = cell(nScale,nAlgo,nGl); glszm = cell(nScale,nAlgo,nGl); ngtdm = cell(nScale,nAlgo,nGl); gldzm = cell(nScale,nAlgo,nGl); ngldm = cell(nScale,nAlgo,nGl);
 type = imParamScan.image.type;
 intensity = imParamScan.image.intensity; % Variable used to determine if there is 'arbitrary' (e.g., MRI) or 'definite' (e.g., CT) intensities.
+if isfield(imParamScan.image,'distCorrection')
+    distCorrection = imParamScan.image.distCorrection;
+else
+    distCorrection = false;
+end
 
 % SETTING UP userSetMinVal
 if ~isempty(range)
@@ -169,7 +174,7 @@ for s = 1:nScale
             for n = 1:nGl
                 countText = countText + 1;
                 tic, fprintf(['--> Computation of texture features in image space for "Scale=',num2str(scaleText{s}(1)),'", "Algo=',algo{a},'", "GL=',num2str(grayLevels{a}(n)),'" (',num2str(countText),'/',num2str(nExp),'): '])
-                [imageStruct] = computeTextureFeatures(volObj,roiObj_Int,roiObj_Morph,scaleText{s},algo{a},grayLevels{a}(n),userSetMinVal);
+                [imageStruct] = computeTextureFeatures(volObj,roiObj_Int,roiObj_Morph,scaleText{s},algo{a},grayLevels{a}(n),userSetMinVal,distCorrection);
                 for t = 1:nTextTypes
                     [radiomics.image.texture.(nameTextTypes{t})] = concatenateStruct(radiomics.image.texture.(nameTextTypes{t}),imageStruct.(nameTextTypes{t}));
                 end
@@ -184,7 +189,7 @@ for s = 1:nScale
                     for n = 1:nGlFilter
                         countFilt = countFilt + 1;
                         tic, fprintf(['--> Computation of texture features in ',filtersType{f},' space for "Scale=',num2str(scaleText{s}(1)),'", "Algo=',algoFilter{a},'", "GL=',num2str(grayLevelsFilter{a}(n)),'" (',num2str(countFilt),'/',num2str(nExpFilter),'): '])
-                        [filterStruct] = computeTextureFeatures(volObj,roiObj_Int,roiObj_Morph,scaleText{s},algoFilter{a},grayLevelsFilter{a}(n),[],filtersType{f});
+                        [filterStruct] = computeTextureFeatures(volObj,roiObj_Int,roiObj_Morph,scaleText{s},algoFilter{a},grayLevelsFilter{a}(n),[],distCorrection,filtersType{f});
                         if ~isempty(strfind(filtersType{f},'wavelet'))
                             for w = 1:nWav
                                 for t = 1:nTextTypes

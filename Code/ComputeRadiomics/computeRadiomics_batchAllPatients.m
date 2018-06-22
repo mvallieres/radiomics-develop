@@ -28,7 +28,7 @@ function computeRadiomics_batchAllPatients(pathRead,pathCSV,pathSave,imParams,ro
 
 startpath = pwd;
 
-time = 60; % Time spent in seconds between checks by the master process to verify the end of parallel computations.
+time = 10; % Time spent in seconds between checks by the master process to verify the end of parallel computations.
 nROItypes = numel(roiType_labels);
 
 for r = 1:nROItypes

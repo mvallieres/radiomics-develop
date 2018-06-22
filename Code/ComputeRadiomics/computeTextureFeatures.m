@@ -1,4 +1,4 @@
-function [resultsStruct] = computeTextureFeatures(volObjImage,roiObj_Int,roiObj_Morph,scaleText,algo,grayLevels,userSetMinVal,filterType)
+function [resultsStruct] = computeTextureFeatures(volObjImage,roiObj_Int,roiObj_Morph,scaleText,algo,grayLevels,userSetMinVal,distCorrection,filterType)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
@@ -29,7 +29,7 @@ function [resultsStruct] = computeTextureFeatures(volObjImage,roiObj_Int,roiObj_
 
 % *************************************************************************
 % INITIALIZATIONS
-if nargin == 8
+if nargin == 9
     filter = true;
 else
     filter = false;
@@ -95,13 +95,13 @@ for o = 1:nObjects
 
         % COMPUTING ALL TEXTURE FEATURES
         try
-            results.glcm_3Dmrg.(processingName) = getGLCMfeatures(volQuant_RE);
+            results.glcm_3Dmrg.(processingName) = getGLCMfeatures(volQuant_RE,distCorrection);
         catch
             fprintf('PROBLEM WITH COMPUTATION OF GLCM FEATURES ')
             results.glcm_3Dmrg.(processingName).error = 'ERROR_COMPUTATION';
         end
         try
-            results.glrlm_3Dmrg.(processingName) = getGLRLMfeatures(volQuant_RE);
+            results.glrlm_3Dmrg.(processingName) = getGLRLMfeatures(volQuant_RE,distCorrection);
         catch
             fprintf('PROBLEM WITH COMPUTATION OF GLRLM FEATURES ')
             results.glrlm_3Dmrg.(processingName).error = 'ERROR_COMPUTATION';                        
@@ -119,7 +119,7 @@ for o = 1:nObjects
             results.gldzm_3D.(processingName).error = 'ERROR_COMPUTATION';                            
         end
         try
-            results.ngtdm_3D.(processingName) = getNGTDMfeatures(volQuant_RE);
+            results.ngtdm_3D.(processingName) = getNGTDMfeatures(volQuant_RE,distCorrection);
         catch
             fprintf('PROBLEM WITH COMPUTATION OF NGTDM FEATURES ')
             results.ngtdm_3D.(processingName).error = 'ERROR_COMPUTATION';                           
