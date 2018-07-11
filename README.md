@@ -1,6 +1,6 @@
 # Welcome to _radiomics-develop_!
 
-This is a private repository dedicated to the development of programming code for new radiomics applications via collaborative work with other scientific colleagues. I really look forward to work with you! Please do not hesitate to contact me if you have any question: Martin Vallières, +33 7 67 13 14 86, mart.vallieres@gmail.com
+This is a repository dedicated to the development of programming code for new radiomics applications (IBSI compliant!) via collaborative work with other scientific colleagues. I look forward to work with you! Please do not hesitate to contact me if you have any question: Martin Vallières, 1-514-839-0248, mart.vallieres@gmail.com
 
 ## Recent developments
 - IBSI calibration test -- Phase 2: Image processing with CT data (June 2018)
@@ -29,11 +29,12 @@ All software code have up to now been tested on:
 ## Instructions
 - **COMPUTATION OF RADIOMIC FEATURES**: Please follow the instructions in the _INSTRUCTIONS.txt_ file at <https://github.com/mvallieres/radiomics-develop/tree/master/WORKSPACE_RadiomicComputation>
 - **IBSI calibration test -- Phase 1: Feature calculation with digital phantom**: Please follow the instructions in the _INSTRUCTIONS.txt_ file at <https://github.com/mvallieres/radiomics-develop/tree/master/Tests/IBSI_FeatureCalculation>
+- **IBSI calibration test -- Phase 2: Image processing with CT patient data**: Please follow the instructions in the _INSTRUCTIONS.txt_ file at <https://github.com/mvallieres/radiomics-develop/tree/master/Tests/IBSI_ImageProcessing>
 - Other applications to come (multivariable modeling) ...
 
 ## Documentation
 - Full list of features and image processing steps are defined by the [Imaging Biomarker Standardisation Initiative](https://arxiv.org/abs/1612.07003).
-- Example applications of how to use texture features extracted using multiple parameters can be found in [M Vallières et al 2015 Phys. Med. Biol. 60 5471](https://doi.org/10.1088/0031-9155/60/14/5471) and in [M Vallières et al 2017 arXiv:1703.08516](https://arxiv.org/abs/1703.08516)
+- Example applications of how to use texture features extracted using multiple parameters can be found in [M Vallières et al 2015 Phys. Med. Biol. 60 5471](https://doi.org/10.1088/0031-9155/60/14/5471) and in [M Vallières et al 2017 Sci. Rep. 7:10117](http://dx.doi.org/10.1038/s41598-017-10371-5)
 
 ## Warning
 - By default, GLCM, GLRLM and NGTDM matrices are using distance corrections as originally defined in [M Vallières et al 2015 Phys. Med. Biol. 60 5471](https://doi.org/10.1088/0031-9155/60/14/5471). Resulting features for these matrices will thus be slightly different from the benchmarked features defined by the [Imaging Biomarker Standardisation Initiative](https://arxiv.org/abs/1612.07003). 
@@ -51,8 +52,3 @@ All software code have up to now been tested on:
 Copyright (C) 2017  Martin Vallières  
 All rights reserved.
 
- By using this package, all members of the team acknowledge that it is to be 
- kept private until public release. Other scientists willing to join the 
- "radiomics-develop" team is however highly encouraged. Please contact 
- Martin Vallières mart.vallieres@gmail.com for this matter.
- -------------------------------------------
