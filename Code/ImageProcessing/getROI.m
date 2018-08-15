@@ -102,7 +102,7 @@ for c = 1:nContour
 
     % APPLYING ROTATION TO XYZ POINTS (if necessary --> MRscan)
     if isfield(sData{2}.scan.volume,'scanRot')
-        ROI_XYZ = (sData{2}.scan.volume.scanRot * ROI_XYZ')';
+        ROI_XYZ = (sData{2}.scan.volume.scanRot * ROI_XYZ(:,1:3)')';
     end
 
     % APPLYING TRANSLATION IF SIMULATION STRUCTURE AS INPUT (software STAMP utility)

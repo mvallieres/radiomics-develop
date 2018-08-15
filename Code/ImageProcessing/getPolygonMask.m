@@ -31,6 +31,7 @@ function [ROImask] = getPolygonMask(ROI_XYZ,spatialRef,orientation)
 % NEEDS TO BE DONE TO BE TOTALLY SURE THIS IS WORKING.
 
 
+% COMPUTING MASK
 sz = spatialRef.ImageSize;
 ROImask = zeros(sz(1),sz(2),sz(3));
 [X,Y,Z] = worldToIntrinsic(spatialRef,ROI_XYZ(:,1),ROI_XYZ(:,2),ROI_XYZ(:,3)); % X,Y,Z in intrinsic image coordinates
@@ -43,11 +44,16 @@ elseif strcmp(orientation,'Coronal')
     a = 1; b = 3; c = 2;
 end
 K = round(points(:,c)); % Must assign the points to one slice
-slices = unique(K);
+closedContours = unique(ROI_XYZ(:,4));
 [xq,yq] = meshgrid(1:sz(2),1:sz(1));
-for k = 1:numel(slices)
-    ind = find(K == slices(k));
-    ROImask(:,:,slices(k)) = or(ROImask(:,:,slices(k)),inpolygon(xq,yq,points(ind,a),points(ind,b)));
+for cc = 1:numel(closedContours)
+    ind = (ROI_XYZ(:,4) == closedContours(cc));
+    slice = mode(K(ind)); % Taking the mode, just in case. But normally, numel(unique(K(ind))) should evaluate to 1, as closed contours are meant to be defined on a given slice
+    ROImask(:,:,slice) = or(ROImask(:,:,slice),inpolygon(xq,yq,points(ind,a),points(ind,b)));
 end
+
+
+% CLEANING UP OF RTSTRUCT
+% --> TO BE DONE
 
 end

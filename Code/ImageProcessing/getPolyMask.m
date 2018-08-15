@@ -38,10 +38,12 @@ elseif strcmp(orientation,'Coronal')
     a = 1; b = 3; c = 2;
 end
 K = round(points(:,c)); % Must assign the points to one slice
-slices = unique(K);
-for k = 1:numel(slices)
-    ind = find(K == slices(k));
-    ROImask(:,:,slices(k)) = or(ROImask(:,:,slices(k)),poly2mask(points(ind,a),points(ind,b),sz(1),sz(2)));
+closedContours = unique(ROI_XYZ(:,4));
+[xq,yq] = meshgrid(1:sz(2),1:sz(1));
+for cc = 1:numel(closedContours)
+    ind = (ROI_XYZ(:,4) == closedContours(cc));
+    slice = mode(K(ind)); % Taking the mode, just in case. But normally, numel(unique(K(ind))) should evaluate to 1, as closed contours are meant to be defined on a given slice
+    ROImask(:,:,slice) = or(ROImask(:,:,slice),poly2mask(xq,yq,points(ind,a),points(ind,b)));
 end
 
 end

@@ -262,16 +262,16 @@ for rs = 1:nRS
         sData{2}.scan.contour(contourNum).nameSet = nameSet;
         sData{2}.scan.contour(contourNum).nameSetInfo = nameSetInfo;
         try
-            nSlice = numel(fieldnames(sData{4}(rs).ROIContourSequence.(itemROI).ContourSequence));
-            for s = 1:nSlice
+            nClosedContours = numel(fieldnames(sData{4}(rs).ROIContourSequence.(itemROI).ContourSequence)); indClosedContour = [];
+            for s = 1:nClosedContours
                  itemSlice = ['Item_',num2str(s)];
-                 pts_temp = sData{4}(rs).ROIContourSequence.(itemROI).ContourSequence.(itemSlice).ContourData; % points stored in the RTstruct file
+                 pts_temp = sData{4}(rs).ROIContourSequence.(itemROI).ContourSequence.(itemSlice).ContourData; nPoints = numel(pts_temp)/3; % points stored in the RTstruct file for a given closed contour (beware: there can be multiple closed contours on a given slice).
                  if ~isempty(pts_temp) && isnumeric(pts_temp)
-                     ind = 1:numel(pts_temp)/3;
+                     ind = 1:nPoints; indClosedContour = [indClosedContour;repmat(s,[nPoints,1])];
                      points = [points;pts_temp(ind*3-2),pts_temp(ind*3-1),pts_temp(ind*3)];
                  end
             end
-            sData{2}.scan.contour(contourNum).points_XYZ = points;
+            sData{2}.scan.contour(contourNum).points_XYZ = [points,indClosedContour];
         catch
             sData{2}.scan.contour(contourNum).points_XYZ = NaN;
         end
