@@ -7,11 +7,11 @@
 
 2. Open MATLAB and set up the MATLAB path on your computer to include all sub-folders contained in "/radiomics-develop/Code" on your computer (this folder should stay where you cloned the GitHub directory on your computer, where frequent "git pull" should be performed in the terminal to conserve up-to-date code on your computer).
 
-3. Download the DICOM data for the IBSI Image Processing tests and unzip the file: https://drive.google.com/file/d/1PbCVcITqNroDkCHi9m82UsB5aGJYtoOb/view?usp=sharing
+3. Download the DICOM data for the IBSI Image Processing tests and unzip the file: https://drive.google.com/file/d/1NSCW3dAkE1VM0ZtrkvapWHRZR8YyI23E/view?usp=sharing. Dowload the CSV data for the IBSI Image Processing tests and unzip the file: https://drive.google.com/file/d/1UScFU6R13c6laOrZu6ux1Diq5TFki5XX/view?usp=sharing
 
-4. Create a new workspace outside GitHub*. Insert the unzipped folder downloaded in step 3, as well as the following file: "/radiomics-develop/Tests/IBSI_ImageProcessing/script_IBSI_ImageProcessing.m"
+4. Create a new workspace outside GitHub*. In this new workspace, insert the two unzipped folders downloaded in step 3 (DICOM_IBSI and CSV_IBSI), as well as the following file: "/radiomics-develop/Tests/IBSI_ImageProcessing/script_IBSI_ImageProcessing.m". Your working directory (i.e. workspace) should now contains 2 folders and 1 .m file.
 
-3. Run "script_IBSI_ImageProcessing.m" in MATLAB. Running this script will result in new "IBSIresults_ImageProcessing_CaseX.csv" files created in the same folder that "script_IBSI_ImageProcessing.m" is run, where "X" refers to Cases 3, 4 and 5 of the tests defined in the IBSI reference manual.
+5. From the workspace created in step 4, run "script_IBSI_ImageProcessing.m" in MATLAB. Running this script will result in new "IBSIresults_ImageProcessing_CaseX.csv" files created in the same folder that "script_IBSI_ImageProcessing.m" is run, where "X" refers to Cases 3, 4 and 5 of the tests defined in the IBSI reference manual.
 
 
 
