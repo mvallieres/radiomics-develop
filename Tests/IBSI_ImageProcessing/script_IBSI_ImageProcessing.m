@@ -110,7 +110,8 @@ matlabPATH = 'matlab'; % OPTION: IMPORTANT --> Full path to the matlab executabl
 % STEP 1: READING DATA
 cd(pathWORK), system('mv DICOM_IBSI DICOM');
 pathDICOM = fullfile(pathWORK,'DICOM'); 
-mkdir('DATA'), pathDATA = fullfile(pathWORK,'DATA'); 
+mkdir('DATA'), pathDATA = fullfile(pathWORK,'DATA');
+cd(pathWORK), system('mv CSV_IBSI CSV'); 
 pathCSV = fullfile(pathWORK,'CSV');
 mkdir('FEATURES'), pathFEATURES = fullfile(pathWORK,'FEATURES');
 tic, fprintf('\n--> READING DATA USING %u CORES ... ',nBatch)
