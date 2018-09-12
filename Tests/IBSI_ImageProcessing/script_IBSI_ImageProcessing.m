@@ -1,6 +1,6 @@
 % *************************************************************************************
 % * DESCRIPTION:                                                                      *
-% * This script computes the image processing standardization tests for the IBSI      *
+% * This script computes the image processing standardization tests #2 for the IBSI   *
 % * --------------------------------------------------------------------------------- *
 % * AUTHOR(S): Martin Vallieres <mart.vallieres@gmail.com>                            *
 % * --------------------------------------------------------------------------------- *
