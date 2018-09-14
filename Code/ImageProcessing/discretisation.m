@@ -71,26 +71,20 @@ maxVal = max(volQuant_RE(:));
 switch type
     case 'FBS'
         wb = nQ; wd = wb;
-        volQuant_RE = ceil((volQuant_RE - minVal)/nQ);
-        if min(volQuant_RE(:)) == 0
-            volQuant_RE(volQuant_RE == min(volQuant_RE(:))) = 1;
-        end
+        volQuant_RE = floor((volQuant_RE - minVal)/wb) + 1;
     case 'FBN'
         wb = (maxVal - minVal)/nQ; wd = 1;
-        volQuant_RE = ceil(nQ * ((volQuant_RE - minVal)/(maxVal - minVal)));
-        volQuant_RE(volQuant_RE == min(volQuant_RE(:))) = 1;
+        volQuant_RE = floor(nQ * ((volQuant_RE - minVal)/(maxVal - minVal))) + 1;
+        volQuant_RE(volQuant_RE == max(volQuant_RE(:))) = nQ;
     case 'FBSequal'
         wb = nQ; wd = wb;
         volQuant_RE = equalization(volQuant_RE);
-        volQuant_RE = ceil((volQuant_RE - minVal)/nQ);
-        if min(volQuant_RE(:)) == 0
-            volQuant_RE(volQuant_RE == min(volQuant_RE(:))) = 1;
-        end
+        volQuant_RE = floor((volQuant_RE - minVal)/wb) + 1;
     case 'FBNequal'
         wb = (maxVal - minVal)/nQ; wd = 1;
         volQuant_RE = equalization(volQuant_RE);
-        volQuant_RE = ceil(nQ * ((volQuant_RE - minVal)/(maxVal - minVal)));
-        volQuant_RE(volQuant_RE == min(volQuant_RE(:))) = 1;
+        volQuant_RE = floor(nQ * ((volQuant_RE - minVal)/(maxVal - minVal))) + 1;
+        volQuant_RE(volQuant_RE == max(volQuant_RE(:))) = nQ;
 end
 
 if nargin == 5 && strcmp(ivh,'ivh') && (strcmp(type,'FBS') || strcmp(type,'FBSequal'))

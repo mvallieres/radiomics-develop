@@ -41,7 +41,7 @@ scaleName = ['scale',scaleName];
 
 % Discretisation name
 grayLevelsName = num2str(grayLevels); grayLevelsName = replaceCharacter(grayLevelsName,'.','dot');
-if ~isempty(strfind(algo,'FBS')) % The minimum value defines the computation.
+if contains(algo,'FBS') % The minimum value defines the computation.
     if ~isempty(userSetMinVal)
         minValName = num2str(userSetMinVal); minValName = replaceCharacter(minValName,'.','dot'); minValName = replaceCharacter(minValName,'-','M');
         minValName = ['_min',minValName];
@@ -65,7 +65,7 @@ processingName = [scaleName,'_',discretisationName];
 
 
 % PREPARATION OF COMPUTATION
-if filter && ~isempty(strfind(filterType,'wavelet'))
+if filter && contains(filterType,'wavelet')
     ind = strfind(filterType,'_'); waveletName = filterType(ind+1:end);
     [subbands] = getWaveletSubbands(volObjImage.data,waveletName);
     nameTypes = fieldnames(subbands); nType = numel(nameTypes); volObjCell = cell(1,nType);
