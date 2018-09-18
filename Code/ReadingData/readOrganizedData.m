@@ -42,9 +42,12 @@ for s = 1:nScans
     try
         compressedDICOM = logical(exist('DICOMseries.tgz','file'));
         if compressedDICOM
-            untar('DICOMseries.tgz')
+            untar('DICOMseries.tgz','tempFolder')
         end
         readAllDICOM(pwd,pwd,0,'matlab','modality');
+        if compressedDICOM
+            system('rm -r tempFolder'); % Deleting the temporary created folder.
+        end
         listMat = dir('*.mat'); % There must be only one scan series in the organized patient-scan folder
         sData = load(listMat(1).name); sData = struct2cell(sData); sData = sData{1};
         delete('*.mat')
