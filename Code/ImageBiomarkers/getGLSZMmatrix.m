@@ -61,6 +61,7 @@ function [GLSZM] = getGLSZMmatrix(ROIOnly,levels)
 % else
 %     adjust = 1000;
 % end
+nMax = sum(~isnan(ROIOnly(:)));
 levelTemp = max(levels) + 1;
 ROIOnly(isnan(ROIOnly)) = levelTemp;
 levels = [levels,levelTemp];
@@ -76,8 +77,7 @@ NL = length(levels) - 1;
 
 
 % INITIALIZATION
-nInit = numel(ROIOnly(:)); % THIS NEEDS TO BE CHANGED. THE ARRAY INITIALIZED COULD BE TOO BIG!
-GLSZM = zeros(NL,nInit);
+GLSZM = zeros(NL,nMax);
 
 
 % COMPUTATION OF GLSZM
