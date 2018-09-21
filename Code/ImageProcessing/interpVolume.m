@@ -1,4 +1,4 @@
-function [volObjQ] = interpVolume(volObjS,voxDim,interpMet,roundVal,type)
+function [volObjQ] = interpVolume(volObjS,voxDim,interpMet,roundVal,type,boxElements)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
@@ -39,8 +39,13 @@ else
         twoD = false;
     end
 end
-if nargin ~= 5
-    error('The number of arguments must be 5')
+if nargin < 5
+    error('The number of arguments must at least be 5')
+end
+if nargin < 5 % Sixth argument is optional
+    useBox = false;
+else
+    useBox = true;
 end
 if ~strcmp(type,'image') && ~strcmp(type,'roi')
     error('Fifth argument must either be "image" or "roi"')
@@ -96,6 +101,23 @@ diff = extentQ - extentS; newLowLimitsQ = lowLimitsS - diff/2;
 spatialRefQ.XWorldLimits = spatialRefQ.XWorldLimits - (lowLimitsQ(1) - newLowLimitsQ(1));
 spatialRefQ.YWorldLimits = spatialRefQ.YWorldLimits - (lowLimitsQ(2) - newLowLimitsQ(2));
 spatialRefQ.ZWorldLimits = spatialRefQ.ZWorldLimits - (lowLimitsQ(3) - newLowLimitsQ(3));
+
+
+% REDUCE THE SIZE OF THE VOLUME PRIOR TO INTERPOLATION
+if useBox
+    boxString = boxElements.boxString;
+    roiObjS = boxElements.roiObj;
+    [~,~,tempSpatialRef] = computeBox(roiObjS.data,roiObjS.data,roiObjS.spatialRef,boxString);
+    sizeQ = tempSpatialRef.ImageSize;
+    [Xbound,Ybound,Zbound] = intrinsicToWorld(tempSpatialRef,[1;sizeTemp(2)],[1;sizeTemp(1)],[1;sizeTemp(3)]);
+    [Xbound,Ybound,Zbound] = worldToIntrinsic(spatialRefQ,Xbound,Ybound,Zbound); sizeQ = [Ybound(2) - Ybound(1) + 1,Xbound(2) - Xbound(1) + 1,Zbound(2) - Zbound(1) + 1];
+    [Xbound,Ybound,Zbound] = intrinsicToWorld(spatialRefQ,Xbound,Ybound,Zbound);
+    newLowLimitsQ(1) = Xbound(1) - resQ(1)/2; newLowLimitsQ(2) = Ybound(1) - resQ(2)/2; newLowLimitsQ(3) = Zbound(1) - resQ(3)/2;
+    spatialRefQ = imref3d(sizeQ,resQ(1),resQ(2),resQ(3));
+    spatialRefQ.XWorldLimits = spatialRefQ.XWorldLimits - (spatialRefQ.XWorldLimits(1) - newLowLimitsQ(1));
+    spatialRefQ.YWorldLimits = spatialRefQ.YWorldLimits - (spatialRefQ.YWorldLimits(1) - newLowLimitsQ(2));
+    spatialRefQ.ZWorldLimits = spatialRefQ.ZWorldLimits - (spatialRefQ.ZWorldLimits(1) - newLowLimitsQ(3));
+end
 
 
 % CREATING QUERIED XYZ POINTS

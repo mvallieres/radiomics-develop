@@ -64,8 +64,7 @@ for p = 1:nPatient
     
     % Computation of ROI mask
     tic, fprintf('\n--> Computation of ROI mask: ')
-    %boxString = 'box10'; % 10 voxels in all three dimensions are added to the smallest bounding box.
-    boxString = 'full'; % TO SOLVE. INTERPOLATION DIFFERENCE WHEN USING (for example) 'box10' and 'full'. For now, safer to always use 'full'. But the problem has to be solved in interpVolume.m (centering problem).
+    boxString = 'full'; % Safer to use a full box at this point
     errorROI = false;
     try
         contourString = findContour(sData,nameROI{p},nameSet{p}); % OUTPUT IS FOR EXAMPLE '3' or '1-3+2'
@@ -86,8 +85,9 @@ for p = 1:nPatient
     toc
     
     % Computing radiomics features
-    try
-        [radiomics] = computeRadiomics(volObjInit,roiObjInit,imParamScan);
+    try 
+        boxString = 'box10'; % 10 voxels in all three dimensions are added to the smallest bounding box. This setting is used to speed up computations of radiomics features. Optional argument in subsequent function.
+        [radiomics] = computeRadiomics(volObjInit,roiObjInit,imParamScan,boxString);
     catch
         fprintf('\nERROR IN RADIOMICS FEATURE COMPUTATION')
         continue

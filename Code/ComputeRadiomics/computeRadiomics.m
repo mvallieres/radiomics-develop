@@ -1,4 +1,4 @@
-function [radiomics] = computeRadiomics(volObjInit,roiObjInit,imParamScan)
+function [radiomics] = computeRadiomics(volObjInit,roiObjInit,imParamScan,boxString)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
@@ -31,6 +31,11 @@ function [radiomics] = computeRadiomics(volObjInit,roiObjInit,imParamScan)
 %   features will be computed.
 % - Eventually, "imParam" variable could be better organized, this is confusing.
 
+
+% PARSING LAST ARGUMENT
+if nargin < 4
+    boxString = 'full'; % Fourth argument is optional. If not present, we use the full box.
+end
 
 
 % INITIALIZATION
@@ -96,8 +101,8 @@ end
 try
     tic, fprintf(['--> Non-texture features: pre-processing (interp + reSeg) for "Scale=',num2str(scaleNonText(1)),'": '])
     % STEP 1: INTERPOLATION
-    [volObj] = interpVolume(volObjInit,scaleNonText,volInterp,glRound,'image');
-    [roiObj_Morph] = interpVolume(roiObjInit,scaleNonText,roiInterp,roiPV,'roi');
+    [volObj] = interpVolume(volObjInit,scaleNonText,volInterp,glRound,'image',boxString);
+    [roiObj_Morph] = interpVolume(roiObjInit,scaleNonText,roiInterp,roiPV,'roi',boxString);
 
     % STEP 2: RE-SEGMENTATION
     roiObj_Int = roiObj_Morph; % Now is the time to create the intensity mask
@@ -160,8 +165,9 @@ for s = 1:nScale
     try
         tic, fprintf(['--> Texture features: pre-processing (interp + reSeg) for "Scale=',num2str(scaleText{s}(1)),'": '])
         % STEP 1: INTERPOLATION
-        [volObj] = interpVolume(volObjInit,scaleText{s},volInterp,glRound,'image');
-        [roiObj_Morph] = interpVolume(roiObjInit,scaleText{s},roiInterp,roiPV,'roi');
+        boxElements.boxString = boxString; boxElements.roiObj = roiObjInit;
+        [volObj] = interpVolume(volObjInit,scaleText{s},volInterp,glRound,'image',boxElements);
+        [roiObj_Morph] = interpVolume(roiObjInit,scaleText{s},roiInterp,roiPV,'roi',boxElements);
 
         % STEP 2: RE-SEGMENTATION
         roiObj_Int = roiObj_Morph; % Now is the time to create the intensity mask
