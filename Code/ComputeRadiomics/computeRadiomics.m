@@ -101,8 +101,9 @@ end
 try
     tic, fprintf(['--> Non-texture features: pre-processing (interp + reSeg) for "Scale=',num2str(scaleNonText(1)),'": '])
     % STEP 1: INTERPOLATION
-    [volObj] = interpVolume(volObjInit,scaleNonText,volInterp,glRound,'image',boxString);
-    [roiObj_Morph] = interpVolume(roiObjInit,scaleNonText,roiInterp,roiPV,'roi',boxString);
+    boxElements.boxString = boxString; boxElements.roiObj = roiObjInit;
+    [volObj] = interpVolume(volObjInit,scaleNonText,volInterp,glRound,'image',boxElements);
+    [roiObj_Morph] = interpVolume(roiObjInit,scaleNonText,roiInterp,roiPV,'roi',boxElements);
 
     % STEP 2: RE-SEGMENTATION
     roiObj_Int = roiObj_Morph; % Now is the time to create the intensity mask

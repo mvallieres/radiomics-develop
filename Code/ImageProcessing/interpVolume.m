@@ -42,7 +42,7 @@ end
 if nargin < 5
     error('The number of arguments must at least be 5')
 end
-if nargin < 5 % Sixth argument is optional
+if nargin < 6 % Sixth argument is optional
     useBox = false;
 else
     useBox = true;
@@ -108,7 +108,7 @@ if useBox
     boxString = boxElements.boxString;
     roiObjS = boxElements.roiObj;
     [~,~,tempSpatialRef] = computeBox(roiObjS.data,roiObjS.data,roiObjS.spatialRef,boxString);
-    sizeQ = tempSpatialRef.ImageSize;
+    sizeTemp = tempSpatialRef.ImageSize;
     [Xbound,Ybound,Zbound] = intrinsicToWorld(tempSpatialRef,[1;sizeTemp(2)],[1;sizeTemp(1)],[1;sizeTemp(3)]);
     [Xbound,Ybound,Zbound] = worldToIntrinsic(spatialRefQ,Xbound,Ybound,Zbound); sizeQ = [Ybound(2) - Ybound(1) + 1,Xbound(2) - Xbound(1) + 1,Zbound(2) - Zbound(1) + 1];
     [Xbound,Ybound,Zbound] = intrinsicToWorld(spatialRefQ,Xbound,Ybound,Zbound);
