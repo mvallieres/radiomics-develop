@@ -64,7 +64,7 @@ for p = 1:nPatient
     
     % Computation of ROI mask
     tic, fprintf('\n--> Computation of ROI mask: ')
-    boxString = 'full'; % Safer to use a full box at this point
+    boxString = 'full'; % Safer to use a full box here.
     errorROI = false;
     try
         contourString = findContour(sData,nameROI{p},nameSet{p}); % OUTPUT IS FOR EXAMPLE '3' or '1-3+2'
@@ -86,7 +86,7 @@ for p = 1:nPatient
     
     % Computing radiomics features
     try 
-        boxString = 'box10'; % 10 voxels in all three dimensions are added to the smallest bounding box. This setting is used to speed up computations of radiomics features. Optional argument in subsequent function.
+        boxString = 'box10'; % 10 voxels in all three dimensions are added to the smallest bounding box. This setting is used to speed up interpolation processes (mostly) prior to the computation of radiomics features. Optional argument in the function computeRadiomics.
         [radiomics] = computeRadiomics(volObjInit,roiObjInit,imParamScan,boxString);
     catch
         fprintf('\nERROR IN RADIOMICS FEATURE COMPUTATION')

@@ -107,11 +107,13 @@ spatialRefQ.ZWorldLimits = spatialRefQ.ZWorldLimits - (lowLimitsQ(3) - newLowLim
 if useBox
     boxString = boxElements.boxString;
     roiObjS = boxElements.roiObj;
-    [~,~,tempSpatialRef] = computeBox(roiObjS.data,roiObjS.data,roiObjS.spatialRef,boxString);
+    [~,~,tempSpatialRef] = computeBox(roiObjS.data,roiObjS.data,roiObjS.spatialRef,boxString); % Computing a new spatialRef for a smaller box as defined by 'boxString'.
     sizeTemp = tempSpatialRef.ImageSize;
-    [Xbound,Ybound,Zbound] = intrinsicToWorld(tempSpatialRef,[1;sizeTemp(2)],[1;sizeTemp(1)],[1;sizeTemp(3)]);
-    [Xbound,Ybound,Zbound] = worldToIntrinsic(spatialRefQ,Xbound,Ybound,Zbound); sizeQ = [Ybound(2) - Ybound(1) + 1,Xbound(2) - Xbound(1) + 1,Zbound(2) - Zbound(1) + 1];
-    [Xbound,Ybound,Zbound] = intrinsicToWorld(spatialRefQ,Xbound,Ybound,Zbound);
+    [Xbound,Ybound,Zbound] = intrinsicToWorld(tempSpatialRef,[1;sizeTemp(2)],[1;sizeTemp(1)],[1;sizeTemp(3)]); % Getting world boundaries (center of voxels) of the new box.
+    [Xbound,Ybound,Zbound] = worldToIntrinsic(spatialRefQ,Xbound,Ybound,Zbound); % Getting the image positions of the boundaries of the new box, IN THE FULL QUERIED FRAME OF REFERENCE (centered on the sampled frame of reference).
+    Xbound = round(Xbound); Ybound = round(Ybound); Zbound = round(Zbound); % Rounding to the nearest image position integer
+    sizeQ = [Ybound(2) - Ybound(1) + 1,Xbound(2) - Xbound(1) + 1,Zbound(2) - Zbound(1) + 1];
+    [Xbound,Ybound,Zbound] = intrinsicToWorld(spatialRefQ,Xbound,Ybound,Zbound); % Converting back to world positions ion order to correctly define edges of the new box and thus center it onto the full queried reference frame
     newLowLimitsQ(1) = Xbound(1) - resQ(1)/2; newLowLimitsQ(2) = Ybound(1) - resQ(2)/2; newLowLimitsQ(3) = Zbound(1) - resQ(3)/2;
     spatialRefQ = imref3d(sizeQ,resQ(1),resQ(2),resQ(3));
     spatialRefQ.XWorldLimits = spatialRefQ.XWorldLimits - (spatialRefQ.XWorldLimits(1) - newLowLimitsQ(1));
