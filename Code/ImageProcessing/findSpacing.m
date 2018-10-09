@@ -28,6 +28,7 @@ function sliceSpacing = findSpacing(points,scanType)
 % README --> This function works for points from at least 2 slices. If only
 % one slice is present, the function returns a NaN.
 
+decimKeep = 4; % We keep at most 4 decimals to find the slice spacing
 
 if strcmp(scanType,'MRscan')
     slices = unique(round(points*10)/10); % Rounding to the nearest 0.1 mm, MRI is more problematic due to arbitrary orientations allowed for imaging volumes.
@@ -40,6 +41,7 @@ for s = 1:nSlices - 1
     diff(s) = slices(s + 1) - slices(s);
 end
 
+diff = round(diff,decimKeep,'decimals'); % THIS LINE COULD BE IMPROVED?
 [sliceSpacing,nOcc] = mode(diff);
 if nOcc == 1
     sliceSpacing = mean(diff);
