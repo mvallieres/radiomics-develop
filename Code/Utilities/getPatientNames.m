@@ -29,7 +29,7 @@ function patientNames = getPatientNames(roiNames)
 nNames = size(roiNames,1);
 patientNames = cell(nNames,1);
 for n = 1:nNames
-    patientNames{n} = [roiNames{n,1},'_',roiNames{n,2},'.',roiNames{n,3},'.mat'];
+    patientNames{n} = [roiNames{n,1},'__',roiNames{n,2},'.',roiNames{n,3},'.mat'];
 end
 
 end

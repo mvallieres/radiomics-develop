@@ -1,4 +1,4 @@
-function preAnonymize(pathANON)
+function computeRadiomics_AllTables(pathFEATURES,pathTABLES,tableTags)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
@@ -25,11 +25,30 @@ function preAnonymize(pathANON)
 % Martin Vallieres for this matter.
 % -------------------------------------------------------------------------
 
-
 startpath = pwd;
+nTables = size(tableTags,1);
 
-cd(pathANON)
-system('for i in $(ls -d */); do python anonymize_dicom.py -n ${i%%/} ${i%%/}; done >& anonymization.log');
+fprintf('\n')
+for t = 1:nTables
+    scan= tableTags{t,1};
+    roiType = tableTags{t,2};
+    imSpace = tableTags{t,3};
+    nameTable = ['radiomics__',scan,'(',roiType,')__',imSpace];
+    wildcard = ['*',scan,'(',roiType,')*']; % Wildcard used to look only in the parent folder (pathFEATURES), no need to recursively look into sub-folders using '**/'.
+    tic, fprintf('\n-->  Computing Radiomics table:"%s" ... ',nameTable);
+    
+    % Create radiomics table
+    radiomicsTable = createRadiomicsTable(getFilePaths(pathFEATURES,wildcard),imSpace);
+    radiomicsTable.Properties.Description = nameTable;
+    
+    % Save radiomics table
+    save(fullfile(pathTABLES,nameTable),'radiomicsTable');
+    
+    % Create CSV table and Definitions
+    writeRadiomicsCSV(fullfile(pathTABLES,nameTable))
+    
+    fprintf('DONE\n'), toc
+end
 
 cd(startpath)
 end

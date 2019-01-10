@@ -356,7 +356,7 @@ if nargin < 5
                 nScanIndex = numel(scanIndex);
                 if nScanIndex > 0
                     for k = 1:nScanIndex
-                        ind1 = numel(idString) + 1; % Getting the '_' position after the PatientID 
+                        ind1 = numel(idString) + 2; % Getting the '_' position after the PatientID 
                         ind2 = numel(nameComp{scanIndex(k)}) - 10; % Getting the '.' position
                         name = nameComp{scanIndex(k)};
                         indWrong = strfind(name,'\');

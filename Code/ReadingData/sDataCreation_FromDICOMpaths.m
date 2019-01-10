@@ -306,8 +306,20 @@ nameSave = replaceCharacter(nameSave,'\','-');
 nameSave = replaceCharacter(nameSave,' ','-');
 nameSave = replaceCharacter(nameSave,'(','-');
 nameSave = replaceCharacter(nameSave,')','-');
+nameSave = replaceCharacter(nameSave,'&','-');
+nameSave = replaceCharacter(nameSave,':','-');
+nameSave = replaceCharacter(nameSave,'*','-');
+nameID = sData{3}(1).PatientID;
+nameID = replaceCharacter(nameID,'/','-');
+nameID = replaceCharacter(nameID,'\','-');
+nameID = replaceCharacter(nameID,' ','-');
+nameID = replaceCharacter(nameID,'(','-');
+nameID = replaceCharacter(nameID,')','-');
+nameID = replaceCharacter(nameID,'&','-');
+nameID = replaceCharacter(nameID,':','-');
+nameID = replaceCharacter(nameID,'*','-');
 cd(pathSave)
-nameComplete = [sData{3}(1).PatientID,'_',nameSave,'.',type,'.mat'];
+nameComplete = [nameID,'__',nameSave,'.',type,'.mat'];
 save(nameComplete,'sData','-v7.3')
 %fprintf('\n--> Creation of sData for %s: DONE',nameComplete(1:end-4));
 

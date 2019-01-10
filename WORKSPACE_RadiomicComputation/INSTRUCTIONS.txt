@@ -6,11 +6,11 @@
 
 2. Copy the folder "WORKSPACE_RadiomicComputation" (radiomics-develop/WORKSPACE_RadiomicComputation) to your favorite working directory on your computer (don't run things from your cloned GitHub directory). The "CSV" folder (and files in it) along with the "script_ReadData.m" and "script_ComputeRadiomics.m" files are mandatory to run the example experiments (thus to be copied), but it is not necessary to copy the "INSTRUCTIONS.txt", "RADIOMIC_OUTPUT.txt" and "WORKSPACE_FORMAT.txt" files.
 
-3. Download the example DICOM dataset at: https://www.dropbox.com/s/6i9qf1i5mh1tgs2/DICOM.zip?dl=0
+3. Download the example DICOM dataset at: https://www.dropbox.com/s/525ojtavw6y3liu/DICOM.zip?dl=0
 
 4. Extract the DICOM folder (DICOM.zip downloaded in step 3), and move it inside the WORKSPACE_RadiomicComputation folder that you copied in step 2.
 
-5. Open MATLAB and set up the MATLAB path on your computer to include all sub-folders contained in "/radiomics-develop/Code" on your computer (this folder should stay where you cloned the GitHub directory on your computer, where frequent "git pull" should be performed in the terminal to conserve up-to-date code on your computer).
+5. Open MATLAB and set up the MATLAB path on your computer to include all "Code" sub-folders contained in "/radiomics-develop/" on your computer (this folder should stay where you cloned the GitHub directory on your computer, where frequent "git pull" should be performed in the terminal to conserve up-to-date code on your computer).
 
 6. Navigate in MATLAB inside the WORKSPACE_RadiomicComputation folder that you copied in step 2, and run "script_ReadData.m" (make sure python is installed on your computer for this step to succeed if you use the "flagAnon = true;' option). At the end of this step, new .mat files for all scans of all patients will be saved in a new folder "DATA" inside the WORKSPACE_RadiomicComputation folder that you copied in step 2.
 

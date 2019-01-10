@@ -60,6 +60,14 @@ if isfield(imParamScan.image,'distCorrection')
 else
     distCorrection = false;
 end
+if isfield(imParamScan.image,'computeDiagFeatures')
+    computeDiagFeatures = imParamScan.image.computeDiagFeatures;
+else
+    computeDiagFeatures = false;
+end
+if computeDiagFeatures % If computeDiagFeatures is true.
+    boxString = 'full'; % This is required for proper comparison.
+end
 
 % SETTING UP userSetMinVal
 if ~isempty(range)
@@ -101,14 +109,16 @@ end
 try
     tic, fprintf(['--> Non-texture features: pre-processing (interp + reSeg) for "Scale=',num2str(scaleNonText(1)),'": '])
     % STEP 1: INTERPOLATION
+    if computeDiagFeatures, type = 'initial'; [diag] = getDiagFeatures(volObjInit,roiObjInit,roiObjInit,type); radiomics.image.diag.(['scale',num2str(scaleNonText(1))]) = diag; end
     boxElements.boxString = boxString; boxElements.roiObj = roiObjInit;
     [volObj] = interpVolume(volObjInit,scaleNonText,volInterp,glRound,'image',boxElements);
     [roiObj_Morph] = interpVolume(roiObjInit,scaleNonText,roiInterp,roiPV,'roi',boxElements);
+    if computeDiagFeatures, type = 'interp'; [diag] = getDiagFeatures(volObj,roiObj_Morph,roiObj_Morph,type); [radiomics.image.diag.(['scale',num2str(scaleNonText(1))])] = concatenateStruct(radiomics.image.diag.(['scale',num2str(scaleNonText(1))]),diag); end
 
     % STEP 2: RE-SEGMENTATION
     roiObj_Int = roiObj_Morph; % Now is the time to create the intensity mask
-    [roiObj_Int.data] = rangeReSeg(volObj.data,roiObj_Int.data,range);
-    [roiObj_Int.data] = outlierReSeg(volObj.data,roiObj_Int.data,outliers);
+    roiObj_Int.data = rangeReSeg(volObj.data,roiObj_Int.data,range) & outlierReSeg(volObj.data,roiObj_Int.data,outliers); % TAKING THE INTERSECTION OF THE TWO RE-SEGMENTATION PROCESSES
+    if computeDiagFeatures, type = 'reSeg'; [diag] = getDiagFeatures(volObj,roiObj_Int,roiObj_Morph,type); [radiomics.image.diag.(['scale',num2str(scaleNonText(1))])] = concatenateStruct(radiomics.image.diag.(['scale',num2str(scaleNonText(1))]),diag); end
     toc
     
     % STEP 3: COMPUTE ALL NON-TEXTURE FEATURES IN IMAGE SPACE
@@ -172,8 +182,7 @@ for s = 1:nScale
 
         % STEP 2: RE-SEGMENTATION
         roiObj_Int = roiObj_Morph; % Now is the time to create the intensity mask
-        [roiObj_Int.data] = rangeReSeg(volObj.data,roiObj_Int.data,range);
-        [roiObj_Int.data] = outlierReSeg(volObj.data,roiObj_Int.data,outliers);
+        roiObj_Int.data = rangeReSeg(volObj.data,roiObj_Int.data,range) & outlierReSeg(volObj.data,roiObj_Int.data,outliers); % TAKING THE INTERSECTION OF THE TWO RE-SEGMENTATION PROCESSES
         toc
         
         % STEP 3: COMPUTE ALL TEXTURE FEATURES IN IMAGE SPACE

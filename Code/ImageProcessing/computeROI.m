@@ -56,7 +56,13 @@ while strcmp(interp,'interp')
     % Creating new imref3d object for sample points (with slice dimension similar to original volume where RTstruct was created)
     sliceSpacing = double(findSpacing(ROI_XYZ(:,dimIJK),scanType)); % Slice spacing in mm
     if isnan(sliceSpacing), sliceSpacing = spatialRef.(['PixelExtentInWorld',direction]); end % Only one slice found in the function "findSpacing" on the above line. We thus must set "sliceSpacing" to the slice spacing of the queried volume, and no interpolation will be performed.
-    newSize = ceil(spatialRef.(['ImageExtentInWorld',direction])/sliceSpacing); %  Using "round" would yield the closest new size we can get. But using "ceil" is safer.
+    calcSize = spatialRef.(['ImageExtentInWorld',direction])/sliceSpacing;
+    ceilSize = ceil(calcSize);
+    if 1 - (ceilSize - calcSize) < 0.01 % Ceiling is probably not a good option here and can cause "small number" issues later on.
+        newSize = round(calcSize);
+    else
+        newSize = ceilSize; % Using "round" would yield the closest new size we can get. But using "ceil" is safer --> IBSI.
+    end
     resXYZ(dimXYZ) = sliceSpacing; 
     sz = spatialRef.ImageSize; sz(dimIJK) = newSize;
     newSpatialRef = imref3d(sz,resXYZ(1),resXYZ(2),resXYZ(3));
@@ -65,7 +71,7 @@ while strcmp(interp,'interp')
     if abs(diff) >= 0.01 % Sampled and queried volume are considered "different".
         newLimit = spatialRef.([direction,'WorldLimits'])(1) - (diff)/2;
         newSpatialRef.([direction,'WorldLimits']) = newSpatialRef.([direction,'WorldLimits']) - (newSpatialRef.([direction,'WorldLimits'])(1)-newLimit); % Sampled volume is now centered on queried volume.    
-    else % Less than a 0.001 mm, sampled and queried volume are considered to be the same. At this point, spatialRef and newSpatialRef may have differed due to data manipulation, so we simply compute the ROI mask with spatialRef (i.e. simply using "poly2mask.m"), without performing interpolation.
+    else % Less than a 0.01 mm, sampled and queried volume are considered to be the same. At this point, spatialRef and newSpatialRef may have differed due to data manipulation, so we simply compute the ROI mask with spatialRef (i.e. simply using "poly2mask.m"), without performing interpolation.
         interp = 'noInterp';
         break % Getting out of the "while" statement
     end

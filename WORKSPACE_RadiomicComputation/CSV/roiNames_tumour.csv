@@ -6,5 +6,4 @@ STS-McGill-001,T2FS,MRscan,{GTV_Mass}
 Meningioma-UCSF-128,SPGR,MRscan,{RTV}
 Cervix-CHRU-095,ADC,MRscan,{GTV}
 Cervix-CHRU-095,GADO,MRscan,{GTV}
-Cervix-CHRU-095,PET,PTscan,{GTV}
 Cervix-CHRU-095,T2,MRscan,{GTV}

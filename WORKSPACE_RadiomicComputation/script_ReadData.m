@@ -41,11 +41,8 @@ help(scriptFileName)
 %                          PARAMETER OPTIONS                              %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% PRE-ANONYMIZATION OPTION
-flagAnon = false; % Use "true" if pre-anonymization of PatientIDs is required, "false" othwerwise.
-
 % PARALLEL OPTIONS
-nBatch_Read = 4; % For the initial reading of the data using parallelization. Beware: RAM usage limitations. In doubt, just put 1.
+nBatch_Read = 1; % For the initial reading of the data using parallelization. Beware: RAM usage limitations. In doubt, just put 1.
 matlabPATH = 'matlab'; % IMPORTANT: Full path to the matlab executable on the system. --> Ex: '/home/martin/Programs/MATLAB/R2016a/bin/matlab'. Here, a symbolic link to the full MATLAB path has previously been created on Martin Vallieres' computer. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -63,14 +60,7 @@ cd(pathWORK)
 tStart = tic;
 fprintf('\n\n************************* READING ALL DICOM DATA *************************')
 
-% 1 PRE-ANONYMIZING THE DATA USING "anonymize_dicom.py" (organization of patient and scans folders as defined in instruction is mandatory)
-if flagAnon
-    tic, fprintf('\n--> PRE-ANONYMIZING THE DATA ... ')
-    preAnonymize(pathDICOM)
-    fprintf('DONE!\n'), toc
-end
-
-% 2 READING DATA (organization of patient and scans folders as defined in instruction is mandatory)
+% 1. READING DATA (organization of patient and scan folders as defined in the instructions is mandatory)
 tic, fprintf('\n--> READING DATA USING %u CORES ... ',nBatch_Read)
 readAllOrganizedData_batch(pathDICOM,pathDATA,nBatch_Read,matlabPATH) % If data is not organized and only in DICOM format, it is still possible to use the function "readAllDICOM.m'.
 fprintf('DONE!\n'), toc

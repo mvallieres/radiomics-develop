@@ -54,9 +54,6 @@ end
 [indPatient] = batchPatients(nPatients,nBatch);
 cd(pathBatch), save('workspace','pathRead','pathSave','namePatients','indPatient')
 for b = 1:nBatch
-    [~,~] = system(['rm batch',num2str(b),'_script.m']); % TO REMOVE AFTER DEBUGGING
-    [~,~] = system(['rm batch',num2str(b),'_script.log']); % TO REMOVE AFTER DEBUGGING
-    [~,~] = system(['rm batch',num2str(b),'_end']); % TO REMOVE AFTER DEBUGGING
     nameScript = ['batch',num2str(b),'_script.m'];
     fid = fopen(nameScript,'w');
     fprintf(fid,'load(''workspace'')\n');

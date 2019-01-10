@@ -37,11 +37,11 @@ else
     scriptFileName = [mfilename,'.m'];
 end
 help(scriptFileName)
-timeRun = char(datetime('now','Format','yyyy-MM-dd_HH:mm'));
-softwareLabel = 'QIPM';
+timeStamp = char(datetime('now','Format','yyyy-MM-dd_HH:mm:ss'));
+softwareLabel = 'PiCare-Matlab.Radiomics';
 softwareVersion = '0.1';
-programmingLanguage = 'Matlab2017b';
-institution = 'McGill_LaTIM_UCSF';
+programmingLanguage = 'Matlab2018a';
+institution = 'McGill_UCSF_D-Lab_Oncoray';
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -149,10 +149,11 @@ matlabPATH = 'matlab'; % OPTION: IMPORTANT --> Full path to the matlab executabl
 %                    RADIOMIC FEATURE COMPUTATION CODE                    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 pathDATA = fullfile(pathWORK,'DATA'); pathCSV = fullfile(pathWORK,'CSV');
-mkdir('FEATURES'), pathFEATURES = fullfile(pathWORK,'FEATURES'); cd(pathWORK)
+mkdir('FEATURES','RAW'), pathFEATURES = fullfile(pathWORK,'FEATURES','RAW'); 
+pathTABLES = fullfile(pathWORK,'FEATURES'); cd(pathWORK)
 
 tStart = tic;
-fprintf('\n\n************************* RADIOMIC FEATURE COMPUTATION *************************')
+fprintf('\n\n************************* RADIOMICS FEATURE COMPUTATION *************************')
 
 % DISABLED AS OF MARCH 2018
 % % 1. ROI CHOICE (optional, see above) OR LOADING PREVIOUSLY CONSTRUCTED roiNames.mat
@@ -209,22 +210,28 @@ imParams.MRscan.postAcquisitionProcessing.partialVolumeEffectCorrection = partia
 imParams.MRscan.postAcquisitionProcessing.noiseReduction = noiseReduction_MR; imParams.CTscan.postAcquisitionProcessing.noiseReduction = noiseReduction_CT; imParams.PTscan.postAcquisitionProcessing.noiseReduction = noiseReduction_PET;
 imParams.MRscan.postAcquisitionProcessing.imageNonUniformityCorrection = imageNonUniformityCorrection_MR; imParams.CTscan.postAcquisitionProcessing.imageNonUniformityCorrection = imageNonUniformityCorrection_CT; imParams.PTscan.postAcquisitionProcessing.imageNonUniformityCorrection = imageNonUniformityCorrection_PET;
 imParams.MRscan.segmentationMethod = segmentationMethod; imParams.CTscan.segmentationMethod = segmentationMethod; imParams.PTscan.segmentationMethod = segmentationMethod;
-imParams.MRscan.calculationRun.dateTime = timeRun; imParams.CTscan.calculationRun.dateTime = timeRun; imParams.PTscan.calculationRun.dateTime = timeRun;
+imParams.MRscan.calculationRun.dateTime = timeStamp; imParams.CTscan.calculationRun.dateTime = timeStamp; imParams.PTscan.calculationRun.dateTime = timeStamp;
 imParams.MRscan.calculationRun.software.label = softwareLabel; imParams.CTscan.calculationRun.software.label = softwareLabel; imParams.PTscan.calculationRun.software.label = softwareLabel;
 imParams.MRscan.calculationRun.software.version = softwareVersion; imParams.CTscan.calculationRun.software.version = softwareVersion; imParams.PTscan.calculationRun.software.version = softwareVersion;
 imParams.MRscan.calculationRun.software.programmingLanguage = programmingLanguage; imParams.CTscan.calculationRun.software.programmingLanguage = programmingLanguage; imParams.PTscan.calculationRun.software.programmingLanguage = programmingLanguage;
 imParams.MRscan.calculationRun.software.institution = institution; imParams.CTscan.calculationRun.software.institution = institution; imParams.PTscan.calculationRun.software.institution = institution;
 
 
-% 3. COMPUTING RADIOMIC FEATURES
-tic, fprintf('\n--> COMPUTING RADIOMIC FEATURES WITH %u CORES ... ',nBatch)
+
+% 3. RADIOMICS COMPUTATIONS
+tic, fprintf('\n--> COMPUTING RADIOMICS FEATURES WITH %u CORES ... ',nBatch)
 computeRadiomics_batchAllPatients(pathDATA,pathCSV,pathFEATURES,imParams,roiTypes,roiType_labels,nBatch,matlabPATH)
-fprintf('\nDONE!\n'), toc
+fprintf('\n    --> ALL ROI TYPES DONE!\n'), toc
+
+tic, fprintf('\n--> COMPUTING RADIOMICS TABLES WITH %u CORES ... ',nBatch)
+computeRadiomics_batchAllTables(pathFEATURES,pathTABLES,roiType_labels,nBatch,matlabPATH)
+fprintf('DONE!\n'), toc
 
 time = toc(tStart);
-fprintf('\n\nTOTAL TIME FOR RADIOMIC FEATURE COMPUTATION: %f seconds\n',time)
+fprintf('\n\nTOTAL TIME FOR RADIOMICS COMPUTATIONS: %f seconds\n',time)
 fprintf('-------------------------------------------------------------------------------------')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 
 

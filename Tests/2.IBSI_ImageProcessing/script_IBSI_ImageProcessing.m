@@ -52,6 +52,7 @@ imParamCT3.discretisation.texture.type = {'FBS'};
 imParamCT3.discretisation.texture.val = {[25]}; 
 imParamCT3.intensity = 'definite'; imParamCT3.units = 'HU'; imParamCT3.type = 'CTscan';
 imParamCT3.distCorrection = false;
+imParamCT3.computeDiagFeatures = true;
 
 % PARAMETERS - IBSI Case 4
 imParamCT4.interp.scaleNonText = [2,2,2]; 
@@ -69,6 +70,7 @@ imParamCT4.discretisation.texture.type = {'FBN'};
 imParamCT4.discretisation.texture.val = {[32]}; 
 imParamCT4.intensity = 'definite'; imParamCT4.units = 'HU'; imParamCT4.type = 'CTscan';
 imParamCT4.distCorrection = false;
+imParamCT4.computeDiagFeatures = true;
 
 % PARAMETERS - IBSI Case 5
 imParamCT5.interp.scaleNonText = [2,2,2]; 
@@ -77,7 +79,7 @@ imParamCT5.interp.volInterp = 'spline';
 imParamCT5.interp.glRound = 1; 
 imParamCT5.interp.roiInterp = 'linear'; 
 imParamCT5.interp.roiPV = 0.5;
-imParamCT5.reSeg.range = [-500,400];  
+imParamCT5.reSeg.range = [-1000,400];
 imParamCT5.reSeg.outliers = 'Collewet'; 
 imParamCT5.discretisation.IH.type = 'FBN';
 imParamCT5.discretisation.IH.val = 32; 
@@ -87,6 +89,7 @@ imParamCT5.discretisation.texture.type = {'FBN'};
 imParamCT5.discretisation.texture.val = {[32]};
 imParamCT5.intensity = 'definite'; imParamCT5.units = 'HU'; imParamCT5.type = 'CTscan';
 imParamCT5.distCorrection = false;
+imParamCT5.computeDiagFeatures = true;
 
 % ROI OPTIONS
 roiTypes = {'GTVp','GTVp','GTVp'};
@@ -131,13 +134,13 @@ fprintf('\n'), toc
 
 
 % STEP3: PRINTING RESULTS
-nonText = {'morph_3D','locInt_3D','stats_3D','intHist_3D','intVolHist_3D'}; nNonText = numel(nonText);
+nonText = {'diag','morph_3D','locInt_3D','stats_3D','intHist_3D','intVolHist_3D'}; nNonText = numel(nonText);
 text = {'glcm_3Dmrg','glrlm_3Dmrg','glszm_3D','gldzm_3D','ngtdm_3D','ngldm_3D'}; nText = numel(text);
 cases = [3,4,5];
 for c = 1:nCases
     thisCase = num2str(cases(c));
     features = struct;
-    cd(pathFEATURES), load(['Lung-IBSI-001_CT(Case',thisCase,').CTscan.mat'])
+    cd(pathFEATURES), load(['Lung-IBSI-001__CT(Case',thisCase,').CTscan.mat'])
     for n = 1:nNonText
         tempStruct = radiomics.image.(nonText{n});
         fields = fieldnames(tempStruct);

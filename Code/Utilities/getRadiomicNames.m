@@ -28,7 +28,7 @@ function radiomicNames = getRadiomicNames(roiNames,roiType)
 nNames = size(roiNames,1);
 radiomicNames = cell(nNames,1);
 for n = 1:nNames
-    radiomicNames{n} = [roiNames{n,1},'_',roiNames{n,2},'(',roiType,').',roiNames{n,3},'.mat'];
+    radiomicNames{n} = [roiNames{n,1},'__',roiNames{n,2},'(',roiType,').',roiNames{n,3},'.mat'];
 end
 
 end
