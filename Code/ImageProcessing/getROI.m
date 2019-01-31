@@ -18,15 +18,15 @@ function [volObj,roiObj] = getROI(sData,contourString,boxString,interp)
 %         --> Ex: '2box': Computes the smallest box and outputs double its 
 %             size. The number before 'box' defines the multiplication in
 %             size.
-% - interp: (optional). String specifying if we are to compute the ROI from
-%           XYZ points solely using the function "inpolygon.m" of MATLAB.
-%           This function can be considered safe when the RTstruct has been
-%           saved specifically for the volume of interest. Otherwise, an
-%            interpolation process (default; no argument) prior to 
-%           "inpolygon.m" in the slice axis direction is recommended.
-%         --> Ex: 'noInterp' (this is the only option, don't put a fourth argument).
-%                 As a consequence: No Interpolation is performed in the
-%                 slice axis dimensions (not recommended).
+% - interp: (optional). String specifying if we are to use an interpolation 
+%           process (using 'interp') prior to "inpolygon.m" in the slice 
+%           axis direction. See computeROI.m for more details.
+%           --> Ex: - 'interp': As a consequence: Interpolation is performed 
+%                     in the slice axis dimensions. To be further tested,
+%                     thus please use with caution. (no interp may be safer)
+%                   - No argument (default): No interpolation. This can 
+%                     definitely be safe when the RTstruct has been saved 
+%                     specifically for the volume of interest.
 % -------------------------------------------------------------------------
 % OUTPUTS:
 % - volObj: 3D array of imaging data defining the smallest box
@@ -70,11 +70,11 @@ if ~strcmp(boxString,'full') && ~contains(boxString,'box')
     error('The third argument must either be "full" or contain the word "box"')
 end
 if nargin == 4
-    if ~strcmp(interp,'noInterp') % The only option for the fourth argument is 'noInterp'
-        interp = 'interp';
+    if ~strcmp(interp,'interp') % The only option for the fourth argument is 'interp'
+        error('If present (i.e. it is optional), the fourth argument must be set to ''interp''')
     end
 else
-    interp = 'interp';
+    interp = 'noInterp';
 end
 [contourNumber,operations] = parseContourString(contourString); 
 

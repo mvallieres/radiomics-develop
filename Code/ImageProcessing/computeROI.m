@@ -25,7 +25,7 @@ function [ROImask] = computeROI(ROI_XYZ,spatialRef,orientation,scanType,interp)
 % Martin Vallieres for this matter.
 % -------------------------------------------------------------------------
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % HERE, ONLY THE DIMENSION OF SLICES IS ACTAULLY INTERPOLATED --> THIS IS
 % THE ONLY RESOLUTION INFO WE CAN GET FROM THE RTstruct XYZ POINTS. 
 % WE ASSUME THAT THE FUNCTION "poly2mask.m" WILL CORRECTLY CLOSE ANY 
@@ -36,9 +36,14 @@ function [ROImask] = computeROI(ROI_XYZ,spatialRef,orientation,scanType,interp)
 %     (e.g. T1w and T2w in MR scans, PET/CT, etc.)
 % --> IN THE IDEAL AND RECOMMENDED CASE, A SPECIFIC RTstruct WAS CREATED AND
 %     SAVED FOR EACH IMAGING VOLUME (SAFE PRACTICE)
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% --> The 'interp' should be used only if tested and verified. 'noInterp'
+% is currently the default in getROI.m
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-% USING INTERPOLATION
+
+% USING INTERPOLATION --> THIS PART NEEDS TO BE FURTHER TESTED. 
 while strcmp(interp,'interp')
 
     % Initialization
@@ -56,13 +61,7 @@ while strcmp(interp,'interp')
     % Creating new imref3d object for sample points (with slice dimension similar to original volume where RTstruct was created)
     sliceSpacing = double(findSpacing(ROI_XYZ(:,dimIJK),scanType)); % Slice spacing in mm
     if isnan(sliceSpacing), sliceSpacing = spatialRef.(['PixelExtentInWorld',direction]); end % Only one slice found in the function "findSpacing" on the above line. We thus must set "sliceSpacing" to the slice spacing of the queried volume, and no interpolation will be performed.
-    calcSize = spatialRef.(['ImageExtentInWorld',direction])/sliceSpacing;
-    ceilSize = ceil(calcSize);
-    if 1 - (ceilSize - calcSize) < 0.01 % Ceiling is probably not a good option here and can cause "small number" issues later on.
-        newSize = round(calcSize);
-    else
-        newSize = ceilSize; % Using "round" would yield the closest new size we can get. But using "ceil" is safer --> IBSI.
-    end
+    newSize = round(spatialRef.(['ImageExtentInWorld',direction])/sliceSpacing);
     resXYZ(dimXYZ) = sliceSpacing; 
     sz = spatialRef.ImageSize; sz(dimIJK) = newSize;
     newSpatialRef = imref3d(sz,resXYZ(1),resXYZ(2),resXYZ(3));
