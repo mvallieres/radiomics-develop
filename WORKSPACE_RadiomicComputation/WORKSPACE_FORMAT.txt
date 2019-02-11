@@ -129,7 +129,7 @@ it is desirable. The next multivariable modeling script will handle missing data
     Also, it is crucial that you  "associate" the label map to the imaging volume in 3D slicer before 
     exporting the label map. Ask Martin Vallieres for a demo before performing this crucial step.
 --> Format: segMask_$nameROI$.nrrd, where $nameROI$ is the name the user is setting up for that ROI. 
-    Please see the example DICOM dataset at "https://www.dropbox.com/s/6i9qf1i5mh1tgs2/DICOM.zip?dl=0" 
+    Please see the example DICOM dataset at "https://www.dropbox.com/s/525ojtavw6y3liu/DICOM.zip?dl=0" 
     for examples of such files.
 --> Important: No special character (_,-,+,etc.) can be used in $nameROI$, but only letters.
 --> More than one label map with different $nameROI$ can be present in a given folder. The algorithm 
@@ -139,8 +139,8 @@ it is desirable. The next multivariable modeling script will handle missing data
     for the desired ROI (e.g., other value is saved due to some bug or miscellaneous manipulation), 
     please save the ".nrrd" or ".img/.hdr" file with the following name format: "segMask_$nameROI
     $_label$X$.nrrd", where X is the numerical value (other than 1) assigned to the desired ROI in the 
-    map. See the PET scan of Cervix-CHRU-095 for an example of such file ("https://www.dropbox.com/
-    s/6i9qf1i5mh1tgs2/DICOM.zip?dl=0". Note: if the numerical value is set to 1 for the desired ROI, 
+    map. See the PET scan of Cervix-CHRU-095 for an example of such file ("https://www.dropbox.com/s/
+    525ojtavw6y3liu/DICOM.zip?dl=0". Note: if the numerical value is set to 1 for the desired ROI, 
     you do not have to add the extra "_label$X$" in the name of the 3D Slicer label map and you can 
     ignore this point.
 ----------------------------------------------------------------------------------------------------
@@ -155,7 +155,7 @@ it is desirable. The next multivariable modeling script will handle missing data
 --> This imaging volume as exported from 3D slicer is the one to be used in radiomics computations
     to ensure correct spatial correspondence with 3D Slicer label maps. The DICOM data is also
     mandatory and needed, as it contains important metadata information (in the DICOM headers).
---> Please see the example DICOM dataset at "https://www.dropbox.com/s/6i9qf1i5mh1tgs2/DICOM.zip?dl=0" 
+--> Please see the example DICOM dataset at "https://www.dropbox.com/s/525ojtavw6y3liu/DICOM.zip?dl=0" 
     for examples of such files. 
 ----------------------------------------------------------------------------------------------------
 

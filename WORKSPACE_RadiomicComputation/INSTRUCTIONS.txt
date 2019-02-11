@@ -2,7 +2,7 @@
 ******************  INSTRUCTIONS FOR RUNNING THE EXAMPLE WORKSPACE ******************
 *************************************************************************************
 
-1. Clone the GitHub repository on your computer by running "git clone https://github.com/mvallieres/radiomics-develop" in the terminal. Enter your GitHub username and password.
+1. Clone the GitHub repository on your computer by running "git clone https://github.com/mvallieres/radiomics-develop.git" in the terminal. Enter your GitHub username and password.
 
 2. Copy the folder "WORKSPACE_RadiomicComputation" (radiomics-develop/WORKSPACE_RadiomicComputation) to your favorite working directory on your computer (don't run things from your cloned GitHub directory). The "CSV" folder (and files in it) along with the "script_ReadData.m" and "script_ComputeRadiomics.m" files are mandatory to run the example experiments (thus to be copied), but it is not necessary to copy the "INSTRUCTIONS.txt", "RADIOMIC_OUTPUT.txt" and "WORKSPACE_FORMAT.txt" files.
 
