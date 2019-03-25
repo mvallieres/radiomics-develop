@@ -81,9 +81,7 @@ while strcmp(interp,'interp')
     [X,Y,Z] = intrinsicToWorld(newSpatialRef,Xi,Yi,Zi);
 
     % Getting sampled mask --> newSpatialRef is actually for the "old original" volume (the sampled volume) on which the RTstruct was created.
-    %V = getPolyMask(ROI_XYZ,newSpatialRef,orientation); % Using the poly2mask.m function. 
     V = getPolygonMask(ROI_XYZ,newSpatialRef,orientation); % Using the inpolygon.m function. To be further tested.
-    %V = getPolygonMaskWithEdges(ROI_XYZ,newSpatialRef,orientation); % Using the inpolygon.m function. To be further tested.
 
     % Getting query points (Xq,Yq,Zq) of output ROImask
     szQ = spatialRef.ImageSize;
@@ -102,9 +100,7 @@ end
 % SIMPLY USING "poly2mask.m" or "inpolygon.m". "inpolygon.m" is slower, but
 % apparently more accurate.
 if strcmp(interp,'noInterp')
-    %ROImask = getPolyMask(ROI_XYZ,spatialRef,orientation); % Using the poly2mask.m function.
     ROImask = getPolygonMask(ROI_XYZ,spatialRef,orientation); % Using the inpolygon.m function. To be further tested.
-    %ROImask = getPolygonMaskWithEdges(ROI_XYZ,spatialRef,orientation); % Using the inpolygon.m function. To be further tested.
 end
 
 end

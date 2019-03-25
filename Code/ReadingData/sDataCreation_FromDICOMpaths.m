@@ -84,6 +84,22 @@ function sDataCreation_FromDICOMpaths(pathSave,pathImages,pathRS,pathREG,pathRD,
 % Martin Vallieres for this matter.
 % -------------------------------------------------------------------------
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FINAL XYZ positions of spatialRef refers to the XYZ reference frame of 
+% the image, not the DICOM one. For MRI rotations + sagittal + coronal
+% images (for PET and CT: XYZ of image is XYZ of DICOM), apply the inverse 
+% of sData{2}.scan.volume.scanRot to the XYZ grid of the image. To obtain
+% the mask from a RTstruct, make sure to rotate the XYZ DICOM points of the
+% RTstruct toi the XYZ reference frame of the image using 
+% sData{2}.scan.volume.scanRot
+%
+% NOTE:
+% - PixelSpacing and Slice spacing: XYZ image reference frame
+% - ImagePositionPatient and ImageOrientation patient: XYZ DICOM reference
+%   frame.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 startpath = pwd;
 warning off
 
@@ -124,16 +140,19 @@ sData{1} = struct('Cell_1','Explanation of cell content', ...
     [~,index] = max(dist);
     if index == 1
         orientation = 'Sagittal';
+        a = 2; b = 3; c = 1; 
     elseif index == 2
         orientation = 'Coronal';
+        a = 1; b = 3; c = 2;
     else
         orientation = 'Axial';
+        a = 1; b = 2; c = 3;
     end
 
     % 3. Sort the images and the dicom headers
     slicePositions = zeros(1,nSlices);
     for i = 1:nSlices
-        slicePositions(i) = dicomH(i).ImagePositionPatient(index);
+        slicePositions(i) = dicomH(i).ImagePositionPatient(index); % Using the right index (ax,sag,cor) only to sort image positions
     end
     [~,indices] = sort(slicePositions);
     sData{2}.scan.volume.data = cell2mat(reshape(cellImages(indices),[1,1,nSlices]));
@@ -149,7 +168,7 @@ sData{1} = struct('Cell_1','Explanation of cell content', ...
     type = [type,'scan'];
     sData{2}.type = type;
 
-    % 5. Compute spatial properties
+    % 5. Compute spatial properties --> DICOM REFERENCE FRAME
     sz = size(cellImages{1});
     Xgrid = zeros(sz(1),sz(2),nSlices);
     Ygrid = zeros(sz(1),sz(2),nSlices);
@@ -163,20 +182,40 @@ sData{1} = struct('Cell_1','Explanation of cell content', ...
         Ygrid(:,:,i) = reshape(([m(2,:),dicomH(i).ImagePositionPatient(2)] * [I,J,ones(nPixel,1)]')',[sz(1),sz(2)]);
         Zgrid(:,:,i) = reshape(([m(3,:),dicomH(i).ImagePositionPatient(3)] * [I,J,ones(nPixel,1)]')',[sz(1),sz(2)]);
     end
+    
+    % 6. Alignment of scan coordinates to image reference frame for
+    % sagittal and coronal orientations, as if we were axial.
+    % --> A better strategy could be employed, work on it.
+    if strcmp(orientation,'Sagittal') || strcmp(orientation,'Coronal')
+        tempXYZ = {Xgrid,Ygrid,Zgrid}; 
+        eval(['Xgrid = tempXYZ{',num2str(a),'};']);
+        eval(['Ygrid = tempXYZ{',num2str(b),'};']);
+        eval(['Zgrid = tempXYZ{',num2str(c),'};']);
+    end
 
-    % 6. Alignment of scan coordinates for MR scans (inverse of ImageOrientationPatient rotation matrix)
+    % 7. Alignment of scan coordinates for MR scans (inverse of
+    % ImageOrientationPatient rotation matrix) --> IMAGE REFERENCE FRAME
+    % (RTstruct points needs to be rotated the same).
     if strcmp(type,'MRscan')
         u = dicomH(1).ImageOrientationPatient(1:3); v = dicomH(1).ImageOrientationPatient(4:6);
         w = cross(u,v);
-        A = [u,v,w]'; % Rotation matrix to apply to revert the initial rotation applied at scanning time
+        A = [u,v,w];
+        if strcmp(orientation,'Sagittal') || strcmp(orientation,'Coronal') % Alignment of scan coordinates to image reference frame (as if we were axial)
+            A(1:3,:) = A([a,b,c],:);
+        end
+        A = A'; % Rotation matrix to apply to revert the initial rotation applied at scanning time
         newCoord = (A*[Xgrid(:)';Ygrid(:)';Zgrid(:)'])';
         Xgrid = reshape(newCoord(:,1),[sz(1),sz(2),nSlices]); Ygrid = reshape(newCoord(:,2),[sz(1),sz(2),nSlices]); Zgrid = reshape(newCoord(:,3),[sz(1),sz(2),nSlices]);
         sData{2}.scan.volume.scanRot = A;
+        if A(3,3) < 0 % We then flip the 3rd dimension of the imaging volume and dicom headers
+            sData{2}.scan.volume.data = flip(sData{2}.scan.volume.data,3);
+            dicomH = flip(dicomH);
+        end
     end
 
-    % 7. Creation of imref3d object
+    % 8. Creation of imref3d object
     pixelX = dicomH(1).PixelSpacing(1); pixelY = dicomH(1).PixelSpacing(2);
-    s1 = round(0.5*nSlices); s2 = round(0.5*nSlices) + 1; % Slices selected to calculate slice spacing
+    s1 = round(0.25*nSlices); s2 = round(0.25*nSlices) + 1; % Slices selected to calculate slice spacing (I have encountered problematic middle slices --> we go to one quarter of volume)  
     sliceS = sqrt(sum((dicomH(s1).ImagePositionPatient - dicomH(s2).ImagePositionPatient).^2)); % Slice Spacing
     spatialRef = imref3d([sz(1),sz(2),nSlices],pixelX,pixelY,sliceS);
     spatialRef.XWorldLimits = spatialRef.XWorldLimits - (spatialRef.XWorldLimits(1)-(min(Xgrid(:))-pixelX/2));
@@ -270,6 +309,9 @@ for rs = 1:nRS
                      ind = 1:nPoints; indClosedContour = [indClosedContour;repmat(s,[nPoints,1])];
                      points = [points;pts_temp(ind*3-2),pts_temp(ind*3-1),pts_temp(ind*3)];
                  end
+            end
+            if strcmp(orientation,'Sagittal') || strcmp(orientation,'Coronal') % Alignment of scan coordinates to image reference frame (as if we were axial)
+                points(:,1:3) = points(:,[a,b,c]);
             end
             sData{2}.scan.contour(contourNum).points_XYZ = [points,indClosedContour];
         catch
