@@ -108,7 +108,6 @@ for i = 1:nBatch
     fclose(fid);
     if ispc
         system(['start /B ',matlabPATH,' -nodisplay -nodesktop -nosplash -singleCompThread -r "diary ',nameScript(1:end-1),'log;',nameScript(1:end-2),';diary off;exit" ']);
-        %system(['start /B ',matlabPATH,' -nodisplay -nodesktop -nosplash -singleCompThread < ',nameScript,' > ',nameScript(1:end-1),'log 2>&1']);
     else
     	system([matlabPATH,' -nodisplay -nodesktop -nosplash -singleCompThread < ',nameScript,' >& ',nameScript(1:end-1),'log &']);
     end
