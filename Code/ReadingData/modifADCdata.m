@@ -33,7 +33,11 @@ for a = 1:nADC
     sData = load(name); sData = struct2cell(sData); sData = sData{1};
     sData{2}.type = 'ADCscan'; save(name,'sData','-v7.3')
     indDot = strfind(name,'.');
-    system(['mv ',name,' ',name(1:indDot(1)),'ADCscan.mat']);
+    if ispc
+        system(['move ',name,' ',name(1:indDot(1)),'ADCscan.mat']);
+    else
+        system(['mv ',name,' ',name(1:indDot(1)),'ADCscan.mat']);
+    end
 end
 
 cd(startpath)

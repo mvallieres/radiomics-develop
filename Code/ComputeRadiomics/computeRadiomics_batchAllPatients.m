@@ -1,4 +1,4 @@
-function computeRadiomics_batchAllPatients(pathRead,pathCSV,pathSave,imParams,roiTypes,roiType_labels,nBatchInit,matlabPATH)
+function computeRadiomics_batchAllPatients(pathRead,pathCSV,pathSave,imParams,roiTypes,roiType_labels,nBatchInit,matlabPATH,codePATH)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
@@ -53,7 +53,11 @@ for r = 1:nROItypes
         info = dir([nameBatchLog,'*']);
         date = info.date; ind = strfind(date,' '); date(ind) = '_';
         newName = [nameBatchLog,'_',date];
-        system(['mv ',nameBatchLog,' ',newName]);    
+        if ispc
+            system(['move ', nameBatchLog, ' ', newName]);
+        else
+            system(['mv ',nameBatchLog,' ',newName]); 
+        end	
     end
     mkdir(nameBatchLog), cd(nameBatchLog), pathBatch = pwd;
 
@@ -69,11 +73,22 @@ for r = 1:nROItypes
         nameScript = ['batch',num2str(i),'_script.m'];
         fid = fopen(nameScript,'w');
         fprintf(fid,'load(''workspace'')\n');
+        addpathline = ['addpath(genpath(''', codePATH,'''));'];
+        fprintf(fid,'%s\n',addpathline); %Windows paths contain \ which are interpreted as escape characters and cannot be used in the fprintf format string
         fprintf(fid,['computeRadiomics_AllPatients(pathRead,pathSave,patientNames(patients{',num2str(i),'}),nameROI(patients{',num2str(i),'}),nameSet(patients{',num2str(i),'}),imParams,roiType,roiType_label)\n']);
-        fprintf(fid,['system(''touch batch',num2str(i),'_end'');\n']);
+        if ispc
+            fprintf(fid,['system(''type nul > batch', num2str(i),'_end'');\n']);
+        else
+            fprintf(fid,['system(''touch batch',num2str(i),'_end'');\n']);
+        end
         fprintf(fid,'clear all');
         fclose(fid);
-        system([matlabPATH,' -nodisplay -nodesktop -nosplash -singleCompThread < ',nameScript,' >& ',nameScript(1:end-1),'log &']);
+        if ispc
+            system(['start /B ',matlabPATH,' -nodisplay -nodesktop -nosplash -singleCompThread -r "diary ',nameScript(1:end-1),'log;',nameScript(1:end-2),';diary off;exit" ']);
+            %system(['start /B ',matlabPATH,' -nodisplay -nodesktop -nosplash -singleCompThread < ',nameScript,' > ',nameScript(1:end-1),'log 2>&1']);
+        else
+            system([matlabPATH,' -nodisplay -nodesktop -nosplash -singleCompThread < ',nameScript,' >& ',nameScript(1:end-1),'log &']);
+        end
     end
 
     
