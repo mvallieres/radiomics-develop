@@ -43,9 +43,9 @@ help(scriptFileName)
 
 % PARALLEL OPTIONS
 nBatch_Read = 1; % For the initial reading of the data using parallelization. Beware: RAM usage limitations. In doubt, just put 1.
-matlabPATH = 'C:\"Program Files"\MATLAB\R2016b\bin\matlab.exe'; % IMPORTANT: Full path to the matlab executable on the system. --> Ex: '/home/martin/Programs/MATLAB/R2016a/bin/matlab'. Here, a symbolic link to the full MATLAB path has previously been created on Martin Vallieres' computer. 
+matlabPATH = 'matlab'; % IMPORTANT: Full path to the matlab executable on the system. --> Ex: '/home/martin/Programs/MATLAB/R2016a/bin/matlab'. Here, a symbolic link to the full MATLAB path has previously been created on Martin Vallieres' computer. 
 global codePATH
-codePATH = 'C:\wrk\radiomics\Code';
+codePATH = '~/GitHub/radiomics-develop/Code'; % To be adapted to your system. Full path to the "radiomics-develop" code on your system.
 addpath(genpath(codePATH));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
