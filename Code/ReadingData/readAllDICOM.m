@@ -113,6 +113,7 @@ function readAllDICOM(pathRead,pathSave,nBatch,matlabPATH,nameSaveOption)
 % Martin Vallieres for this matter.
 % -------------------------------------------------------------------------
 
+global codePATH
 startpath = pwd;
 warning off
 
@@ -167,7 +168,11 @@ while ~isempty(stackFolder)
                             nameSave = [nameSave cell(1)];
                             if nargin > 4 && strcmp(nameSaveOption,'folder')
                                 path = pwd;
-                                ind = strfind(path,'/'); % NOT GOOD FOR WINDOWS
+                                if ispc
+                                    ind = strfind(path,'\');
+                                else
+                                    ind = strfind(path,'/');                                   
+                                end
                                 nameSave{indSeriesID} = path((ind(end)+1):end);
                             elseif nargin > 4 && strcmp(nameSaveOption,'modality')
                                 nameSave{indSeriesID} = info.Modality;
@@ -287,13 +292,23 @@ if nBatch
         fid = fopen(nameScript,'w');
         fprintf(fid,'dummy = 0;\n');
         fprintf(fid,'load(''workspace'')\n');
+        addpathline = ['addpath(genpath(''', codePATH,'''));'];
+        fprintf(fid,'%s\n',addpathline); %Windows paths contain \ which are interpreted as escape characters and cannot be used in the fprintf format string
         for j = 1:nScan
             fprintf(fid,['sDataCreation_FromDICOMpaths(pathSave,cellPathImages{scans{',num2str(i),'}(',num2str(j),')},cellPathRS{scans{',num2str(i),'}(',num2str(j),')},cellPathREG{scans{',num2str(i),'}(',num2str(j),')},cellPathRD{scans{',num2str(i),'}(',num2str(j),')},cellPathRP{scans{',num2str(i),'}(',num2str(j),')},nameSave{scans{',num2str(i),'}(',num2str(j),')})\n']);
         end
-        fprintf(fid,['system(''touch batch',num2str(i),'_end'');\n']);
+        if ispc
+            fprintf(fid,['system(''type nul > batch', num2str(i),'_end'');\n']);
+        else
+            fprintf(fid,['system(''touch batch',num2str(i),'_end'');\n']);
+        end
         fprintf(fid,'clear all');
         fclose(fid);
-        system([matlabPATH,' -nojvm -nodisplay -nodesktop -nosplash < ',nameScript,' >& ',nameScript(1:end-1),'log &']);
+        if ispc
+            system(['start /B ',matlabPATH,' -nodisplay -nodesktop -nosplash -singleCompThread -r "diary ',nameScript(1:end-1),'log;',nameScript(1:end-2),';diary off;exit" ']);
+        else
+            system([matlabPATH,' -nodisplay -nodesktop -nosplash -singleCompThread -r "diary ',nameScript(1:end-1),'log;',nameScript(1:end-2),';diary off;exit" &']);
+        end
     end
     waitBatch(pathBatch,30,nBatch)
     cd ..
@@ -395,9 +410,17 @@ if nargin < 5
                             end
                         end
                         if nScanIndex == 1
-                            system(['mv "',name,'" "',nameComp{scanIndex(k)}(1:ind1(1)),type{j}(2:3),nameComp{scanIndex(k)}(ind2(1):end),'"']);
+                            if ispc
+                                system(['move "',name,'" "',nameComp{scanIndex(k)}(1:ind1(1)),type{j}(2:3),nameComp{scanIndex(k)}(ind2(1):end),'"']);
+                            else
+                                system(['mv "',name,'" "',nameComp{scanIndex(k)}(1:ind1(1)),type{j}(2:3),nameComp{scanIndex(k)}(ind2(1):end),'"']);
+                            end
                         else
-                            system(['mv "',name,'" "',nameComp{scanIndex(k)}(1:ind1(1)),type{j}(2:3),num2str(k),nameComp{scanIndex(k)}(ind2(1):end),'"']);
+                            if ispc
+                                system(['move "',name,'" "',nameComp{scanIndex(k)}(1:ind1(1)),type{j}(2:3),num2str(k),nameComp{scanIndex(k)}(ind2(1):end),'"']);
+                            else
+                                system(['mv "',name,'" "',nameComp{scanIndex(k)}(1:ind1(1)),type{j}(2:3),num2str(k),nameComp{scanIndex(k)}(ind2(1):end),'"']);
+                            end
                         end
                     end
                 end

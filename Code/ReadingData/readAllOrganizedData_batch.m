@@ -1,4 +1,4 @@
-function readAllOrganizedData_batch(pathRead,pathSave,nBatch,pathMATLAB)
+function readAllOrganizedData_batch(pathRead,pathSave,nBatch,matlabPATH)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
@@ -24,6 +24,7 @@ function readAllOrganizedData_batch(pathRead,pathSave,nBatch,pathMATLAB)
 % "radiomics-develop" team is however highly encouraged. Please contact 
 % Martin Vallieres for this matter.
 % -------------------------------------------------------------------------
+global codePATH
 
 warning off
 startpath = pwd;
@@ -57,11 +58,21 @@ for b = 1:nBatch
     nameScript = ['batch',num2str(b),'_script.m'];
     fid = fopen(nameScript,'w');
     fprintf(fid,'load(''workspace'')\n');
+    addpathline = ['addpath(genpath(''', codePATH,'''));'];
+    fprintf(fid,'%s\n',addpathline); %Windows paths contain \ which are interpreted as escape characters and cannot be used in the fprintf format string
     fprintf(fid,['readAllOrganizedData(pathRead,pathSave,namePatients(indPatient{',num2str(b),'}))\n']);
-    fprintf(fid,['system(''touch batch',num2str(b),'_end'');\n']);
+    if ispc
+        fprintf(fid,['system(''type nul > batch', num2str(b),'_end'');\n']);
+    else
+    	fprintf(fid,['system(''touch batch',num2str(b),'_end'');\n']);
+    end
     fprintf(fid,'clear all');
     fclose(fid);
-    system([pathMATLAB,' -nodisplay -nodesktop -nosplash -singleCompThread < ',nameScript,' >& ',nameScript(1:end-1),'log &']);
+    if ispc
+        system(['start /B ',matlabPATH,' -nodisplay -nodesktop -nosplash -singleCompThread -r "diary ',nameScript(1:end-1),'log;',nameScript(1:end-2),';diary off;exit" ']);
+    else
+    	system([matlabPATH,' -nodisplay -nodesktop -nosplash -singleCompThread -r "diary ',nameScript(1:end-1),'log;',nameScript(1:end-2),';diary off;exit" &']);
+    end
 end
 
 % WAITING LOOP

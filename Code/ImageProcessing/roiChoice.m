@@ -136,7 +136,11 @@ if exist('roiNames.mat')
     info = dir('roiNames.mat');
     date = info.date; ind = strfind(date,' '); date(ind) = '_';
     newName = ['roiNames_',date,'.mat'];
-    system(['mv roiNames.mat ',newName]);
+    if ispc
+        system(['move roiNames.mat ', newName]);
+    else
+        system(['mv roiNames.mat ',newName]);
+    end
 end
 save('roiNames','roiNames')
 
@@ -146,7 +150,11 @@ if exist('roiCheck.mat')
     info = dir('roiCheck.mat');
     date = info.date; ind = strfind(date,' '); date(ind) = '_';
     newName = ['roiCheck_',date,'.mat'];
-    system(['mv roiCheck.mat ',newName]);
+    if ispc
+        system(['move roiCheck.mat ', newName]);
+    else
+        system(['mv roiCheck.mat ',newName]);
+    end
 end
 save('roiCheck','roiCheck')
 

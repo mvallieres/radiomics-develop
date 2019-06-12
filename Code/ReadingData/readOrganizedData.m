@@ -46,7 +46,11 @@ for s = 1:nScans
         end
         readAllDICOM(pwd,pwd,0,'matlab','modality');
         if compressedDICOM
-            system('rm -r tempFolder'); % Deleting the temporary created folder.
+            if ispc
+                system('rmdir /q /s tempFolder'); % Deleting the temporary created folder.
+            else
+                system('rm -r tempFolder'); % Deleting the temporary created folder.
+            end
         end
         listMat = dir('*.mat'); % There must be only one scan series in the organized patient-scan folder
         sData = load(listMat(1).name); sData = struct2cell(sData); sData = sData{1};

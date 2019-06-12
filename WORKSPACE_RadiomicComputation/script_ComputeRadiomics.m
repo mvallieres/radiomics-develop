@@ -138,7 +138,9 @@ imageNonUniformityCorrection_PET = ''; % Value specifying if image nonuniformity
 
 % PARALLEL OPTIONS
 nBatch = 4; % OPTION: To compute radiomic features using parallelization. Put this number to the total number of cores that you have on your machine, but beware of RAM usage.
-matlabPATH = 'matlab'; % OPTION: IMPORTANT --> Full path to the matlab executable on the system. --> Ex: '/home/martin/Programs/MATLAB/R2017b/bin/matlab'. Here, a symbolic link to the full MATLAB path has previously been created on Martin Vallieres' computer. 
+matlabPATH = 'C:\"Program Files"\MATLAB\R2016b\bin\matlab.exe'; % OPTION: IMPORTANT --> Full path to the matlab executable on the system. --> Ex: '/home/martin/Programs/MATLAB/R2017b/bin/matlab'. Here, a symbolic link to the full MATLAB path has previously been created on Martin Vallieres' computer. 
+global codePATH
+codePATH = 'C:\wrk\radiomics\Code';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
