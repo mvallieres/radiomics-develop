@@ -1,4 +1,4 @@
-function computeRadiomics_batchAllTables(pathFEATURES,pathTABLES,roiType_labels,nBatchInit,matlabPATH,codePATH)
+function computeRadiomics_batchAllTables(pathFEATURES,pathTABLES,roiType_labels,nBatchInit,matlabPATH)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
@@ -24,6 +24,8 @@ function computeRadiomics_batchAllTables(pathFEATURES,pathTABLES,roiType_labels,
 % "radiomics-develop" team is however highly encouraged. Please contact 
 % Martin Vallieres for this matter.
 % -------------------------------------------------------------------------
+
+global codePATH
 
 startpath = pwd;
 time = 10; % Time spent in seconds between checks by the master process to verify the end of parallel computations.
@@ -109,7 +111,7 @@ for i = 1:nBatch
     if ispc
         system(['start /B ',matlabPATH,' -nodisplay -nodesktop -nosplash -singleCompThread -r "diary ',nameScript(1:end-1),'log;',nameScript(1:end-2),';diary off;exit" ']);
     else
-    	system([matlabPATH,' -nodisplay -nodesktop -nosplash -singleCompThread < ',nameScript,' >& ',nameScript(1:end-1),'log &']);
+    	system([matlabPATH,' -nodisplay -nodesktop -nosplash -singleCompThread -r "diary ',nameScript(1:end-1),'log;',nameScript(1:end-2),';diary off;exit" &']);
     end
 end
 

@@ -1,4 +1,4 @@
-function computeRadiomics_batchAllPatients(pathRead,pathCSV,pathSave,imParams,roiTypes,roiType_labels,nBatchInit,matlabPATH,codePATH)
+function computeRadiomics_batchAllPatients(pathRead,pathCSV,pathSave,imParams,roiTypes,roiType_labels,nBatchInit,matlabPATH)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
@@ -25,6 +25,7 @@ function computeRadiomics_batchAllPatients(pathRead,pathCSV,pathSave,imParams,ro
 % Martin Vallieres for this matter.
 % -------------------------------------------------------------------------
 
+global codePATH
 
 startpath = pwd;
 
@@ -86,7 +87,7 @@ for r = 1:nROItypes
         if ispc
             system(['start /B ',matlabPATH,' -nodisplay -nodesktop -nosplash -singleCompThread -r "diary ',nameScript(1:end-1),'log;',nameScript(1:end-2),';diary off;exit" ']);
         else
-            system([matlabPATH,' -nodisplay -nodesktop -nosplash -singleCompThread < ',nameScript,' >& ',nameScript(1:end-1),'log &']);
+            system([matlabPATH,' -nodisplay -nodesktop -nosplash -singleCompThread -r "diary ',nameScript(1:end-1),'log;',nameScript(1:end-2),';diary off;exit" & ']);
         end
     end
 

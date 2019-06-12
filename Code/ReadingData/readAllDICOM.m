@@ -113,6 +113,7 @@ function readAllDICOM(pathRead,pathSave,nBatch,matlabPATH,nameSaveOption)
 % Martin Vallieres for this matter.
 % -------------------------------------------------------------------------
 
+global codePATH
 startpath = pwd;
 warning off
 
@@ -291,6 +292,8 @@ if nBatch
         fid = fopen(nameScript,'w');
         fprintf(fid,'dummy = 0;\n');
         fprintf(fid,'load(''workspace'')\n');
+        addpathline = ['addpath(genpath(''', codePATH,'''));'];
+        fprintf(fid,'%s\n',addpathline); %Windows paths contain \ which are interpreted as escape characters and cannot be used in the fprintf format string
         for j = 1:nScan
             fprintf(fid,['sDataCreation_FromDICOMpaths(pathSave,cellPathImages{scans{',num2str(i),'}(',num2str(j),')},cellPathRS{scans{',num2str(i),'}(',num2str(j),')},cellPathREG{scans{',num2str(i),'}(',num2str(j),')},cellPathRD{scans{',num2str(i),'}(',num2str(j),')},cellPathRP{scans{',num2str(i),'}(',num2str(j),')},nameSave{scans{',num2str(i),'}(',num2str(j),')})\n']);
         end
@@ -302,9 +305,9 @@ if nBatch
         fprintf(fid,'clear all');
         fclose(fid);
         if ispc
-            system(['start /B ',matlabPATH,' -nodisplay -nodesktop -nosplash -singleCompThread -r "addpath(genpath(''c:\wrk\radiomics\Code''));diary ',nameScript(1:end-1),'log;',nameScript(1:end-2),';diary off;exit" ']);
+            system(['start /B ',matlabPATH,' -nodisplay -nodesktop -nosplash -singleCompThread -r "diary ',nameScript(1:end-1),'log;',nameScript(1:end-2),';diary off;exit" ']);
         else
-            system([matlabPATH,' -nodisplay -nodesktop -nosplash -singleCompThread < ',nameScript,' >& ',nameScript(1:end-1),'log &']);
+            system([matlabPATH,' -nodisplay -nodesktop -nosplash -singleCompThread -r "diary ',nameScript(1:end-1),'log;',nameScript(1:end-2),';diary off;exit" &']);
         end
     end
     waitBatch(pathBatch,30,nBatch)

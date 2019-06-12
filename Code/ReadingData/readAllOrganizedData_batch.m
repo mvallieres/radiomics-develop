@@ -1,4 +1,4 @@
-function readAllOrganizedData_batch(pathRead,pathSave,nBatch,matlabPATH,codePATH)
+function readAllOrganizedData_batch(pathRead,pathSave,nBatch,matlabPATH)
 % -------------------------------------------------------------------------
 % AUTHOR(S): 
 % - Martin Vallieres <mart.vallieres@gmail.com>
@@ -24,6 +24,7 @@ function readAllOrganizedData_batch(pathRead,pathSave,nBatch,matlabPATH,codePATH
 % "radiomics-develop" team is however highly encouraged. Please contact 
 % Martin Vallieres for this matter.
 % -------------------------------------------------------------------------
+global codePATH
 
 warning off
 startpath = pwd;
@@ -70,7 +71,7 @@ for b = 1:nBatch
     if ispc
         system(['start /B ',matlabPATH,' -nodisplay -nodesktop -nosplash -singleCompThread -r "diary ',nameScript(1:end-1),'log;',nameScript(1:end-2),';diary off;exit" ']);
     else
-    	system([matlabPATH,' -nodisplay -nodesktop -nosplash -singleCompThread < ',nameScript,' >& ',nameScript(1:end-1),'log &']);
+    	system([matlabPATH,' -nodisplay -nodesktop -nosplash -singleCompThread -r "diary ',nameScript(1:end-1),'log;',nameScript(1:end-2),';diary off;exit" &']);
     end
 end
 
