@@ -38,9 +38,7 @@
 *                *          *   	               --> DATA (not necessarily the same as above)  
 *                *           --> $CancerE-$InstitutionF$-### ***********************************
 *                *          *		               --> DATA (not necessarily the same as above)
-*                *          *                          *****************************************
-*                *          *
-*                *           --> anonymize_dicom.py (optional, see script_ReadData.m)
+*                *          *                          *****************************************s
 *                *          ********************************************************************
 *                *
 *                *
@@ -64,19 +62,16 @@
 
 
 --> NOTES:
-1. Place the anonymize_dicom.py script in the DICOM folder next to all PATIENT ID folders (optional).
-It will be used to pre-anonymize the data and change the patient IDs inside all .dcm files. Beware,
-as dates of scans, etc. will be lost after running the script, so be sure to record them beforehand 
-if needed. Be sure to install python on your computer prior to running masterScript.m: on Linux, this 
-is simply performed by running "sudo apt-get install python" in the terminal.
-
-2. Running script_ReadData.m in will read the imaging data contained in the DICOM folder and organize 
+1. Running script_ReadData.m in will read the imaging data contained in the DICOM folder and organize 
 all data in MATLAB format in a newly created DATA folder.
 
-3. Running script_ComputeRadiomics.m will read all organized data contained in the DATA folder, 
-compute all radiomic features and save feature in a structure format a newly created FEATURES folder.
+2. Running script_ComputeRadiomics.m will read all organized data contained in the DATA folder, 
+compute all radiomic features and save features in a structure format a newly created FEATURES/RAW folder.
+Organized CSV/TXT files grouping output radiomics data for all patients per scan-imageSpace-roiType
+will also be created in the folder FEATURES (associated TXT files describe the variable names of each 
+CSV data file).
 
-4. It is not necessary to have all imaging modalities available for all patients (complete data), but
+3. It is not necessary to have all imaging modalities available for all patients (complete data), but
 it is desirable. The next multivariable modeling script will handle missing data.
 ----------------------------------------------------------------------------------------------------
 
@@ -103,15 +98,14 @@ it is desirable. The next multivariable modeling script will handle missing data
 ----------------------------------------------------------------------------------------------------
 
  
---------------- 4. FORMAT FOR DICOM DATA (mandatory) -----------------------------------------------
---> Make sure all files end with the extension .dcm.
+--------------- 3. FORMAT FOR DICOM DATA (mandatory) -----------------------------------------------
 --> Those files are the ones that could be imported into 3D slicer for contouring (if no RTstruct is 
     available). However, DO NOT EXPORT THEM BACK from 3D slicer to use them in this workspace, as 
     important information could be missing in the exported DICOM headers.
 ----------------------------------------------------------------------------------------------------
 
 
---------------- 5. FORMAT FOR DICOM RTstruct or .nrrd or .img/.hdr (mandatory) ---------------------
+--------------- 4. FORMAT FOR DICOM RTstruct or .nrrd or .img/.hdr (mandatory) ---------------------
 --> A file defining the ROI(s) for radiomics computation must be present in all scan folders of all
     patients. At the moment, this file must either be a RTstruct.dcm file (one file can contain all 
     desired ROIs), or one or multiple .nnrd or .img/.hdr file(s) exported from 3D Slicer after 
@@ -120,7 +114,7 @@ it is desirable. The next multivariable modeling script will handle missing data
 ----------------------------------------------------------------------------------------------------
 
 
---------------- 6. FORMAT FOR 3D Slicer LABEL MAPS (optional) --------------------------------------
+--------------- 5. FORMAT FOR 3D Slicer LABEL MAPS (optional) --------------------------------------
 --> Contouring in 3D slicer is an alternative if no RTstruct is available. Exported label maps 
     from 3D Slicer then define the ROI(s) for radiomics computation.
 --> Each label map CONTAINS ONLY 1 ROI exported as a ".nrrd" or ".img/.hdr" file from 3D slicer. Make 
@@ -146,7 +140,7 @@ it is desirable. The next multivariable modeling script will handle missing data
 ----------------------------------------------------------------------------------------------------
 
 
---------------- 7. FORMAT FOR 3D SLICER IMAGING VOLUME (mandatory if not using RTstructs) ----------
+--------------- 6. FORMAT FOR 3D SLICER IMAGING VOLUME (mandatory if not using RTstructs) ----------
 --> This file is mandatory if 3D Slicer is used for contouring (i.e. no RTstruct available).
 --> In addition to the DICOM imaging data initially imported in 3D Slicer, each patient-scan folder 
     must also contain that same imaging volume as exported from 3D Slicer in ".nrrd" or ".img/.hdr" 
@@ -160,7 +154,7 @@ it is desirable. The next multivariable modeling script will handle missing data
 ----------------------------------------------------------------------------------------------------
 
 
---------------- 8. FORMAT FOR roiNames_$nameExperiment1$.csv (mandatory) ---------------------------
+--------------- 7. FORMAT FOR roiNames_$nameExperiment1$.csv (mandatory) ---------------------------
 --> The roiNames_$nameExperiment$.csv files determine the different types of ROIs for which 
     the radiomics features will be automatically computed (e.g. GTV, CTV, PTV, etc.). 
 --> Format: roiNames_$nameExperiment$.csv, where $nameExperiment$ is determined by the user.

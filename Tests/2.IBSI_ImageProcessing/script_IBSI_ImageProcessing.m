@@ -98,9 +98,9 @@ nCases = numel(roiTypes);
 
 % PARALLEL OPTIONS
 nBatch = 1; 
-matlabPATH = 'matlab'; % OPTION: IMPORTANT --> To be adapted to your system. Full path to the matlab executable on your system. --> Ex: '/home/martin/Programs/MATLAB/R2017b/bin/matlab'. Here, a symbolic link to the full MATLAB path has previously been created on Martin Vallieres' computer. 
+matlabPATH = fullfile(matlabroot,'bin','matlab'); % Full path to the matlab executable on your system.
 global codePATH
-codePATH = '~/GitHub/radiomics-develop/Code'; % To be adapted to your system. Full path to the "radiomics-develop" code on your system.
+codePATH = '~/GitHub/radiomics-develop/Code'; % IMPORTANT OPTION: To be adapted to your system. Full path to the "radiomics-develop" code on your system.
 addpath(genpath(codePATH));
 % -------------------------------------------------------------------------
 

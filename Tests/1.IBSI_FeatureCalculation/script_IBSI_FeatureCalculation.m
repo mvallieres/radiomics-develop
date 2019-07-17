@@ -34,12 +34,19 @@ else
     scriptFileName = [mfilename,'.m'];
 end
 help(scriptFileName)
-fprintf('--> COMPUTING IBSI CALIBRATION TEST -- PHASE 1 (Digital Phantom) ... ')
+
+% MATLAB CODE PATH
+global codePATH
+codePATH = '~/GitHub/radiomics-develop/Code'; % IMPORTANT OPTION: To be adapted to your system. Full path to the "radiomics-develop" code on your system.
+addpath(genpath(codePATH));
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   LOADING VARIABLES USED FOR THE IBSI TESTS USING THE DIGITAL PHANTOM   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+fprintf('--> COMPUTING IBSI CALIBRATION TEST -- PHASE 1 (Digital Phantom) ... ')
 cd(pathWORK), run testVolume % Variable 'imgObj' and 'roiObj' gets out of there.
 maskInt = roiObj; maskMorph = roiObj; % Both "intensity" and "morphological" masks are the same in this example. Both are created for the sake of the exercise.
 roiOnlyInt = imgObj; roiOnlyInt(maskInt == 0) = NaN; % Imaging data with NaNs outside the mask.

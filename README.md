@@ -13,18 +13,9 @@ This is a repository dedicated to the development of programming code for new ra
 - Definition of definite/aboslute/filter imaging intensities (August 2017)
 - Visualization tool to check ROIs on images with manualROIchoice=true (August 2017)
 
-## System requirements
-- MAC or Linux operating systems. If you are using Windows, please install a Linux virtual box on your system.
-- MATLAB 2017a and above.
-- Python version 2.7 and above: "sudo apt-get install python" in linux.
-- pydicom package: "sudo apt-get install python-dicom" in linux.
-
-All software code have up to now been tested on: 
-- MATLAB 2017a using Ubuntu 16.04 (Linux).
-
 ## Installation
 1. Install `git` on your computer. In Linux, this goes simply by running `sudo apt-get install git` in the terminal.
-2. Clone this online repository to your prefered location on your computer by running `git clone https://github.com/mvallieres/radiomics-develop.git` in the terminal. 
+2. Clone this online repository to your preferred location on your computer by running `git clone https://github.com/mvallieres/radiomics-develop.git` in the terminal. 
 
 ## Instructions
 - **COMPUTATION OF RADIOMIC FEATURES**: Please follow the instructions in the _INSTRUCTIONS.txt_ file at <https://github.com/mvallieres/radiomics-develop/tree/master/WORKSPACE_RadiomicComputation>
@@ -49,6 +40,6 @@ All software code have up to now been tested on:
 "I'm not a programmer, I'm just a scientist doing stuff!"
 
 #### STATEMENT
-Copyright (C) 2017  Martin Vallières  
+Copyright (C) 2017-2019  Martin Vallières  
 All rights reserved.
 

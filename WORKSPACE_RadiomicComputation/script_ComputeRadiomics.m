@@ -38,7 +38,7 @@ else
 end
 help(scriptFileName)
 timeStamp = char(datetime('now','Format','yyyy-MM-dd_HH:mm:ss'));
-softwareLabel = 'PiCare-Matlab.Radiomics';
+softwareLabel = 'MEDomicsLab-Matlab.Radiomics';
 softwareVersion = '0.1';
 programmingLanguage = 'Matlab2018a';
 institution = 'McGill_UCSF_D-Lab_Oncoray';
@@ -138,7 +138,7 @@ imageNonUniformityCorrection_PET = ''; % Value specifying if image nonuniformity
 
 % PARALLEL OPTIONS
 nBatch = 4; % OPTION: To compute radiomic features using parallelization. Put this number to the total number of cores that you have on your machine, but beware of RAM usage.
-matlabPATH = 'matlab'; % OPTION: IMPORTANT --> Full path to the matlab executable on the system. --> Ex: '/home/martin/Programs/MATLAB/R2017b/bin/matlab'. Here, a symbolic link to the full MATLAB path has previously been created on Martin Vallieres' computer. 
+matlabPATH = fullfile(matlabroot,'bin','matlab'); % Full path to the matlab executable on your system.
 global codePATH
 codePATH = '~/GitHub/radiomics-develop/Code'; % To be adapted to your system. Full path to the "radiomics-develop" code on your system.
 addpath(genpath(codePATH));
