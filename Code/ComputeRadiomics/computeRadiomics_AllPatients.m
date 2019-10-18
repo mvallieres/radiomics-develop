@@ -48,13 +48,21 @@ for p = 1:nPatient
     if strcmp(scanType,'PTscan') % MOVE THIS IN THE READING DATA PART AND ALSO APPLY PVE CORRECTIONS AND DENOISING (for MRI(N3/N4 method) and CT too)?  FUTURE WORK ON ITS WAY (image post-processing)?
         try
             if isfield(sData{2},'nii')
-                sData{2}.nii.volume.data = computeSUVmap(single(sData{2}.nii.volume.data),sData{3}(1));
+                if max(sData{2}.nii.volume.data(:)) > 100 % Otherwise, we can safely assume that the data is already in SUV format.
+                    sData{2}.nii.volume.data = computeSUVmap(single(sData{2}.nii.volume.data),sData{3}(1));
+                end
             elseif isfield(sData{2},'nrrd')
-                sData{2}.nrrd.volume.data = computeSUVmap(single(sData{2}.nrrd.volume.data),sData{3}(1));
+                if max(sData{2}.nrrd.volume.data(:)) > 100 % Otherwise, we can safely assume that the data is already in SUV format.
+                    sData{2}.nrrd.volume.data = computeSUVmap(single(sData{2}.nrrd.volume.data),sData{3}(1));
+                end
             elseif isfield(sData{2},'img')
-                sData{2}.img.volume.data = computeSUVmap(single(sData{2}.img.volume.data),sData{3}(1));
+                if max(sData{2}.img.volume.data(:)) > 100 % Otherwise, we can safely assume that the data is already in SUV format.
+                    sData{2}.img.volume.data = computeSUVmap(single(sData{2}.img.volume.data),sData{3}(1));
+                end
             else
-                sData{2}.scan.volume.data = computeSUVmap(single(sData{2}.scan.volume.data),sData{3}(1));
+                if max(sData{2}.scan.volume.data(:)) > 100 % Otherwise, we can safely assume that the data is already in SUV format.
+                    sData{2}.scan.volume.data = computeSUVmap(single(sData{2}.scan.volume.data),sData{3}(1));
+                end
             end
         catch
             fprintf('\nERROR COMPUTING SUV MAP - SOME FEATURES WILL BE INVALID')

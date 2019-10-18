@@ -76,7 +76,9 @@ for s = 1:nScans
             while true % If the nifti file is compressed, it appears that only one gunzip call (for unzipping, inside niftiread and niftiinfo) can be executed on the system at a time. This is a big problem for parallelization. Temporary loop here. TO SOLVE.
                 try
                     sData{2}.nii.volume.data = single(niftiread('imagingVolume'));
-                    sData{2}.nii.volume.header = niftiinfo('imagingVolume');
+                    try
+                        sData{2}.nii.mask(m).header = niftiinfo(nameMaskFile); % Not absolutely necessary
+                    end
                     break
                 catch
                     pause(ceil(5*rand(1))); % Wait between 1 and 5 seconds (randomly chosen) before trying again --> different threads should not get stuck.
@@ -103,7 +105,9 @@ for s = 1:nScans
                 while true % If the nifti file is compressed, it appears that only one gunzip call (for unzipping, inside niftiread and niftiinfo) can be executed on the system at a time. This is a big problem for parallelization. Temporary loop here. TO SOLVE.
                     try
                         sData{2}.nii.mask(m).data = niftiread(nameMaskFile);
-                        sData{2}.nii.mask(m).header = niftiinfo(nameMaskFile);
+                        try
+                            sData{2}.nii.mask(m).header = niftiinfo(nameMaskFile); % Not absolutely necessary
+                        end
                         break
                     catch
                         pause(ceil(5*rand(1))); % Wait between 1 and 5 seconds (randomly chosen) before trying again --> different threads should not get stuck.

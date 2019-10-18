@@ -159,12 +159,12 @@ sData{1} = struct('Cell_1','Explanation of cell content', ...
     dicomH = dicomH(indices);
 
     % 4. Process volume
-    type = dicomH(1).Modality;
-    if strcmp(type,'PT') || strcmp(type,'CT')
+    if isfield(dicomH(1),'RescaleSlope') && isfield(dicomH(1),'RescaleIntercept')
         for i = 1:size(sData{2}.scan.volume.data,3)
             sData{2}.scan.volume.data(:,:,i) = sData{2}.scan.volume.data(:,:,i)*dicomH(i).RescaleSlope + dicomH(i).RescaleIntercept;
         end
     end
+    type = dicomH(1).Modality;
     type = [type,'scan'];
     sData{2}.type = type;
 

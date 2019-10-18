@@ -33,14 +33,14 @@ time = 10; % Number of seconds to wait before checking if parallel computations 
 % INITIALIZATION
 cd(pathRead), listPatients = dir;
 listPatients = listPatients(~ismember({listPatients.name},{'.','..','.DS_Store','._.DS_Store'}));
-indRemove = [];
-for p = 1:numel(listPatients)
-    indHyphen = strfind(listPatients(p).name,'-');
-    if numel(indHyphen) ~= 2
-        indRemove = [indRemove,p];
-    end
-end
-listPatients(indRemove) = []; % We remove any folder that do not follow conventions: $cancer$-$institution$-000
+%indRemove = [];
+% for p = 1:numel(listPatients)
+%     indHyphen = strfind(listPatients(p).name,'-');
+%     if numel(indHyphen) ~= 2
+%         indRemove = [indRemove,p];
+%     end
+% end
+% listPatients(indRemove) = []; % We remove any folder that do not follow conventions: $cancer$-$institution$-000
 nPatients = numel(listPatients); namePatients = cell(1,nPatients);
 for p = 1:nPatients
     namePatients{p} = listPatients(p).name;
