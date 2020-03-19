@@ -98,7 +98,7 @@ nCases = numel(roiTypes);
 
 % PARALLEL OPTIONS
 nBatch = 1; 
-matlabPATH = fullfile(matlabroot,'bin','matlab'); % Full path to the matlab executable on your system.
+matlabPATH = ['"',fullfile(matlabroot,'bin','matlab'),'"']; % Full path to the matlab executable on your system.
 global codePATH
 codePATH = '~/GitHub/radiomics-develop/Code'; % IMPORTANT OPTION: To be adapted to your system. Full path to the "radiomics-develop" code on your system.
 addpath(genpath(codePATH));
