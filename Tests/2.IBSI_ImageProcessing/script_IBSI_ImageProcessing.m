@@ -114,10 +114,20 @@ addpath(genpath(codePATH));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % STEP 1: READING DATA
-cd(pathWORK), system('mv DICOM_IBSI DICOM');
+cd(pathWORK)
+if ispc
+    system('move DICOM_IBSI DICOM');
+else
+    system('mv DICOM_IBSI DICOM');
+end
 pathDICOM = fullfile(pathWORK,'DICOM'); 
 mkdir('DATA'), pathDATA = fullfile(pathWORK,'DATA');
-cd(pathWORK), system('mv CSV_IBSI CSV'); 
+cd(pathWORK)
+if ispc
+    system('move CSV_IBSI CSV');
+else
+    system('mv CSV_IBSI CSV');
+end 
 pathCSV = fullfile(pathWORK,'CSV');
 mkdir('FEATURES'), pathFEATURES = fullfile(pathWORK,'FEATURES');
 tic, fprintf('\n--> READING DATA USING %u CORES ... ',nBatch)
