@@ -50,7 +50,7 @@ elseif isfield(dicomH,'PatientsWeight')
 else
     weight = [];
 end
-if isempty(weight)
+if isempty(weight) || weight == 0
     weight = 75000; % Estimation
 end
 
