@@ -353,14 +353,6 @@ function vol_filt = filter_separable(vol,kernel,boundary,pooling,energy,delta)
         % Unpadding the volume
         cell_rot{r} = unPadVol(cell_rot{r},padSize);
         
-        % Getting energy image
-        if energy
-            szKernel = delta*2 + 1; % delta must not be NaN!
-            kernel_energy = ones(szKernel,szKernel,szKernel); % Kernel used to get the energy image.
-            %normFactor = imfilter(ones(size(cell_rot{r})),kernel_energy,0); % This lines produce the effective neighborhood of each voxel, similarly to NGTDM (assuming zero padding is used for the actual filter). Keep it there for reference, but will probably never be used. 
-            normFactor = sum(kernel_energy(:)); % Same as Phil, and as recommended by IBSI for simplicity.
-            cell_rot{r} = imfilter(abs(cell_rot{r}),kernel_energy,boundary) ./ normFactor;   
-        end
     end
     szVol = size(cell_rot{1});
     
@@ -379,6 +371,15 @@ function vol_filt = filter_separable(vol,kernel,boundary,pooling,energy,delta)
             vol_filt = nanmax(temp);
         end
         vol_filt = reshape(vol_filt',szVol(1),szVol(2),szVol(3));
+    end
+    
+    % Getting energy image
+    if energy
+        szKernel = delta*2 + 1; % delta must not be NaN!
+        kernel_energy = ones(szKernel,szKernel,szKernel); % Kernel used to get the energy image.
+        %normFactor = imfilter(ones(size(cell_rot{r})),kernel_energy,0); % This lines produce the effective neighborhood of each voxel, similarly to NGTDM (assuming zero padding is used for the actual filter). Keep it there for reference, but will probably never be used. 
+        normFactor = sum(kernel_energy(:)); % Same as Phil, and as recommended by IBSI for simplicity.
+        vol_filt = imfilter(abs(vol_filt),kernel_energy,boundary) ./ normFactor; 
     end
     
 end
