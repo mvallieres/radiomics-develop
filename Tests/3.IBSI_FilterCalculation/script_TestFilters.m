@@ -41,18 +41,19 @@ filtersInfo.LoG.infos = {'Phase1_2a','Phase1_2b'};
 % ---> Options for Laws filters. This defines the experiments to perform.
 % ---> Make sure the number of entries in phantom, boundary, kernels,
 %      pooling, energy and deltas correspond.
+E3 = 1/sqrt(2)*[-1,0,1];
 E5 = 1/sqrt(10)*[-1,-2,0,2,1];
 L5 = 1/sqrt(70)*[1,4,6,4,1];
 S5 = 1/sqrt(6)*[-1,0,2,0,-1];
 W5 = 1/sqrt(10)*[-1,2,0,-2,1];
 R5 = 1/sqrt(70)*[1,-4,6,-4,1];
 single_rot_E5L5S5 = {E5,L5,S5};
-single_rot_E5W5R5 = {E5,W5,R5};
+single_rot_E3W5R5 = {E3,W5,R5};
 rot_invariant_E5L5S5 = set_rotInv_3D(single_rot_E5L5S5);
-rot_invariant_E5W5R5 = set_rotInv_3D(single_rot_E5W5R5);
+rot_invariant_E3W5R5 = set_rotInv_3D(single_rot_E3W5R5);
 filtersInfo.Laws.phantom = {'response.nii.gz','response.nii.gz','response.nii.gz','checkerboard.nii.gz','checkerboard.nii.gz','checkerboard.nii.gz'}; 
 filtersInfo.Laws.boundary = {0,0,0,'symmetric','symmetric','symmetric'};
-filtersInfo.Laws.kernels = {single_rot_E5L5S5,rot_invariant_E5L5S5,rot_invariant_E5L5S5,single_rot_E5W5R5,rot_invariant_E5W5R5,rot_invariant_E5W5R5}; % We will always use rotation invariance. Add another cell for other types of kernels.
+filtersInfo.Laws.kernels = {single_rot_E5L5S5,rot_invariant_E5L5S5,rot_invariant_E5L5S5,single_rot_E3W5R5,rot_invariant_E3W5R5,rot_invariant_E3W5R5}; % We will always use rotation invariance. Add another cell for other types of kernels.
 filtersInfo.Laws.pooling = {'average','max','max','average','max','max'};
 filtersInfo.Laws.energy = [false,false,true,false,false,true];
 filtersInfo.Laws.deltas = [NaN,NaN,7,NaN,NaN,7]; % In units of voxels
